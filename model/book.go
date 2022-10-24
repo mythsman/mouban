@@ -6,7 +6,7 @@ import (
 
 type Book struct {
 	ID          uint64 `gorm:"primarykey"`
-	DoubanId    uint64
+	DoubanId    uint64 `gorm:"uniqueIndex"`
 	Title       string
 	Subtitle    string
 	Author      string

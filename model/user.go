@@ -6,8 +6,8 @@ import (
 
 type User struct {
 	ID           uint64 `gorm:"primarykey"`
-	DoubanUid    uint64
-	UniqueId     string
+	DoubanUid    uint64 `gorm:"uniqueIndex"`
+	UniqueId     string `gorm:"uniqueIndex"`
 	Name         string
 	Thumbnail    string
 	BookWish     uint64
