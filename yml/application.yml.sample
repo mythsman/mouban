@@ -1,0 +1,11 @@
+server:
+  port: 8080
+datasource:
+  driverName: mysql
+  host: localhost
+  port: 3306
+  database: mouban
+  username: root
+  password: 123456
+  charset: utf8mb4
+  loc: Asia/Shanghai
