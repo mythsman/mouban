@@ -6,7 +6,7 @@ import (
 
 type Movie struct {
 	ID        uint64 `gorm:"primarykey"`
-	DoubanId  uint64
+	DoubanId  uint64 `gorm:"uniqueIndex"`
 	Title     string
 	Director  string
 	Writer    string

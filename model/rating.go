@@ -6,8 +6,8 @@ import (
 
 type Rating struct {
 	ID        uint64 `gorm:"primarykey"`
-	Type      uint8
-	DoubanId  uint64
+	Type      uint8  `gorm:"uniqueIndex:uk_unique_id"`
+	DoubanId  uint64 `gorm:"uniqueIndex:uk_unique_id"`
 	Total     uint64
 	Rating    float32
 	Star5     float32
