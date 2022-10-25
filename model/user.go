@@ -6,9 +6,9 @@ import (
 
 type User struct {
 	ID           uint64
-	DoubanUid    uint64 `gorm:"uniqueIndex"`
-	UniqueId     string `gorm:"type:varchar(64);uniqueIndex"`
-	Name         string `gorm:"type:varchar(512);"`
+	DoubanUid    uint64 `gorm:"not null;uniqueIndex"`
+	UniqueId     string `gorm:"not hull;type:varchar(64);uniqueIndex"`
+	Name         string `gorm:"not null;type:varchar(512);"`
 	Thumbnail    string `gorm:"type:varchar(512);"`
 	BookWish     uint32
 	BookDo       uint32

@@ -7,7 +7,7 @@ import (
 type Movie struct {
 	ID        uint64
 	DoubanId  uint64 `gorm:"not null;uniqueIndex"`
-	Title     string `gorm:"type:varchar(512)"`
+	Title     string `gorm:"not null;type:varchar(512)"`
 	Director  string `gorm:"type:varchar(512)"`
 	Writer    string `gorm:"type:varchar(512)"`
 	Actor     string `gorm:"type:varchar(512)"`
@@ -16,9 +16,9 @@ type Movie struct {
 	Country   string `gorm:"type:varchar(512)"`
 	Language  string `gorm:"type:varchar(512)"`
 	PublishAt string `gorm:"type:datetime(3)"`
-	Season    uint16
-	Episode   uint16
-	Duration  uint64
+	Season    uint32
+	Episode   uint32
+	Duration  uint32
 	Alias     string `gorm:"type:varchar(512)"`
 	IMDb      string `gorm:"type:varchar(512)"`
 	Intro     string `gorm:"type:mediumtext"`
