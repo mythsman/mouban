@@ -5,24 +5,24 @@ import (
 )
 
 type Movie struct {
-	ID        uint64 `gorm:"primarykey"`
-	DoubanId  uint64 `gorm:"uniqueIndex"`
-	Title     string
-	Director  string
-	Writer    string
-	Actor     string
-	Style     string
-	Site      string
-	Country   string
-	Language  string
-	PublishAt string
-	Season    uint64
-	Episode   uint64
-	Duration  string
-	Alias     string
-	IMDb      string
-	Intro     string
-	Thumbnail string
+	ID        uint64
+	DoubanId  uint64 `gorm:"not null;uniqueIndex"`
+	Title     string `gorm:"type:varchar(512)"`
+	Director  string `gorm:"type:varchar(512)"`
+	Writer    string `gorm:"type:varchar(512)"`
+	Actor     string `gorm:"type:varchar(512)"`
+	Style     string `gorm:"type:varchar(512)"`
+	Site      string `gorm:"type:varchar(512)"`
+	Country   string `gorm:"type:varchar(512)"`
+	Language  string `gorm:"type:varchar(512)"`
+	PublishAt string `gorm:"type:datetime(3)"`
+	Season    uint16
+	Episode   uint16
+	Duration  uint64
+	Alias     string `gorm:"type:varchar(512)"`
+	IMDb      string `gorm:"type:varchar(512)"`
+	Intro     string `gorm:"type:mediumtext"`
+	Thumbnail string `gorm:"type:varchar(512)"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
