@@ -11,9 +11,24 @@ import (
 	"net/url"
 )
 
-var DB *gorm.DB
+var Db *gorm.DB
 
-func TryCreateDB(username string, password string, host string, port string, database string) {
+func init() {
+	// 从配置文件中获取参数
+	host := viper.GetString("datasource.host")
+	port := viper.GetString("datasource.port")
+	database := viper.GetString("datasource.database")
+	username := viper.GetString("datasource.username")
+	password := viper.GetString("datasource.password")
+	charset := viper.GetString("datasource.charset")
+	loc := viper.GetString("datasource.loc")
+
+	tryCreateDB(username, password, host, port, database)
+	getConnection(username, password, host, port, database, charset, loc)
+	migrateTables()
+}
+
+func tryCreateDB(username string, password string, host string, port string, database string) {
 	sqlStr := fmt.Sprintf("%s:%s@tcp(%s:%s)/", username, password, host, port)
 
 	db, err := sql.Open("mysql", sqlStr)
@@ -29,7 +44,7 @@ func TryCreateDB(username string, password string, host string, port string, dat
 	fmt.Println("Create db success.")
 }
 
-func GetConnection(username string, password string, host string, port string, database string, charset string, loc string) *gorm.DB {
+func getConnection(username string, password string, host string, port string, database string, charset string, loc string) {
 
 	// 字符串拼接
 	sqlStr := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=%s&parseTime=true&loc=%s",
@@ -47,12 +62,12 @@ func GetConnection(username string, password string, host string, port string, d
 		fmt.Println("打开数据库失败", err)
 		panic("打开数据库失败" + err.Error())
 	}
-	return db
+	Db = db
 }
 
-func MigrateTables(db *gorm.DB) {
+func migrateTables() {
 
-	err := db.AutoMigrate(
+	err := Db.AutoMigrate(
 		&model.Access{},
 		&model.Book{},
 		&model.Comment{},
@@ -67,22 +82,4 @@ func MigrateTables(db *gorm.DB) {
 		panic("初始化数据库失败" + err.Error())
 	}
 
-}
-
-func InitDB() {
-	// 从配置文件中获取参数
-	host := viper.GetString("datasource.host")
-	port := viper.GetString("datasource.port")
-	database := viper.GetString("datasource.database")
-	username := viper.GetString("datasource.username")
-	password := viper.GetString("datasource.password")
-	charset := viper.GetString("datasource.charset")
-	loc := viper.GetString("datasource.loc")
-
-	TryCreateDB(username, password, host, port, database)
-	db := GetConnection(username, password, host, port, database, charset, loc)
-	MigrateTables(db)
-}
-
-func init() {
 }
