@@ -3,17 +3,12 @@ package common
 import (
 	"database/sql"
 	"fmt"
-	"log"
-	"mouban/model"
-	"net/url"
-	"os"
-	"time"
-
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/spf13/viper"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
+	"mouban/model"
+	"net/url"
 )
 
 var DB *gorm.DB
@@ -44,23 +39,9 @@ func GetConnection(username string, password string, host string, port string, d
 		port,
 		database,
 		charset,
-		url.QueryEscape(loc),
-	)
+		url.QueryEscape(loc))
 
-	// 配置日志输出
-	newLogger := logger.New(
-		log.New(os.Stdout, "\r\n", log.LstdFlags), // io writer
-		logger.Config{
-			SlowThreshold:             time.Second,   // 缓存日志时间
-			LogLevel:                  logger.Silent, // 日志级别
-			IgnoreRecordNotFoundError: true,          // Ignore ErrRecordNotFound error for logger
-			Colorful:                  false,         // Disable color
-		},
-	)
-
-	db, err := gorm.Open(mysql.Open(sqlStr), &gorm.Config{
-		Logger: newLogger,
-	})
+	db, err := gorm.Open(mysql.Open(sqlStr))
 
 	if err != nil {
 		fmt.Println("打开数据库失败", err)
