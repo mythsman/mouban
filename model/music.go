@@ -7,7 +7,7 @@ import (
 type Music struct {
 	ID          uint64
 	DoubanId    uint64 `gorm:"not null;uniqueIndex"`
-	Title       string `gorm:"type:varchar(512)"`
+	Title       string `gorm:"not null;type:varchar(512)"`
 	Actor       string `gorm:"type:varchar(512)"`
 	Type        string `gorm:"type:varchar(512)"`
 	Media       string `gorm:"type:varchar(512)"`
