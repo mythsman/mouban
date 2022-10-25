@@ -71,39 +71,17 @@ func GetConnection(username string, password string, host string, port string, d
 
 func MigrateTables(db *gorm.DB) {
 
-	err := db.AutoMigrate(&model.Access{})
-	if err != nil {
-		panic("初始化数据库失败" + err.Error())
-	}
-	err = db.AutoMigrate(&model.Book{})
-	if err != nil {
-		panic("初始化数据库失败" + err.Error())
-	}
-	err = db.AutoMigrate(&model.Comment{})
-	if err != nil {
-		panic("初始化数据库失败" + err.Error())
-	}
-	err = db.AutoMigrate(&model.Game{})
-	if err != nil {
-		panic("初始化数据库失败" + err.Error())
-	}
-	err = db.AutoMigrate(&model.Movie{})
-	if err != nil {
-		panic("初始化数据库失败" + err.Error())
-	}
-	err = db.AutoMigrate(&model.Music{})
-	if err != nil {
-		panic("初始化数据库失败" + err.Error())
-	}
-	err = db.AutoMigrate(&model.Queue{})
-	if err != nil {
-		panic("初始化数据库失败" + err.Error())
-	}
-	err = db.AutoMigrate(&model.Rating{})
-	if err != nil {
-		panic("初始化数据库失败" + err.Error())
-	}
-	err = db.AutoMigrate(&model.User{})
+	err := db.AutoMigrate(
+		&model.Access{},
+		&model.Book{},
+		&model.Comment{},
+		&model.Game{},
+		&model.Movie{},
+		&model.Music{},
+		&model.Queue{},
+		&model.Rating{},
+		&model.User{},
+	)
 	if err != nil {
 		panic("初始化数据库失败" + err.Error())
 	}
