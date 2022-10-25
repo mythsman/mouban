@@ -22,3 +22,7 @@ type Music struct {
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 }
+
+func (Music) TableName() string {
+	return "music"
+}

@@ -21,3 +21,7 @@ type Book struct {
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 }
+
+func (Book) TableName() string {
+	return "book"
+}

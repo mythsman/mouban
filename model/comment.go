@@ -17,3 +17,7 @@ type Comment struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
+
+func (Comment) TableName() string {
+	return "comment"
+}

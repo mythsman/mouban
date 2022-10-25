@@ -18,3 +18,7 @@ type Game struct {
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 }
+
+func (Game) TableName() string {
+	return "game"
+}
