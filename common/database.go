@@ -3,15 +3,17 @@ package common
 import (
 	"database/sql"
 	"fmt"
+	"log"
+	"mouban/model"
+	"net/url"
+	"os"
+	"time"
+
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/spf13/viper"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
-	"log"
-	"net/url"
-	"os"
-	"time"
 )
 
 var DB *gorm.DB
@@ -25,7 +27,7 @@ func TryCreateDB(username string, password string, host string, port string, dat
 	}
 	defer db.Close()
 
-	_, err = db.Exec(fmt.Sprintf("CREATE DATABASE IF NOT EXISTS  %s ;", database))
+	_, err = db.Exec(fmt.Sprintf("CREATE DATABASE IF NOT EXISTS %s ;", database))
 	if err != nil {
 		panic(err)
 	}
@@ -64,11 +66,51 @@ func GetConnection(username string, password string, host string, port string, d
 		fmt.Println("打开数据库失败", err)
 		panic("打开数据库失败" + err.Error())
 	}
-	DB = db
-	return DB
+	return db
 }
 
-func InitDB() *gorm.DB {
+func MigrateTables(db *gorm.DB) {
+
+	err := db.AutoMigrate(&model.Access{})
+	if err != nil {
+		panic("初始化数据库失败" + err.Error())
+	}
+	err = db.AutoMigrate(&model.Book{})
+	if err != nil {
+		panic("初始化数据库失败" + err.Error())
+	}
+	err = db.AutoMigrate(&model.Comment{})
+	if err != nil {
+		panic("初始化数据库失败" + err.Error())
+	}
+	err = db.AutoMigrate(&model.Game{})
+	if err != nil {
+		panic("初始化数据库失败" + err.Error())
+	}
+	err = db.AutoMigrate(&model.Movie{})
+	if err != nil {
+		panic("初始化数据库失败" + err.Error())
+	}
+	err = db.AutoMigrate(&model.Music{})
+	if err != nil {
+		panic("初始化数据库失败" + err.Error())
+	}
+	err = db.AutoMigrate(&model.Queue{})
+	if err != nil {
+		panic("初始化数据库失败" + err.Error())
+	}
+	err = db.AutoMigrate(&model.Rating{})
+	if err != nil {
+		panic("初始化数据库失败" + err.Error())
+	}
+	err = db.AutoMigrate(&model.User{})
+	if err != nil {
+		panic("初始化数据库失败" + err.Error())
+	}
+
+}
+
+func InitDB() {
 	// 从配置文件中获取参数
 	host := viper.GetString("datasource.host")
 	port := viper.GetString("datasource.port")
@@ -79,10 +121,9 @@ func InitDB() *gorm.DB {
 	loc := viper.GetString("datasource.loc")
 
 	TryCreateDB(username, password, host, port, database)
-	return GetConnection(username, password, host, port, database, charset, loc)
+	db := GetConnection(username, password, host, port, database, charset, loc)
+	MigrateTables(db)
 }
 
 func init() {
-	fmt.Println("数据库连接")
-	InitDB()
 }

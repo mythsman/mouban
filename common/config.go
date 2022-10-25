@@ -7,7 +7,7 @@ import (
 	"path"
 )
 
-func InitConfig() {
+func init() {
 	workDir, _ := os.Getwd()
 	viper.SetConfigName("application")
 	viper.SetConfigType("yml")
@@ -17,8 +17,6 @@ func InitConfig() {
 		fmt.Println("获取配置文件错误")
 		panic(err)
 	}
-}
+	fmt.Println("配置初始化成功")
 
-func init() {
-	InitConfig()
 }

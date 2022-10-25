@@ -3,15 +3,10 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	"mouban/common"
-	"mouban/model"
 )
 
 func init() {
-	err := common.DB.AutoMigrate(&model.Book{})
-	if err != nil {
-		panic("初始化数据库失败" + err.Error())
-	}
-
+	common.InitDB()
 }
 func main() {
 	r := gin.Default()

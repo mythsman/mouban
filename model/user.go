@@ -5,23 +5,23 @@ import (
 )
 
 type User struct {
-	ID           uint64 `gorm:"primarykey"`
+	ID           uint64
 	DoubanUid    uint64 `gorm:"uniqueIndex"`
-	UniqueId     string `gorm:"uniqueIndex"`
-	Name         string
-	Thumbnail    string
-	BookWish     uint64
-	BookDo       uint64
-	BookCollect  uint64
-	GameWish     uint64
-	GameDo       uint64
-	GameCollect  uint64
-	MusicWish    uint64
-	MusicDo      uint64
-	MusicCollect uint64
-	MovieWish    uint64
-	MovieDo      uint64
-	MovieCollect uint64
+	UniqueId     string `gorm:"type:varchar(64);uniqueIndex"`
+	Name         string `gorm:"type:varchar(512);"`
+	Thumbnail    string `gorm:"type:varchar(512);"`
+	BookWish     uint32
+	BookDo       uint32
+	BookCollect  uint32
+	GameWish     uint32
+	GameDo       uint32
+	GameCollect  uint32
+	MusicWish    uint32
+	MusicDo      uint32
+	MusicCollect uint32
+	MovieWish    uint32
+	MovieDo      uint32
+	MovieCollect uint32
 	CreatedAt    time.Time
 	UpdatedAt    time.Time
 }
