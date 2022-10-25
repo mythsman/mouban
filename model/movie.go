@@ -26,3 +26,7 @@ type Movie struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
+
+func (Movie) TableName() string {
+	return "movie"
+}

@@ -19,3 +19,7 @@ type Rating struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
+
+func (Rating) TableName() string {
+	return "rating"
+}

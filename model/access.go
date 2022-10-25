@@ -14,3 +14,7 @@ type Access struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
+
+func (Access) TableName() string {
+	return "access"
+}
