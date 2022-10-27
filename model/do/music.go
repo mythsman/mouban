@@ -1,4 +1,4 @@
-package model
+package do
 
 import (
 	"time"
@@ -9,7 +9,7 @@ type Music struct {
 	DoubanId    uint64 `gorm:"not null;uniqueIndex"`
 	Title       string `gorm:"not null;type:varchar(512)"`
 	Actor       string `gorm:"type:varchar(512)"`
-	Type        string `gorm:"type:varchar(512)"`
+	Style        string `gorm:"type:varchar(512)"`
 	Media       string `gorm:"type:varchar(512)"`
 	Genre       string `gorm:"type:varchar(512)"`
 	PublishDate string `gorm:"type:varchar(512)"`
