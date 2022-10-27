@@ -74,8 +74,8 @@ func migrateTables() {
 		&model.Game{},
 		&model.Movie{},
 		&model.Music{},
-		&model.Queue{},
 		&model.Rating{},
+		&model.Record{},
 		&model.User{},
 	)
 	if err != nil {

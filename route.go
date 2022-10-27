@@ -13,17 +13,11 @@ func CollectRoute(router *gin.Engine) *gin.Engine {
 		queryGroup.GET("/user_game", controller.ListUserGame)
 		queryGroup.GET("/user_movie", controller.ListUserMovie)
 		queryGroup.GET("/user_music", controller.ListUserMusic)
-
-		queryGroup.GET("/user", controller.GetUser)
-		queryGroup.GET("/book", controller.GetBook)
-		queryGroup.GET("/game", controller.GetGame)
-		queryGroup.GET("/movie", controller.GetMovie)
-		queryGroup.GET("/music", controller.GetMusic)
 	}
 
 	adminGroup := router.Group("/admin")
 	{
-		adminGroup.GET("/info", controller.GetOverview)
+		adminGroup.GET("/overview", controller.GetOverview)
 	}
 
 	volunteerGroup := router.Group("/volunteer")
