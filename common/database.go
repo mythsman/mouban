@@ -7,7 +7,7 @@ import (
 	"github.com/spf13/viper"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
-	"mouban/model"
+	"mouban/model/do"
 	"net/url"
 )
 
@@ -68,15 +68,15 @@ func getConnection(username string, password string, host string, port string, d
 func migrateTables() {
 
 	err := Db.AutoMigrate(
-		&model.Access{},
-		&model.Book{},
-		&model.Comment{},
-		&model.Game{},
-		&model.Movie{},
-		&model.Music{},
-		&model.Rating{},
-		&model.Record{},
-		&model.User{},
+		&do.Access{},
+		&do.Book{},
+		&do.Comment{},
+		&do.Game{},
+		&do.Movie{},
+		&do.Music{},
+		&do.Rating{},
+		&do.Record{},
+		&do.User{},
 	)
 	if err != nil {
 		panic("初始化数据库失败" + err.Error())

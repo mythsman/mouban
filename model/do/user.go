@@ -1,4 +1,4 @@
-package model
+package do
 
 import (
 	"time"
@@ -7,7 +7,7 @@ import (
 type User struct {
 	ID           uint64
 	DoubanUid    uint64 `gorm:"not null;uniqueIndex"`
-	UniqueId     string `gorm:"not hull;type:varchar(64);uniqueIndex"`
+	Domain     string `gorm:"not hull;type:varchar(64);uniqueIndex"`
 	Name         string `gorm:"not null;type:varchar(512);"`
 	Thumbnail    string `gorm:"type:varchar(512);"`
 	BookWish     uint32
