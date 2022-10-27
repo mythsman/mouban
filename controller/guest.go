@@ -40,18 +40,3 @@ func GetUser(ctx *gin.Context) {
 	}
 	ctx.JSON(200, result)
 }
-
-func GetBook(ctx *gin.Context) {
-
-}
-
-func GetMovie(ctx *gin.Context) {
-
-}
-
-func GetMusic(ctx *gin.Context) {
-
-}
-func GetGame(ctx *gin.Context) {
-
-}
