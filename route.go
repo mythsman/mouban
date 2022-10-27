@@ -26,9 +26,7 @@ func CollectRoute(router *gin.Engine) *gin.Engine {
 
 	volunteerGroup := router.Group("/volunteer")
 	{
-		volunteerGroup.POST("/pull_task", controller.PullTask)
-		volunteerGroup.POST("/report_data", controller.ReportData)
-
+		volunteerGroup.POST("/report_user", controller.ReportUser)
 	}
 	return router
 }
