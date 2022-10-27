@@ -18,11 +18,17 @@ func CollectRoute(router *gin.Engine) *gin.Engine {
 	adminGroup := router.Group("/admin")
 	{
 		adminGroup.GET("/overview", controller.GetOverview)
+		adminGroup.GET("/crawl_user", controller.CrawlUser)
+		adminGroup.GET("/crawl_book", controller.CrawlBook)
+		adminGroup.GET("/crawl_music", controller.CrawlMusic)
+		adminGroup.GET("/crawl_game", controller.CrawlGame)
 	}
 
 	volunteerGroup := router.Group("/volunteer")
 	{
-		volunteerGroup.GET("/pull_task", controller.Test)
+		volunteerGroup.POST("/pull_task", controller.PullTask)
+		volunteerGroup.POST("/report_data", controller.ReportData)
+
 	}
 	return router
 }
