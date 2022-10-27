@@ -4,6 +4,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func GetDataInfo(ctx *gin.Context) {
+func GetOverview(ctx *gin.Context) {
 
 }
