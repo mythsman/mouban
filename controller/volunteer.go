@@ -2,6 +2,10 @@ package controller
 
 import "github.com/gin-gonic/gin"
 
-func Test(ctx *gin.Context) {
+func PullTask(ctx *gin.Context) {
+
+}
+
+func ReportData(ctx *gin.Context) {
 
 }
