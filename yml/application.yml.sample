@@ -9,3 +9,5 @@ datasource:
   password: 123456
   charset: utf8mb4
   loc: Asia/Shanghai
+http:
+  timeout: 5
