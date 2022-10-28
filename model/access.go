@@ -1,4 +1,4 @@
-package do
+package model
 
 import (
 	"time"

@@ -1,4 +1,4 @@
-package do
+package model
 
 import (
 	"time"
@@ -22,4 +22,15 @@ type Rating struct {
 
 func (Rating) TableName() string {
 	return "rating"
+}
+
+type RatingVO struct {
+	Total  uint32  `json:"total"`
+	Rating float32 `json:"rating"`
+	Star5  float32 `json:"star5"`
+	Star4  float32 `json:"star4"`
+	Star3  float32 `json:"star3"`
+	Star2  float32 `json:"star2"`
+	Star1  float32 `json:"star1"`
+	Status string  `json:"status"`
 }

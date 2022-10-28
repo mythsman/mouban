@@ -1,4 +1,4 @@
-package do
+package model
 
 import (
 	"time"
@@ -20,4 +20,12 @@ type Comment struct {
 
 func (Comment) TableName() string {
 	return "comment"
+}
+
+type CommentVO struct {
+	Rate     uint8     `json:"rate"`
+	Label    string    `json:"label"`
+	Comment  string    `json:"comment"`
+	Status   uint8     `json:"status"`
+	MarkDate time.Time `json:"mark_date"`
 }

@@ -1,4 +1,4 @@
-package do
+package model
 
 import (
 	"time"
@@ -9,6 +9,7 @@ type Game struct {
 	DoubanId    uint64 `gorm:"not null;uniqueIndex"`
 	Title       string `gorm:"not null;type:varchar(512)"`
 	Platform    string `gorm:"type:varchar(512)"`
+	Genre       string `gorm:"type:varchar(512)"`
 	Alias       string `gorm:"type:varchar(512)"`
 	Developer   string `gorm:"type:varchar(512)"`
 	Publisher   string `gorm:"type:varchar(512)"`
@@ -21,4 +22,17 @@ type Game struct {
 
 func (Game) TableName() string {
 	return "game"
+}
+
+type GameVO struct {
+	DoubanId    uint64   `json:"douban_id"`
+	Title       string   `json:"title"`
+	Platform    string   `json:"platform"`
+	Genre       string   `json:"genre"`
+	Alias       string   `json:"alias"`
+	Developer   []string `json:"developer"`
+	Publisher   []string `json:"publisher"`
+	PublishDate string   `json:"publish_date"`
+	Intro       string   `json:"intro"`
+	Thumbnail   string   `json:"thumbnail"`
 }
