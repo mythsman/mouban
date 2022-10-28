@@ -12,7 +12,7 @@ type Comment struct {
 	Rate      uint8
 	Label     string    `gorm:"type:varchar(512)"`
 	Comment   string    `gorm:"type:mediumtext"`
-	Status    uint8     `gorm:"not null;index:idx_search;priority:4"`
+	Action    uint8     `gorm:"not null;index:idx_search;priority:4"`
 	MarkDate  time.Time `gorm:"not null;index:idx_search;priority:5"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
@@ -26,6 +26,6 @@ type CommentVO struct {
 	Rate     uint8     `json:"rate"`
 	Label    string    `json:"label"`
 	Comment  string    `json:"comment"`
-	Status   uint8     `json:"status"`
+	Action   uint8     `json:"action"`
 	MarkDate time.Time `json:"mark_date"`
 }

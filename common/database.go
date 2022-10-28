@@ -35,7 +35,12 @@ func tryCreateDB(username string, password string, host string, port string, dat
 	if err != nil {
 		panic(err)
 	}
-	defer db.Close()
+	defer func(db *sql.DB) {
+		err := db.Close()
+		if err != nil {
+			fmt.Println("database close failed")
+		}
+	}(db)
 
 	_, err = db.Exec(fmt.Sprintf("CREATE DATABASE IF NOT EXISTS %s ;", database))
 	if err != nil {
