@@ -40,7 +40,7 @@ func init() {
 }
 
 func Get(url string) (*string, error) {
-	fmt.Printf("Request com : %s\n", url)
+	fmt.Printf("Request come : %s\n", url)
 	req, err := http.NewRequest("GET", url, nil)
 	req.Header.Set("User-Agent", userAgent[rand.Intn(len(userAgent))])
 
