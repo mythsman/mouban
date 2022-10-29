@@ -1,7 +1,6 @@
 package crawl
 
 import (
-	"fmt"
 	"github.com/spf13/viper"
 	"io/ioutil"
 	"math/rand"
@@ -40,7 +39,7 @@ func init() {
 }
 
 func Get(url string) (*string, error) {
-	fmt.Printf("Request come : %s\n", url)
+
 	req, err := http.NewRequest("GET", url, nil)
 	req.Header.Set("User-Agent", userAgent[rand.Intn(len(userAgent))])
 
@@ -53,7 +52,6 @@ func Get(url string) (*string, error) {
 		return nil, err
 	}
 
-	fmt.Printf("status code : %d\n", resp.StatusCode)
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {

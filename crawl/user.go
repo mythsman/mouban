@@ -9,24 +9,57 @@ import (
 	"strings"
 )
 
-func UserFull(id string) (*model.User, error) {
-	UserHash(id)
-	bookOverview(id)
-	movieOverview(id)
-	gameOverview(id)
-	return nil, nil
-}
-
-func UserHash(id string) (*string, error) {
-	body, err := Get(fmt.Sprintf(util.UserRssUrl, id))
+func UserOverview(id string) (*model.User, error) {
+	hash, err := UserHash(id)
 	if err != nil {
 		return nil, err
+	}
+
+	book, err := bookOverview(id)
+	if err != nil {
+		return nil, err
+	}
+
+	movie, err := movieOverview(id)
+	if err != nil {
+		return nil, err
+	}
+	game, err := gameOverview(id)
+	if err != nil {
+		return nil, err
+
+	}
+	user := &model.User{
+		DoubanUid:    book.DoubanUid,
+		Domain:       book.Domain,
+		Name:         book.Name,
+		Thumbnail:    book.Thumbnail,
+		BookWish:     book.BookWish,
+		BookDo:       book.BookDo,
+		BookCollect:  book.BookCollect,
+		GameWish:     game.GameWish,
+		GameDo:       game.GameDo,
+		GameCollect:  game.GameCollect,
+		MovieWish:    movie.MovieWish,
+		MovieDo:      movie.MovieDo,
+		MovieCollect: movie.MovieCollect,
+		RssHash:      hash,
+		RegisterAt:   book.RegisterAt,
+	}
+
+	return user, nil
+}
+
+func UserHash(id string) (string, error) {
+	body, err := Get(fmt.Sprintf(util.UserRssUrl, id))
+	if err != nil {
+		return "", err
 	}
 	data := []byte(*body)
 	has := md5.Sum(data)
 	md5str := fmt.Sprintf("%x", has)
 
-	return &md5str, nil
+	return md5str, nil
 }
 
 func bookOverview(id string) (*model.User, error) {
@@ -136,4 +169,3 @@ func gameOverview(id string) (*model.User, error) {
 	return user, err
 
 }
-
