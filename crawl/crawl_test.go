@@ -45,3 +45,11 @@ func TestBookOverview(t *testing.T) {
 	}
 	fmt.Println(overview)
 }
+
+func TestMovieOverview(t *testing.T) {
+	overview, err := movieOverview("mythsman")
+	if err != nil {
+		return
+	}
+	fmt.Println(overview)
+}

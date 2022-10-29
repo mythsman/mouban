@@ -82,13 +82,26 @@ func movieOverview(id string) (*model.User, error) {
 	doc, err := htmlquery.Parse(strings.NewReader(*body))
 	if err != nil {
 		return nil, err
+	}
+	domain := htmlquery.SelectAttr(htmlquery.FindOne(doc, "//div[@id='db-usr-profile']//div[@class='pic']/a"), "href")
+	domain = util.ParseDomain(domain)
 
+	list := htmlquery.Find(doc, "//div[@id='db-movie-mine']//span[@class='pl']/a")
+	do := htmlquery.InnerText(list[0])
+	collect := htmlquery.InnerText(list[1])
+	wish := htmlquery.InnerText(list[2])
+
+	doNum := util.ParseNumber(do)
+	wishNum := util.ParseNumber(wish)
+	collectNum := util.ParseNumber(collect)
+
+	user := &model.User{
+		Domain:       domain,
+		MovieDo:      uint32(doNum),
+		MovieWish:    uint32(wishNum),
+		MovieCollect: uint32(collectNum),
 	}
-	list := htmlquery.Find(doc, "//a[@href]")
-	for i := range list {
-		fmt.Println(list[i])
-	}
-	return nil, err
+	return user, err
 
 }
 
