@@ -30,28 +30,14 @@ func TestUserHash(t *testing.T) {
 	if err != nil {
 		return
 	}
-	t.Logf("User hash for is %s", *hash)
-}
-func TestBookOverview(t *testing.T) {
-	overview, err := bookOverview("mythsman")
-	if err != nil {
-		return
-	}
-	fmt.Println(overview)
+	t.Logf("User hash for is %s", hash)
 }
 
-func TestMovieOverview(t *testing.T) {
-	overview, err := movieOverview("mythsman")
+func TestUserOverview(t *testing.T) {
+	overview, err := UserOverview("mythsman")
 	if err != nil {
 		return
-	}
-	fmt.Println(overview)
-}
 
-func TestGameOverview(t *testing.T) {
-	overview, err := gameOverview("mythsman")
-	if err != nil {
-		return
 	}
 	fmt.Println(overview)
 }
