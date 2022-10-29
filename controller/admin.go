@@ -29,7 +29,3 @@ func CrawlMovie(ctx *gin.Context) {
 	fmt.Println("id: ", id)
 }
 
-func CrawlMusic(ctx *gin.Context) {
-	id := ctx.Query("id")
-	fmt.Println("id: ", id)
-}
