@@ -24,12 +24,6 @@ func TestBook(t *testing.T) {
 		return
 	}
 }
-func TestMusic(t *testing.T) {
-	_, _, err := Music(5350604)
-	if err != nil {
-		return
-	}
-}
 
 func TestUserHash(t *testing.T) {
 	hash, err := UserHash("mythsman")
@@ -48,6 +42,14 @@ func TestBookOverview(t *testing.T) {
 
 func TestMovieOverview(t *testing.T) {
 	overview, err := movieOverview("mythsman")
+	if err != nil {
+		return
+	}
+	fmt.Println(overview)
+}
+
+func TestGameOverview(t *testing.T) {
+	overview, err := gameOverview("mythsman")
 	if err != nil {
 		return
 	}

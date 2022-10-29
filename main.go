@@ -22,7 +22,6 @@ func collectRoute(router *gin.Engine) *gin.Engine {
 		queryGroup.GET("/user_book", controller.ListUserBook)
 		queryGroup.GET("/user_game", controller.ListUserGame)
 		queryGroup.GET("/user_movie", controller.ListUserMovie)
-		queryGroup.GET("/user_music", controller.ListUserMusic)
 	}
 
 	adminGroup := router.Group("/admin")
@@ -31,7 +30,6 @@ func collectRoute(router *gin.Engine) *gin.Engine {
 		adminGroup.GET("/crawl_user", controller.CrawlUser)
 		adminGroup.GET("/crawl_book", controller.CrawlBook)
 		adminGroup.GET("/crawl_movie", controller.CrawlMovie)
-		adminGroup.GET("/crawl_music", controller.CrawlMusic)
 		adminGroup.GET("/crawl_game", controller.CrawlGame)
 	}
 

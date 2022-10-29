@@ -13,7 +13,6 @@ func UserFull(id string) (*model.User, error) {
 	UserHash(id)
 	bookOverview(id)
 	movieOverview(id)
-	musicOverview(id)
 	gameOverview(id)
 	return nil, nil
 }
@@ -115,29 +114,26 @@ func gameOverview(id string) (*model.User, error) {
 	if err != nil {
 		return nil, err
 	}
-	list := htmlquery.Find(doc, "//a[@href]")
-	for i := range list {
-		fmt.Println(list[i])
+
+	domain := htmlquery.SelectAttr(htmlquery.FindOne(doc, "//div[@id='db-usr-profile']//div[@class='pic']/a"), "href")
+	domain = util.ParseDomain(domain)
+
+	list := htmlquery.Find(doc, "//div[@class='tabs']/a")
+	wish := htmlquery.InnerText(list[0])
+	do := htmlquery.InnerText(list[1])
+	collect := htmlquery.InnerText(list[2])
+
+	wishNum := util.ParseNumber(wish)
+	doNum := util.ParseNumber(do)
+	collectNum := util.ParseNumber(collect)
+
+	user := &model.User{
+		Domain:      domain,
+		GameDo:      uint32(doNum),
+		GameWish:    uint32(wishNum),
+		GameCollect: uint32(collectNum),
 	}
-	return nil, err
+	return user, err
 
 }
 
-func musicOverview(id string) (*model.User, error) {
-	body, err := Get(fmt.Sprintf(util.MusicOverviewUrl, id))
-	if err != nil {
-		return nil, err
-	}
-
-	doc, err := htmlquery.Parse(strings.NewReader(*body))
-	if err != nil {
-		return nil, err
-
-	}
-	list := htmlquery.Find(doc, "//a[@href]")
-	for i := range list {
-		fmt.Println(list[i])
-	}
-	return nil, err
-
-}

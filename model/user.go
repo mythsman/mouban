@@ -16,9 +16,6 @@ type User struct {
 	GameWish     uint32
 	GameDo       uint32
 	GameCollect  uint32
-	MusicWish    uint32
-	MusicDo      uint32
-	MusicCollect uint32
 	MovieWish    uint32
 	MovieDo      uint32
 	MovieCollect uint32
@@ -43,9 +40,6 @@ type UserVO struct {
 	GameWish     uint32 `json:"game_wish"`
 	GameDo       uint32 `json:"game_do"`
 	GameCollect  uint32 `json:"game_collect"`
-	MusicWish    uint32 `json:"music_wish"`
-	MusicDo      uint32 `json:"music_do"`
-	MusicCollect uint32 `json:"music_collect"`
 	MovieWish    uint32 `json:"movie_wish"`
 	MovieDo      uint32 `json:"movie_do"`
 	MovieCollect uint32 `json:"movie_collect"`

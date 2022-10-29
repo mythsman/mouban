@@ -78,7 +78,6 @@ func migrateTables() {
 		&model.Comment{},
 		&model.Game{},
 		&model.Movie{},
-		&model.Music{},
 		&model.Rating{},
 		&model.Record{},
 		&model.User{},
