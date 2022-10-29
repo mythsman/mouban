@@ -3,13 +3,13 @@ package crawl
 import (
 	"fmt"
 	"github.com/antchfx/htmlquery"
-	"mouban/common"
 	"mouban/model"
+	"mouban/util"
 	"strings"
 )
 
 func Movie(doubanId int) (*model.Movie, *model.Rating, error) {
-	body, err := Get(fmt.Sprintf(common.MovieDetailUrl, doubanId))
+	body, err := Get(fmt.Sprintf(util.MovieDetailUrl, doubanId))
 	if err != nil {
 		return nil, nil, err
 	}

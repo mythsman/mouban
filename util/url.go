@@ -1,4 +1,4 @@
-package common
+package util
 
 const UserRssUrl = "https://www.douban.com/feed/people/%s/interests"
 const BookOverviewUrl = "https://book.douban.com/people/%s/"

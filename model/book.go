@@ -14,7 +14,7 @@ type Book struct {
 	Press        string `gorm:"type:varchar(512)"`
 	Producer     string `gorm:"type:varchar(512)"`
 	Serial       string `gorm:"type:varchar(512)"`
-	PublishMonth time.Month
+	PublishMonth time.Time
 	ISBN         string `gorm:"type:varchar(64)"`
 	Page         uint32
 	Price        uint32

@@ -23,6 +23,7 @@ type User struct {
 	MovieDo      uint32
 	MovieCollect uint32
 	RssHash      string `gorm:"type:varchar(32);"`
+	RegisterAt   time.Time
 	CreatedAt    time.Time
 	UpdatedAt    time.Time
 }
