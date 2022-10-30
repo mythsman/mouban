@@ -15,10 +15,12 @@ func TestMovie(t *testing.T) {
 }
 
 func TestGame(t *testing.T) {
-	_, _, err := Game(10734276)
+	game, rating, err := Game(26667882)
 	if err != nil {
 		return
 	}
+	fmt.Println(game)
+	fmt.Println(rating)
 }
 func TestBook(t *testing.T) {
 	book, rating, err := Book(35948443)

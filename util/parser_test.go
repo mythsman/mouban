@@ -85,8 +85,8 @@ func Test_trimLine(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := trimLine(tt.args.text); got != tt.want {
-				t.Errorf("trimLine() = %v, want %v", got, tt.want)
+			if got := TrimLine(tt.args.text); got != tt.want {
+				t.Errorf("TrimLine() = %v, want %v", got, tt.want)
 			}
 		})
 	}
