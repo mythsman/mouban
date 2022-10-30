@@ -11,8 +11,21 @@ import (
 )
 
 func Rating(interestSelect *html.Node) *model.Rating {
+	if interestSelect == nil {
+		result := &model.Rating{
+			Status: consts.RatingNotAllowed,
+		}
+		return result
+	}
 
-	rating := util.ParseFloat(htmlquery.InnerText(htmlquery.FindOne(interestSelect, "//strong[@property='v:average']")))
+	ratingRaw := htmlquery.InnerText(htmlquery.FindOne(interestSelect, "//strong[@property='v:average']"))
+	if len(ratingRaw) == 0 {
+		result := &model.Rating{
+			Status: consts.RatingNotEnough,
+		}
+		return result
+	}
+	rating := util.ParseFloat(ratingRaw)
 	totalStr := htmlquery.InnerText(htmlquery.FindOne(interestSelect, "//span[@property='v:votes']"))
 	total, err := strconv.ParseUint(totalStr, 10, 32)
 	if err != nil {

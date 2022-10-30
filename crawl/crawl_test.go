@@ -6,10 +6,12 @@ import (
 )
 
 func TestMovie(t *testing.T) {
-	_, _, err := Movie(3908424)
+	movie, rating, err := Movie(3543690)
 	if err != nil {
 		return
 	}
+	fmt.Println(movie)
+	fmt.Println(rating)
 }
 
 func TestGame(t *testing.T) {
