@@ -3,8 +3,8 @@ package crawl
 import (
 	"fmt"
 	"github.com/antchfx/htmlquery"
+	"mouban/consts"
 	"mouban/model"
-	"mouban/util"
 	"strings"
 )
 
@@ -16,7 +16,7 @@ func CommentMovie(doubanUid int) (*model.User, []*model.Comment, error) {
 }
 
 func scrollMovie(doubanUid int, action string) ([]*model.Comment, *int, *string, error) {
-	body, err := Get(fmt.Sprintf(util.MovieCommentUrl, doubanUid, action))
+	body, err := Get(fmt.Sprintf(consts.MovieCommentUrl, doubanUid, action))
 	if err != nil {
 		return nil, nil, nil, err
 	}

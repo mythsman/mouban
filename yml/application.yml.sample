@@ -10,4 +10,4 @@ datasource:
   charset: utf8mb4
   loc: Asia/Shanghai
 http:
-  timeout: 5
+  timeout: 10
