@@ -33,9 +33,5 @@ func collectRoute(router *gin.Engine) *gin.Engine {
 		adminGroup.GET("/crawl_game", controller.CrawlGame)
 	}
 
-	volunteerGroup := router.Group("/volunteer")
-	{
-		volunteerGroup.POST("/report_user", controller.ReportUser)
-	}
 	return router
 }
