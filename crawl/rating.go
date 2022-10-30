@@ -5,16 +5,14 @@ import (
 	"golang.org/x/net/html"
 	"mouban/consts"
 	"mouban/model"
+	"mouban/util"
 	"strconv"
 	"strings"
 )
 
 func Rating(interestSelect *html.Node) *model.Rating {
 
-	rating, err := strconv.ParseFloat(htmlquery.InnerText(htmlquery.FindOne(interestSelect, "//strong[@property='v:average']")), 32)
-	if err != nil {
-		return nil
-	}
+	rating := util.ParseFloat(htmlquery.InnerText(htmlquery.FindOne(interestSelect, "//strong[@property='v:average']")))
 	totalStr := htmlquery.InnerText(htmlquery.FindOne(interestSelect, "//span[@property='v:votes']"))
 	total, err := strconv.ParseUint(totalStr, 10, 32)
 	if err != nil {

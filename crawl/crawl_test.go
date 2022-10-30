@@ -19,10 +19,13 @@ func TestGame(t *testing.T) {
 	}
 }
 func TestBook(t *testing.T) {
-	_, _, err := Book(35948443)
+	book, rating, err := Book(25863621)
 	if err != nil {
 		return
 	}
+	fmt.Println(book)
+	fmt.Println(rating)
+
 }
 
 func TestUserHash(t *testing.T) {
