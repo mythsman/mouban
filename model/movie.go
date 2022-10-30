@@ -15,8 +15,7 @@ type Movie struct {
 	Site        string `gorm:"type:varchar(512)"`
 	Country     string `gorm:"type:varchar(512)"`
 	Language    string `gorm:"type:varchar(512)"`
-	ReleaseDate string `gorm:"type:datetime(3)"`
-	Season      uint32
+	PublishDate string `gorm:"type:datetime(3)"`
 	Episode     uint32
 	Duration    uint32
 	Alias       string `gorm:"type:varchar(512)"`
@@ -41,8 +40,7 @@ type MovieVO struct {
 	Site        string   `json:"site"`
 	Country     []string `json:"country"`
 	Language    []string `json:"language"`
-	ReleaseDate []string `json:"release_date"`
-	Season      uint32   `json:"season"`
+	PublishDate []string `json:"publish_date"`
 	Episode     uint32   `json:"episode"`
 	Duration    uint32   `json:"duration"`
 	Alias       string   `json:"alias"`
