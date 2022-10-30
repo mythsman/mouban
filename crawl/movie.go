@@ -21,7 +21,16 @@ func Movie(doubanId uint64) (*model.Movie, *model.Rating, error) {
 	}
 	title := htmlquery.SelectAttr(htmlquery.FindOne(doc, "//meta[@property='og:title']"), "content")
 	thumbnail := htmlquery.SelectAttr(htmlquery.FindOne(doc, "//a[@class='nbg']/img"), "src")
-	intro := strings.TrimSpace(htmlquery.InnerText(htmlquery.FindOne(doc, "//div[@id='link-report-intra']/span[@class='all hidden']")))
+
+	intro := ""
+	allHiddenIntro := htmlquery.FindOne(doc, "//div[@id='link-report-intra']/span[@class='all hidden']")
+	if allHiddenIntro != nil {
+		intro = strings.TrimSpace(htmlquery.InnerText(allHiddenIntro))
+	} else {
+		shortIntro := htmlquery.FindOne(doc, "//div[@id='link-report-intra']/span[@property='v:summary']")
+		intro = strings.TrimSpace(htmlquery.InnerText(shortIntro))
+	}
+
 	data := util.TrimInfo(htmlquery.OutputHTML(htmlquery.FindOne(doc, "//div[@id='info']"), false))
 
 	director := data["编剧"]
