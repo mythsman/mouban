@@ -55,6 +55,37 @@ func ParseDomain(link string) string {
 	return result[1]
 }
 
+func TrimParagraph(info string) string {
+	var data strings.Builder
+
+	mark := true
+	for _, ss := range info {
+		if ss == '\n' {
+			if mark {
+				continue
+			} else {
+				data.WriteString(" ")
+				mark = true
+			}
+		} else if ss == ' ' {
+			if mark {
+				data.WriteString(string(ss))
+				mark = false
+			} else {
+				data.WriteString(string(ss))
+			}
+		} else {
+			if mark {
+				data.WriteString(string(ss))
+				mark = false
+			} else {
+				data.WriteString(string(ss))
+			}
+		}
+	}
+	return data.String()
+}
+
 func TrimInfo(info string) map[string]string {
 	list := strings.Split(info, "<br/>")
 	result := make(map[string]string)

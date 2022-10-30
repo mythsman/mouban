@@ -1,6 +1,10 @@
 package util
 
-import "testing"
+import (
+	"reflect"
+	"testing"
+	"time"
+)
 
 func TestParseDoubanUid(t *testing.T) {
 	type args struct {
@@ -25,26 +29,6 @@ func TestParseDoubanUid(t *testing.T) {
 	}
 }
 
-func TestParseDate(t *testing.T) {
-	type args struct {
-		date string
-	}
-	tests := []struct {
-		name string
-		args args
-		want string
-	}{
-		{"1", args{date: "  2017-09-01 读过"}, "2017-09-01"},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := ParseDate(tt.args.date); got != tt.want {
-				t.Errorf("ParseDate() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
 func TestParseNumber(t *testing.T) {
 	type args struct {
 		number string
@@ -62,6 +46,27 @@ func TestParseNumber(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := ParseNumber(tt.args.number); got != tt.want {
 				t.Errorf("ParseNumber() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestParseDate(t *testing.T) {
+	type args struct {
+		date string
+	}
+
+	tests := []struct {
+		name string
+		args args
+		want time.Time
+	}{
+		{"1", args{date: "  2017-09-01 读过"}, time.Date(2017, 9, 1, 0, 0, 0, 0, time.UTC)},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := ParseDate(tt.args.date); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("ParseDate() = %v, want %v", got, tt.want)
 			}
 		})
 	}
