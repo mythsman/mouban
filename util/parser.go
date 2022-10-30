@@ -78,7 +78,7 @@ func TrimInfo(info string) map[string]string {
 			return nil
 		}
 		text := htmlquery.InnerText(parse)
-		line := trimLine(text)
+		line := TrimLine(text)
 		colonIndex := strings.Index(line, ":")
 		if colonIndex != -1 {
 			result[line[0:colonIndex]] = line[colonIndex+1:]
@@ -88,7 +88,7 @@ func TrimInfo(info string) map[string]string {
 	return result
 }
 
-func trimLine(text string) string {
+func TrimLine(text string) string {
 	var data strings.Builder
 
 	mark := true
