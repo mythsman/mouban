@@ -22,7 +22,7 @@ func Book(doubanId uint64) (*model.Book, *model.Rating, error) {
 	title := htmlquery.SelectAttr(htmlquery.FindOne(doc, "//meta[@property='og:title']"), "content")
 	thumbnail := htmlquery.SelectAttr(htmlquery.FindOne(doc, "//a[@class='nbg']/img"), "src")
 	intros := htmlquery.Find(doc, "//div[@class='intro']")
-	intro := strings.TrimSpace(htmlquery.InnerText(intros[len(intros)-1]))
+	intro := util.TrimParagraph(strings.TrimSpace(htmlquery.InnerText(intros[len(intros)-1])))
 
 	data := util.TrimInfo(htmlquery.OutputHTML(htmlquery.FindOne(doc, "//div[@id='info']"), false))
 

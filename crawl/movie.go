@@ -25,10 +25,10 @@ func Movie(doubanId uint64) (*model.Movie, *model.Rating, error) {
 	intro := ""
 	allHiddenIntro := htmlquery.FindOne(doc, "//div[@id='link-report-intra']/span[@class='all hidden']")
 	if allHiddenIntro != nil {
-		intro = strings.TrimSpace(htmlquery.InnerText(allHiddenIntro))
+		intro = util.TrimParagraph(htmlquery.InnerText(allHiddenIntro))
 	} else {
 		shortIntro := htmlquery.FindOne(doc, "//div[@id='link-report-intra']/span[@property='v:summary']")
-		intro = strings.TrimSpace(htmlquery.InnerText(shortIntro))
+		intro = util.TrimParagraph(htmlquery.InnerText(shortIntro))
 	}
 
 	data := util.TrimInfo(htmlquery.OutputHTML(htmlquery.FindOne(doc, "//div[@id='info']"), false))

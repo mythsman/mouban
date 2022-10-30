@@ -71,3 +71,43 @@ func TestParseDate(t *testing.T) {
 		})
 	}
 }
+
+func Test_trimLine(t *testing.T) {
+	type args struct {
+		text string
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		{"1", args{text: "   112 \n 21321    \n \n   a "}, "112 21321 a"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := trimLine(tt.args.text); got != tt.want {
+				t.Errorf("trimLine() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestTrimParagraph(t *testing.T) {
+	type args struct {
+		info string
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		{"1", args{info: "\n 1 dal \n \n fsd  ds \n  "}, "1 dal\nfsd  ds"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := TrimParagraph(tt.args.info); got != tt.want {
+				t.Errorf("TrimParagraph() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
