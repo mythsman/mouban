@@ -6,7 +6,7 @@ import (
 )
 
 func TestMovie(t *testing.T) {
-	movie, rating, err := Movie(26584183)
+	movie, rating, err := Movie(6026035)
 	if err != nil {
 		return
 	}
@@ -21,7 +21,7 @@ func TestGame(t *testing.T) {
 	}
 }
 func TestBook(t *testing.T) {
-	book, rating, err := Book(25863621)
+	book, rating, err := Book(35948443)
 	if err != nil {
 		return
 	}
