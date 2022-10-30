@@ -3,13 +3,13 @@ package crawl
 import (
 	"fmt"
 	"github.com/antchfx/htmlquery"
+	"mouban/consts"
 	"mouban/model"
-	"mouban/util"
 	"strings"
 )
 
-func Game(doubanId int) (*model.Game, *model.Rating, error) {
-	body, err := Get(fmt.Sprintf(util.GameDetailUrl, doubanId))
+func Game(doubanId uint64) (*model.Game, *model.Rating, error) {
+	body, err := Get(fmt.Sprintf(consts.GameDetailUrl, doubanId))
 	if err != nil {
 		return nil, nil, err
 	}

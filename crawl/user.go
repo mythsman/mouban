@@ -4,6 +4,7 @@ import (
 	"crypto/md5"
 	"fmt"
 	"github.com/antchfx/htmlquery"
+	"mouban/consts"
 	"mouban/model"
 	"mouban/util"
 	"strings"
@@ -51,7 +52,7 @@ func UserOverview(id string) (*model.User, error) {
 }
 
 func UserHash(id string) (string, error) {
-	body, err := Get(fmt.Sprintf(util.UserRssUrl, id))
+	body, err := Get(fmt.Sprintf(consts.UserRssUrl, id))
 	if err != nil {
 		return "", err
 	}
@@ -63,7 +64,7 @@ func UserHash(id string) (string, error) {
 }
 
 func bookOverview(id string) (*model.User, error) {
-	body, err := Get(fmt.Sprintf(util.BookOverviewUrl, id))
+	body, err := Get(fmt.Sprintf(consts.BookOverviewUrl, id))
 	if err != nil {
 		return nil, err
 	}
@@ -82,10 +83,10 @@ func bookOverview(id string) (*model.User, error) {
 	collect := htmlquery.InnerText(list[1])
 	wish := htmlquery.InnerText(list[2])
 
-	thumbnail = strings.Trim(thumbnail, " ")
+	thumbnail = strings.TrimSpace(thumbnail)
 	domain = util.ParseDomain(domain)
 	doubanUid := util.ParseDoubanUid(thumbnail)
-	username = strings.Trim(username, " ")
+	username = strings.TrimSpace(username)
 	registerTime := util.ParseDate(registerAt)
 	doNum := util.ParseNumber(do)
 	wishNum := util.ParseNumber(wish)
@@ -106,7 +107,7 @@ func bookOverview(id string) (*model.User, error) {
 }
 
 func movieOverview(id string) (*model.User, error) {
-	body, err := Get(fmt.Sprintf(util.MovieOverviewUrl, id))
+	body, err := Get(fmt.Sprintf(consts.MovieOverviewUrl, id))
 	if err != nil {
 		return nil, err
 	}
@@ -138,7 +139,7 @@ func movieOverview(id string) (*model.User, error) {
 }
 
 func gameOverview(id string) (*model.User, error) {
-	body, err := Get(fmt.Sprintf(util.GameOverviewUrl, id))
+	body, err := Get(fmt.Sprintf(consts.GameOverviewUrl, id))
 	if err != nil {
 		return nil, err
 	}
