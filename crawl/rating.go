@@ -50,7 +50,7 @@ func Rating(interestSelect *html.Node) *model.Rating {
 
 	result := &model.Rating{
 		Total:  uint32(total),
-		Rating: float32(rating),
+		Rating: rating,
 		Star5:  float32(star5),
 		Star4:  float32(star4),
 		Star3:  float32(star3),
