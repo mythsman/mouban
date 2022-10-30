@@ -21,27 +21,42 @@ func Movie(doubanId uint64) (*model.Movie, *model.Rating, error) {
 	}
 	title := htmlquery.SelectAttr(htmlquery.FindOne(doc, "//meta[@property='og:title']"), "content")
 	thumbnail := htmlquery.SelectAttr(htmlquery.FindOne(doc, "//a[@class='nbg']/img"), "src")
-	intro := strings.TrimSpace(htmlquery.InnerText(htmlquery.FindOne(doc, "//div[@id='link-report-intra']")))
-
+	intro := strings.TrimSpace(htmlquery.InnerText(htmlquery.FindOne(doc, "//div[@id='link-report-intra']/span[@class='all hidden']")))
 	data := util.TrimInfo(htmlquery.OutputHTML(htmlquery.FindOne(doc, "//div[@id='info']"), false))
-	fmt.Println(data)
+
+	director := data["编剧"]
+	actor := data["主演"]
+	writer := data["编剧"]
+	site := data["官方网站"]
+	style := data["类型"]
+	country := data["制片国家/地区"]
+	language := data["语言"]
+	duration := uint64(0)
+	if data["片长"] != "" {
+		duration = util.ParseNumber(data["片长"]) * 60
+	} else if data["单集片长"] != "" {
+		duration = util.ParseNumber(data["单集片长"]) * 60
+	}
+	alias := data["又名"]
+	imdb := data["Imdb"]
+	episode := util.ParseNumber(data["集数"])
+	releaseData := data["上映日期"]
 
 	movie := &model.Movie{
 		DoubanId:    doubanId,
 		Title:       title,
-		Director:    "",
-		Writer:      "",
-		Actor:       "",
-		Style:       "",
-		Site:        "",
-		Country:     "",
-		Language:    "",
-		ReleaseDate: "",
-		Season:      0,
-		Episode:     0,
-		Duration:    0,
-		Alias:       "",
-		IMDb:        "",
+		Director:    director,
+		Writer:      writer,
+		Actor:       actor,
+		Style:       style,
+		Site:        site,
+		Country:     country,
+		Language:    language,
+		PublishDate: releaseData,
+		Episode:     uint32(episode),
+		Duration:    uint32(duration),
+		Alias:       alias,
+		IMDb:        imdb,
 		Intro:       intro,
 		Thumbnail:   thumbnail,
 	}
