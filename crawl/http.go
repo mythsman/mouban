@@ -3,11 +3,12 @@ package crawl
 import (
 	"crypto/tls"
 	"fmt"
-	"github.com/google/uuid"
+	"github.com/MercuryEngineering/CookieMonster"
 	"github.com/spf13/viper"
 	"io/ioutil"
 	"math/rand"
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -56,12 +57,17 @@ func init() {
 		}}
 }
 
-var id = uuid.New().String()[:10]
-
 func Get(url string) (*string, error) {
 	req, err := http.NewRequest("GET", url, nil)
 	req.Header.Set("User-Agent", userAgent[rand.Intn(len(userAgent))])
-	req.AddCookie(&http.Cookie{Name: "bid", Value: "_" + id})
+	cookies, err := cookiemonster.ParseFile("../cookie.txt")
+	if err != nil {
+		panic(err)
+	}
+	for _, c := range cookies {
+		c.Value = strings.Trim(c.Value, "\"")
+		req.AddCookie(c)
+	}
 
 	if err != nil {
 		return nil, err
