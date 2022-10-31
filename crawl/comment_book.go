@@ -10,14 +10,59 @@ import (
 )
 
 func CommentBook(doubanUid uint64) (*model.User, []*model.Comment, error) {
-	scrollBook(doubanUid, consts.ActionDo)
-	scrollBook(doubanUid, consts.ActionWish)
-	scrollBook(doubanUid, consts.ActionCollect)
-	return nil, nil, nil
+	var allComments []*model.Comment
+	user := &model.User{}
+	url := ""
+	for {
+		comments, total, next, err := scrollBook(doubanUid, url, consts.ActionDo)
+		if err != nil {
+			return nil, nil, err
+		}
+		user.BookDo = total
+		url = next
+		allComments = append(allComments, comments...)
+		if next == "" {
+			break
+		}
+	}
+
+	url = ""
+	for {
+		comments, total, next, err := scrollBook(doubanUid, url, consts.ActionWish)
+		if err != nil {
+			return nil, nil, err
+		}
+		user.BookWish = total
+		url = next
+		allComments = append(allComments, comments...)
+
+		if next == "" {
+			break
+		}
+	}
+
+	url = ""
+	for {
+		comments, total, next, err := scrollBook(doubanUid, url, consts.ActionCollect)
+		if err != nil {
+			return nil, nil, err
+		}
+		user.BookCollect = total
+		url = next
+		allComments = append(allComments, comments...)
+
+		if next == "" {
+			break
+		}
+	}
+	return user, allComments, nil
 }
 
-func scrollBook(doubanUid uint64, action consts.Action) ([]*model.Comment, int, string, error) {
-	body, err := Get(fmt.Sprintf(consts.BookCommentUrl, doubanUid, action.Name))
+func scrollBook(doubanUid uint64, url string, action consts.Action) ([]*model.Comment, uint32, string, error) {
+	if url == "" {
+		url = fmt.Sprintf(consts.BookCommentUrl, doubanUid, action.Name)
+	}
+	body, err := Get(url)
 	if err != nil {
 		return nil, 0, "", err
 	}
@@ -70,10 +115,10 @@ func scrollBook(doubanUid uint64, action consts.Action) ([]*model.Comment, int, 
 
 	nextBtn := htmlquery.FindOne(doc, "//link[@rel='next']")
 	if nextBtn == nil {
-		return comments, int(total), "", err
+		return comments, uint32(total), "", err
 	} else {
 		nextLink := htmlquery.SelectAttr(nextBtn, "href")
-		return comments, int(total), "https://book.douban.com" + nextLink, err
+		return comments, uint32(total), "https://book.douban.com" + nextLink, err
 	}
 
 }
