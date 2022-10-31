@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"github.com/MercuryEngineering/CookieMonster"
 	"github.com/spf13/viper"
+	"golang.org/x/net/context"
+	"golang.org/x/time/rate"
 	"io/ioutil"
 	"math/rand"
 	"net/http"
@@ -37,6 +39,7 @@ var userAgent = []string{
 }
 
 var client http.Client
+var limiter *rate.Limiter
 
 func init() {
 	client = http.Client{
@@ -55,9 +58,16 @@ func init() {
 				},
 			},
 		}}
+	limiter = rate.NewLimiter(rate.Every(3*time.Second), 1)
 }
 
 func Get(url string) (*string, error) {
+	ctx, _ := context.WithTimeout(context.Background(), time.Second*10)
+	err := limiter.Wait(ctx)
+	if err != nil {
+		return nil, err
+	}
+
 	req, err := http.NewRequest("GET", url, nil)
 	req.Header.Set("User-Agent", userAgent[rand.Intn(len(userAgent))])
 	cookies, err := cookiemonster.ParseFile("../cookie.txt")
