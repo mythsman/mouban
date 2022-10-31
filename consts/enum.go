@@ -16,3 +16,9 @@ var ActionCollect = Action{2, "collect"}
 const TypeBook = 0
 const TypeMovie = 1
 const TypeGame = 2
+
+const RecordToCrawl = 0
+const RecordCrawling = 1
+const RecordSucceeded = 2
+const RecordFailed = 3
+const RecordInvalid = 4
