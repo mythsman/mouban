@@ -2,6 +2,7 @@ package crawl
 
 import (
 	"fmt"
+	"mouban/util"
 	"testing"
 )
 
@@ -10,8 +11,8 @@ func TestMovie(t *testing.T) {
 	if err != nil {
 		return
 	}
-	fmt.Println(movie)
-	fmt.Println(rating)
+	fmt.Println(util.ToJson(movie))
+	fmt.Println(util.ToJson(rating))
 }
 
 func TestGame(t *testing.T) {
@@ -19,17 +20,16 @@ func TestGame(t *testing.T) {
 	if err != nil {
 		return
 	}
-	fmt.Println(game)
-	fmt.Println(rating)
+	fmt.Println(util.ToJson(game))
+	fmt.Println(util.ToJson(rating))
 }
 func TestBook(t *testing.T) {
 	book, rating, err := Book(35948443)
 	if err != nil {
 		return
 	}
-	fmt.Println(book)
-	fmt.Println(rating)
-
+	fmt.Println(util.ToJson(book))
+	fmt.Println(util.ToJson(rating))
 }
 
 func TestUserHash(t *testing.T) {
@@ -46,5 +46,5 @@ func TestUserOverview(t *testing.T) {
 		return
 
 	}
-	fmt.Println(overview)
+	fmt.Println(util.ToJson(overview))
 }

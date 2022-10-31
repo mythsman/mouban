@@ -3,6 +3,7 @@ package crawl
 import (
 	"fmt"
 	"mouban/consts"
+	"mouban/util"
 	"testing"
 )
 
@@ -12,7 +13,7 @@ func Test_scrollBook(t *testing.T) {
 		return
 	}
 	for i := range book {
-		fmt.Println(book[i])
+		fmt.Println(util.ToJson(book[i]))
 	}
 	fmt.Println(total)
 	fmt.Println(next)
@@ -23,8 +24,8 @@ func Test_CommentBook(t *testing.T) {
 	if err != nil {
 		return
 	}
-	fmt.Println(user)
+	fmt.Println(util.ToJson(user))
 	for _, c := range comments {
-		fmt.Println(c)
+		fmt.Println(util.ToJson(c))
 	}
 }
