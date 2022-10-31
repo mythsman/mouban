@@ -56,11 +56,12 @@ func init() {
 		}}
 }
 
+var id = uuid.New().String()[:10]
+
 func Get(url string) (*string, error) {
-	id := uuid.New()
 	req, err := http.NewRequest("GET", url, nil)
 	req.Header.Set("User-Agent", userAgent[rand.Intn(len(userAgent))])
-	req.AddCookie(&http.Cookie{Name: "bid", Value: "_" + id.String()[:10]})
+	req.AddCookie(&http.Cookie{Name: "bid", Value: "_" + id})
 
 	if err != nil {
 		return nil, err
