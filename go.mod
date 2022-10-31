@@ -3,10 +3,10 @@ module mouban
 go 1.17
 
 require (
+	github.com/MercuryEngineering/CookieMonster v0.0.0-20180304172713-1584578b3403
 	github.com/antchfx/htmlquery v1.2.5
 	github.com/gin-gonic/gin v1.8.1
 	github.com/go-sql-driver/mysql v1.6.0
-	github.com/google/uuid v1.1.2
 	github.com/spf13/viper v1.13.0
 	golang.org/x/net v0.1.0
 	gorm.io/driver/mysql v1.4.3
