@@ -2,6 +2,8 @@ package crawl
 
 import (
 	"crypto/tls"
+	"fmt"
+	"github.com/google/uuid"
 	"github.com/spf13/viper"
 	"io/ioutil"
 	"math/rand"
@@ -55,9 +57,10 @@ func init() {
 }
 
 func Get(url string) (*string, error) {
-
+	id := uuid.New()
 	req, err := http.NewRequest("GET", url, nil)
 	req.Header.Set("User-Agent", userAgent[rand.Intn(len(userAgent))])
+	req.AddCookie(&http.Cookie{Name: "bid", Value: "_" + id.String()[:10]})
 
 	if err != nil {
 		return nil, err
@@ -68,6 +71,9 @@ func Get(url string) (*string, error) {
 		return nil, err
 	}
 
+	if resp.StatusCode != 200 {
+		fmt.Printf(" code is %d for %s\n", resp.StatusCode, url)
+	}
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
