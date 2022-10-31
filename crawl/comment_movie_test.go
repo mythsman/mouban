@@ -3,6 +3,7 @@ package crawl
 import (
 	"fmt"
 	"mouban/consts"
+	"mouban/util"
 	"testing"
 )
 
@@ -12,7 +13,7 @@ func Test_scrollMovie(t *testing.T) {
 		return
 	}
 	for i := range movie {
-		fmt.Println(movie[i])
+		fmt.Println(util.ToJson(movie[i]))
 	}
 	fmt.Println(total)
 	fmt.Println(next)

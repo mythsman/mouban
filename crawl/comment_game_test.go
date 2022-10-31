@@ -3,6 +3,7 @@ package crawl
 import (
 	"fmt"
 	"mouban/consts"
+	"mouban/util"
 	"testing"
 )
 
@@ -12,7 +13,7 @@ func Test_scrollGame(t *testing.T) {
 		return
 	}
 	for i := range game {
-		fmt.Println(game[i])
+		fmt.Println(util.ToJson(game[i]))
 	}
 	fmt.Println(total)
 	fmt.Println(next)
