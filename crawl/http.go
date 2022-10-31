@@ -71,9 +71,8 @@ func Get(url string) (*string, error) {
 		return nil, err
 	}
 
-	if resp.StatusCode != 200 {
-		fmt.Printf(" code is %d for %s\n", resp.StatusCode, url)
-	}
+	fmt.Printf(" code is %d for %s\n", resp.StatusCode, url)
+
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
