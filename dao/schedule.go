@@ -19,7 +19,7 @@ func SearchSchedule(t uint8, status uint8, limit int) *[]model.Schedule {
 	return &schedules
 }
 
-func ChangeSchedule(doubanId uint64, t uint8, status uint8) {
+func UpsertSchedule(doubanId uint64, t uint8, status uint8) {
 	if t != consts.TypeBook &&
 		t != consts.TypeMovie &&
 		t != consts.TypeGame &&
