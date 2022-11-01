@@ -13,6 +13,12 @@ func GetSchedule(doubanId uint64, t uint8) *model.Schedule {
 	return schedule
 }
 
+func SearchSchedule(t uint8, status uint8, limit int) *[]model.Schedule {
+	var schedules []model.Schedule
+	common.Db.Limit(limit).Where("type = ? AND status = ? ", t, status).Find(&schedules)
+	return &schedules
+}
+
 func ChangeSchedule(doubanId uint64, t uint8, status uint8) {
 	if t != consts.TypeBook &&
 		t != consts.TypeMovie &&
