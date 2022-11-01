@@ -9,7 +9,6 @@ type Schedule struct {
 	DoubanId  uint64 `gorm:"not null;uniqueIndex:uk_schedule;"`
 	Type      uint8  `gorm:"not null;uniqueIndex:uk_schedule;index:idx_search;priority=1"`
 	Status    uint8  `gorm:"not null;index:idx_search;priority=2"`
-	TimeCost  uint32
 	CreatedAt time.Time
 	UpdatedAt time.Time `gorm:"index:idx_search;priority=3"`
 }
