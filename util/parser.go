@@ -112,3 +112,12 @@ func TrimLine(text string) string {
 
 	return strings.TrimSpace(data.String())
 }
+
+func IsParsable(str string) bool {
+	_, err := strconv.ParseUint(str, 10, 64)
+	if err != nil {
+		return false
+	} else {
+		return true
+	}
+}
