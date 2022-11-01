@@ -14,6 +14,9 @@ func UpsertRating(rating *model.Rating) {
 func GetRating(doubanId uint64, t uint8) *model.Rating {
 	rating := &model.Rating{}
 	common.Db.Where("douban_id = ? AND type = ?", doubanId, t).Find(rating)
+	if rating.ID == 0 {
+		return nil
+	}
 	return rating
 }
 

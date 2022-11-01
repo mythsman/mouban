@@ -22,5 +22,8 @@ func GetUser(doubanUidOrDomain string) *model.User {
 	} else {
 		common.Db.Where("domain = ? ", doubanUidOrDomain).Find(user)
 	}
+	if user.ID == 0 {
+		return nil
+	}
 	return user
 }

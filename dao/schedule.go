@@ -10,6 +10,9 @@ import (
 func GetSchedule(doubanId uint64, t uint8) *model.Schedule {
 	schedule := &model.Schedule{}
 	common.Db.Where("douban_id = ? AND type = ? ", doubanId, t).Find(schedule)
+	if schedule.ID == 0 {
+		return nil
+	}
 	return schedule
 }
 
