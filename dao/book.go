@@ -10,3 +10,15 @@ func UpsertBook(book *model.Book) {
 		common.Db.Create(book)
 	}
 }
+
+func GetBookDetail(doubanId uint64) *model.Book {
+	book := &model.Book{}
+	common.Db.Where("douban_id = ? ", doubanId).Find(book)
+	return book
+}
+
+func ListBookBrief(doubanIds *[]uint64) *[]model.Book {
+	var books *[]model.Book
+	common.Db.Omit("serial", "isbn", "framing", "page", "intro").Where("douban_id IN ? ", *doubanIds).Find(&books)
+	return books
+}
