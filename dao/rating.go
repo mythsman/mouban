@@ -10,3 +10,15 @@ func UpsertRating(rating *model.Rating) {
 		common.Db.Create(rating)
 	}
 }
+
+func GetRating(doubanId uint64, t uint8) *model.Rating {
+	rating := &model.Rating{}
+	common.Db.Where("douban_id = ? AND type = ?", doubanId, t).Find(rating)
+	return rating
+}
+
+func ListRating(doubanIds *[]uint64, t uint8) *[]model.Rating {
+	var rating *[]model.Rating
+	common.Db.Where("douban_id IN ? AND type = ?", *doubanIds, t).Find(&rating)
+	return rating
+}
