@@ -17,8 +17,8 @@ const TypeBook = 0
 const TypeMovie = 1
 const TypeGame = 2
 
-const RecordToCrawl = 0
-const RecordCrawling = 1
-const RecordSucceeded = 2
-const RecordFailed = 3
-const RecordInvalid = 4
+const ScheduleToCrawl = 0
+const ScheduleCrawling = 1
+const ScheduleSucceeded = 2
+const ScheduleFailed = 3
+const ScheduleInvalid = 4
