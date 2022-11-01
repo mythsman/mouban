@@ -35,6 +35,7 @@ func Book(doubanId uint64) (*model.Book, *model.Rating, error) {
 	translator := data["译者"]
 	serial := data["丛书"]
 	publishAt := data["出版年"]
+	framing := data["装帧"]
 	page := uint32(util.ParseNumber(data["页数"]))
 	price := uint32(util.ParseFloat(data["定价"]) * 100)
 
@@ -50,6 +51,7 @@ func Book(doubanId uint64) (*model.Book, *model.Rating, error) {
 		Serial:     serial,
 		PublishAt:  publishAt,
 		ISBN:       isbn,
+		Framing:    framing,
 		Page:       page,
 		Price:      price,
 		Intro:      intro,

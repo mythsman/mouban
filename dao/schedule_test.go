@@ -7,8 +7,8 @@ import (
 	"testing"
 )
 
-func TestChangeSchedule(t *testing.T) {
-	ChangeSchedule(1234, consts.TypeMovie, consts.ScheduleSucceeded)
+func TestUpsertSchedule(t *testing.T) {
+	UpsertSchedule(1234, consts.TypeMovie, consts.ScheduleSucceeded)
 }
 
 func TestGetSchedule(t *testing.T) {

@@ -15,7 +15,7 @@ type Rating struct {
 	Star3     float32
 	Star2     float32
 	Star1     float32
-	Status    uint8 //comment:0-normal,1-not enough,2-can not rate
+	Status    uint8
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
