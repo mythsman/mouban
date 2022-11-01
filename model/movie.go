@@ -15,7 +15,7 @@ type Movie struct {
 	Site        string `gorm:"type:varchar(512)"`
 	Country     string `gorm:"type:varchar(512)"`
 	Language    string `gorm:"type:varchar(512)"`
-	PublishDate string `gorm:"type:datetime(3)"`
+	PublishDate string `gorm:"type:varchar(64)"`
 	Episode     uint32
 	Duration    uint32
 	Alias       string `gorm:"type:varchar(512)"`
