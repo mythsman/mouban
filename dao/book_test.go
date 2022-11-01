@@ -1,7 +1,9 @@
 package dao
 
 import (
+	"fmt"
 	"mouban/model"
+	"mouban/util"
 	"testing"
 )
 
@@ -25,4 +27,14 @@ func TestUpsertBook(t *testing.T) {
 		Thumbnail:  "thumbnail",
 	}
 	UpsertBook(book)
+}
+
+func TestGetBookDetail(t *testing.T) {
+	detail := GetBookDetail(11)
+	fmt.Println(util.ToJson(detail))
+}
+
+func TestListBookBrief(t *testing.T) {
+	briefs := ListBookBrief(&[]uint64{11, 11})
+	fmt.Println(util.ToJson(briefs))
 }
