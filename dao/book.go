@@ -14,6 +14,9 @@ func UpsertBook(book *model.Book) {
 func GetBookDetail(doubanId uint64) *model.Book {
 	book := &model.Book{}
 	common.Db.Where("douban_id = ? ", doubanId).Find(book)
+	if book.ID == 0 {
+		return nil
+	}
 	return book
 }
 

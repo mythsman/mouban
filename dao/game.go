@@ -14,6 +14,9 @@ func UpsertGame(game *model.Game) {
 func GetGameDetail(doubanId uint64) *model.Game {
 	game := &model.Game{}
 	common.Db.Where("douban_id = ? ", doubanId).Find(game)
+	if game.ID == 0 {
+		return nil
+	}
 	return game
 }
 

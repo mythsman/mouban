@@ -15,6 +15,9 @@ func UpsertComment(comment *model.Comment) {
 func GetComment(doubanId uint64, doubanUid uint64, t uint8) *model.Comment {
 	comment := &model.Comment{}
 	common.Db.Where("douban_id = ? AND douban_uid = ? AND type = ?", doubanId, doubanUid, t).Find(comment)
+	if comment.ID == 0 {
+		return nil
+	}
 	return comment
 }
 

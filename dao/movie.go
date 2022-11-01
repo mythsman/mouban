@@ -13,6 +13,9 @@ func UpsertMovie(movie *model.Movie) {
 func GetMovieDetail(doubanId uint64) *model.Movie {
 	movie := &model.Movie{}
 	common.Db.Where("douban_id = ? ", doubanId).Find(movie)
+	if movie.ID == 0 {
+		return nil
+	}
 	return movie
 }
 
