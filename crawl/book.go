@@ -59,6 +59,8 @@ func Book(doubanId uint64) (*model.Book, *model.Rating, error) {
 	}
 
 	rating := Rating(htmlquery.FindOne(doc, "//div[@id='interest_sectl']"))
+	rating.DoubanId = doubanId
+	rating.Type = consts.TypeBook
 
 	return book, rating, nil
 }

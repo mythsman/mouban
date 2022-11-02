@@ -11,6 +11,10 @@ func UpsertBook(book *model.Book) {
 	}
 }
 
+func CreateBookNx(book *model.Book) {
+	common.Db.Create(book)
+}
+
 func GetBookDetail(doubanId uint64) *model.Book {
 	book := &model.Book{}
 	common.Db.Where("douban_id = ? ", doubanId).Find(book)

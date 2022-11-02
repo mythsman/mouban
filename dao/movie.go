@@ -10,6 +10,11 @@ func UpsertMovie(movie *model.Movie) {
 		common.Db.Create(movie)
 	}
 }
+
+func CreateMovie(movie *model.Movie) {
+	common.Db.Create(movie)
+}
+
 func GetMovieDetail(doubanId uint64) *model.Movie {
 	movie := &model.Movie{}
 	common.Db.Where("douban_id = ? ", doubanId).Find(movie)
