@@ -45,6 +45,7 @@ func Game(doubanId uint64) (*model.Game, *model.Rating, error) {
 	}
 
 	rating := Rating(htmlquery.FindOne(doc, "//div[@id='interest_sectl']"))
-
+	rating.DoubanId = doubanId
+	rating.Type = consts.TypeGame
 	return game, rating, nil
 }

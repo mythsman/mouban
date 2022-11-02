@@ -15,7 +15,7 @@ func CheckUser(ctx *gin.Context) {
 	schedule := dao.GetSchedule(doubanUid, consts.TypeUser)
 
 	if schedule == nil {
-		logic.DispatchUser(doubanUid)
+		logic.Dispatch(doubanUid, consts.TypeUser)
 		panic("未录入当前用户，已发起录入，请等待后台数据更新")
 	}
 

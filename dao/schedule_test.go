@@ -8,7 +8,7 @@ import (
 )
 
 func TestUpsertSchedule(t *testing.T) {
-	UpsertSchedule(1234, consts.TypeMovie, consts.ScheduleStatusToCrawl, consts.ScheduleResultInvalid)
+	CreateSchedule(1234, consts.TypeMovie, consts.ScheduleStatusToCrawl, consts.ScheduleResultInvalid)
 }
 
 func TestGetSchedule(t *testing.T) {
@@ -17,6 +17,6 @@ func TestGetSchedule(t *testing.T) {
 }
 
 func TestSearchSchedule(t *testing.T) {
-	schedules := SearchScheduleByStatus(consts.TypeMovie, consts.ScheduleStatusToCrawl, 10)
-	fmt.Println(util.ToJson(schedules))
+	schedule := SearchScheduleByStatus(consts.ScheduleStatusToCrawl)
+	fmt.Println(util.ToJson(schedule))
 }

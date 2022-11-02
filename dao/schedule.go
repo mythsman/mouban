@@ -16,10 +16,15 @@ func GetSchedule(doubanId uint64, t uint8) *model.Schedule {
 	return schedule
 }
 
-func SearchScheduleByStatus(t uint8, status uint8, limit int) *[]model.Schedule {
-	var schedules []model.Schedule
-	common.Db.Limit(limit).Where("type = ? AND status = ? ", t, status).Find(&schedules)
-	return &schedules
+func SearchScheduleByStatus(status uint8) *model.Schedule {
+	schedule := &model.Schedule{}
+	common.Db.Where("status = ? ", status).
+		Order("updated_at asc").
+		Find(&schedule)
+	if schedule.ID == 0 {
+		return nil
+	}
+	return schedule
 }
 
 func SearchScheduleByResult(t uint8, result uint8, limit int) *[]model.Schedule {
@@ -28,7 +33,20 @@ func SearchScheduleByResult(t uint8, result uint8, limit int) *[]model.Schedule 
 	return &schedules
 }
 
-func UpsertSchedule(doubanId uint64, t uint8, status uint8, result uint8) {
+func CasScheduleStatus(doubanId uint64, t uint8, status uint8, rawStatus uint8) bool {
+	row := common.Db.Model(&model.Schedule{}).
+		Where("douban_id = ? AND type = ? AND status = ?", doubanId, t, rawStatus).
+		UpdateColumn("status", status).RowsAffected
+	return row > 0
+}
+
+func ChangeScheduleResult(doubanId uint64, t uint8, result uint8) {
+	common.Db.Model(&model.Schedule{}).
+		Where("douban_id = ? AND type = ?", doubanId, t).
+		UpdateColumn("result", result)
+}
+
+func CreateSchedule(doubanId uint64, t uint8, status uint8, result uint8) {
 	if t != consts.TypeBook &&
 		t != consts.TypeMovie &&
 		t != consts.TypeGame &&
@@ -56,7 +74,5 @@ func UpsertSchedule(doubanId uint64, t uint8, status uint8, result uint8) {
 		Status:   status,
 		Result:   result,
 	}
-	if common.Db.Where("douban_id = ? AND type = ? ", doubanId, t).Updates(&schedule).RowsAffected == 0 {
-		common.Db.Create(&schedule)
-	}
+	common.Db.Create(&schedule)
 }

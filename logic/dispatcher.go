@@ -1,17 +1,24 @@
 package logic
 
-func DispatchUser(doubanUid uint64) {
-	panic("")
-}
+import (
+	"mouban/consts"
+	"mouban/dao"
+)
 
-func DispatchBook() {
-
-}
-
-func DispatchMovie() {
-
-}
-
-func DispatchGame() {
-
+func Dispatch(doubanId uint64, t uint8) bool {
+	schedule := dao.GetSchedule(doubanId, t)
+	triggered := false
+	switch schedule.Status {
+	case consts.ScheduleStatusCrawled:
+		dao.CasScheduleStatus(schedule.DoubanId, schedule.Type, consts.ScheduleStatusToCrawl, consts.ScheduleStatusCrawled)
+		triggered = true
+		break
+	case consts.ScheduleStatusCrawling:
+		break
+	case consts.ScheduleStatusToCrawl:
+		break
+	default:
+		break
+	}
+	return triggered
 }
