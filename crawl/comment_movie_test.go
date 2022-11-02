@@ -8,13 +8,13 @@ import (
 )
 
 func Test_scrollMovie(t *testing.T) {
-	movie, total, next, err := scrollMovie(162448367, "", consts.ActionCollect)
+	comments, movies, total, next, err := scrollMovie(162448367, "", consts.ActionCollect)
 	if err != nil {
 		return
 	}
-	for i := range movie {
-		fmt.Println(util.ToJson(movie[i]))
-	}
+	fmt.Println(util.ToJson(*comments))
+	fmt.Println(util.ToJson(*movies))
+
 	fmt.Println(total)
 	fmt.Println(next)
 }

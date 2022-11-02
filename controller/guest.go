@@ -2,6 +2,7 @@ package controller
 
 import (
 	"github.com/gin-gonic/gin"
+	"mouban/consts"
 	"mouban/dao"
 	"mouban/logic"
 	"net/http"
@@ -9,18 +10,25 @@ import (
 )
 
 func CheckUser(ctx *gin.Context) {
-	doubanUid := LogAccess(ctx)
+	doubanUid := logAccess(ctx)
+
+	schedule := dao.GetSchedule(doubanUid, consts.TypeUser)
+
+	if schedule == nil {
+		logic.DispatchUser(doubanUid)
+		panic("未录入当前用户，已发起录入，请等待后台数据更新")
+	}
+
+	if schedule.Result == consts.ScheduleResultUnready {
+		panic("当前用户录入中")
+	}
+
+	if schedule.Result == consts.ScheduleResultInvalid {
+		panic("当前用户不存在")
+	}
 
 	user := dao.GetUser(doubanUid)
-	if user == nil {
-		logic.DispatchUser(doubanUid)
-		ctx.JSON(http.StatusOK, gin.H{
-			"success": false,
-			"msg":     "未录入当前用户，请等待后台数据更新（约十分钟）",
-		})
-		return
-	}
-	
+
 	ctx.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"result":  user.Show(),
@@ -29,75 +37,85 @@ func CheckUser(ctx *gin.Context) {
 }
 
 func ListUserMovie(ctx *gin.Context) {
-	doubanUid := LogAccess(ctx)
+	doubanUid := logAccess(ctx)
 
-	user := dao.GetUser(doubanUid)
-	if user == nil {
-		ctx.JSON(http.StatusOK, gin.H{
-			"success": false,
-			"msg":     "未知用户",
-		})
-		return
-	}
 	action := ctx.Query("action")
 	if action == "" {
-		ctx.JSON(http.StatusOK, gin.H{
-			"success": false,
-			"msg":     "参数错误",
-		})
-		return
+		panic("参数错误")
 	}
+	schedule := dao.GetSchedule(doubanUid, consts.TypeUser)
+
+	if schedule == nil {
+		panic("当前用户未录入")
+	}
+
+	if schedule.Result == consts.ScheduleResultUnready {
+		panic("当前用户录入中")
+	}
+
+	if schedule.Result == consts.ScheduleResultInvalid {
+		panic("当前用户不存在")
+	}
+
+	//user := dao.GetUser(doubanUid)
 
 }
 
 func ListUserBook(ctx *gin.Context) {
-	doubanUid := LogAccess(ctx)
+	doubanUid := logAccess(ctx)
 
-	user := dao.GetUser(doubanUid)
-	if user == nil {
-		ctx.JSON(http.StatusOK, gin.H{
-			"success": false,
-			"msg":     "未知用户",
-		})
-		return
-	}
 	action := ctx.Query("action")
 	if action == "" {
-		ctx.JSON(http.StatusOK, gin.H{
-			"success": false,
-			"msg":     "参数错误",
-		})
-		return
+		panic("参数错误")
 	}
+	schedule := dao.GetSchedule(doubanUid, consts.TypeUser)
+
+	if schedule == nil {
+		panic("当前用户未录入")
+	}
+
+	if schedule.Result == consts.ScheduleResultUnready {
+		panic("当前用户录入中")
+	}
+
+	if schedule.Result == consts.ScheduleResultInvalid {
+		panic("当前用户不存在")
+	}
+
+	//user := dao.GetUser(doubanUid)
 
 }
 
 func ListUserGame(ctx *gin.Context) {
-	doubanUid := LogAccess(ctx)
+	doubanUid := logAccess(ctx)
 
-	user := dao.GetUser(doubanUid)
-	if user == nil {
-		ctx.JSON(http.StatusOK, gin.H{
-			"success": false,
-			"msg":     "未知用户",
-		})
-		return
-	}
 	action := ctx.Query("action")
 	if action == "" {
-		ctx.JSON(http.StatusOK, gin.H{
-			"success": false,
-			"msg":     "参数错误",
-		})
-		return
+		panic("参数错误")
 	}
+
+	schedule := dao.GetSchedule(doubanUid, consts.TypeUser)
+
+	if schedule == nil {
+		panic("当前用户未录入")
+	}
+
+	if schedule.Result == consts.ScheduleResultUnready {
+		panic("当前用户录入中")
+	}
+
+	if schedule.Result == consts.ScheduleResultInvalid {
+		panic("当前用户不存在")
+	}
+
+	//user := dao.GetUser(doubanUid)
 }
 
-func LogAccess(ctx *gin.Context) uint64 {
+func logAccess(ctx *gin.Context) uint64 {
 	id := ctx.Query("id")
 	doubanUid, err := strconv.ParseUint(id, 10, 64)
 	if err != nil || id == "0" {
-		return 0
+		panic("用户ID输入错误")
 	}
 
 	ua := ctx.GetHeader("User-Agent")

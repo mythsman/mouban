@@ -23,8 +23,6 @@ func TestUpsertUser(t *testing.T) {
 }
 
 func TestGetUser(t *testing.T) {
-	user1 := GetUser("1323")
-	user2 := GetUser("domain")
-	fmt.Println(util.ToJson(user1))
-	fmt.Println(util.ToJson(user2))
+	user := GetUser(1323)
+	fmt.Println(util.ToJson(user))
 }

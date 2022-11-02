@@ -12,6 +12,9 @@ func UpsertUser(user *model.User) {
 }
 
 func GetUser(doubanUid uint64) *model.User {
+	if doubanUid == 0 {
+		return nil
+	}
 	user := &model.User{}
 	common.Db.Where("douban_uid = ? ", doubanUid).Find(user)
 	if user.ID == 0 {

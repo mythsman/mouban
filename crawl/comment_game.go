@@ -9,77 +9,83 @@ import (
 	"strings"
 )
 
-func CommentGame(doubanUid uint64) (*model.User, []*model.Comment, error) {
-	var allComments []*model.Comment
+func CommentGame(doubanUid uint64) (*model.User, *[]model.Comment, *[]model.Game, error) {
+	var allComments []model.Comment
+	var allGames []model.Game
 	user := &model.User{}
-	url := ""
-	for {
-		comments, total, next, err := scrollGame(doubanUid, url, consts.ActionDo)
-		if err != nil {
-			return nil, nil, err
-		}
-		user.GameDo = total
-		url = next
-		allComments = append(allComments, comments...)
-		if next == "" {
-			break
-		}
-	}
 
-	url = ""
-	for {
-		comments, total, next, err := scrollGame(doubanUid, url, consts.ActionWish)
-		if err != nil {
-			return nil, nil, err
-		}
-		user.GameWish = total
-		url = next
-		allComments = append(allComments, comments...)
+	comments, games, total := scrollAllGame(doubanUid, consts.ActionDo)
+	user.GameDo = total
+	allComments = append(allComments, *comments...)
+	allGames = append(allGames, *games...)
 
-		if next == "" {
-			break
-		}
-	}
+	comments, games, total = scrollAllGame(doubanUid, consts.ActionWish)
+	user.GameWish = total
+	allComments = append(allComments, *comments...)
+	allGames = append(allGames, *games...)
 
-	url = ""
-	for {
-		comments, total, next, err := scrollGame(doubanUid, url, consts.ActionCollect)
-		if err != nil {
-			return nil, nil, err
-		}
-		user.GameCollect = total
-		url = next
-		allComments = append(allComments, comments...)
+	comments, games, total = scrollAllGame(doubanUid, consts.ActionCollect)
+	user.GameCollect = total
+	allComments = append(allComments, *comments...)
+	allGames = append(allGames, *games...)
 
-		if next == "" {
-			break
-		}
-	}
-	return user, allComments, nil
+	return user, &allComments, &allGames, nil
 }
 
-func scrollGame(doubanUid uint64, url string, action consts.Action) ([]*model.Comment, uint32, string, error) {
+func scrollAllGame(doubanUid uint64, action consts.Action) (*[]model.Comment, *[]model.Game, uint32) {
+	total := uint32(0)
+	var allComments []model.Comment
+	var allGames []model.Game
+
+	url := ""
+	for {
+		comments, games, count, next, err := scrollGame(doubanUid, url, action)
+		if err != nil {
+			panic(err)
+		}
+		total = count
+		url = next
+		allComments = append(allComments, *comments...)
+		allGames = append(allGames, *games...)
+		if next == "" {
+			break
+		}
+	}
+	return &allComments, &allGames, total
+}
+
+func scrollGame(doubanUid uint64, url string, action consts.Action) (*[]model.Comment, *[]model.Game, uint32, string, error) {
 	if url == "" {
 		url = fmt.Sprintf(consts.GameCommentUrl, doubanUid, action.Name)
 	}
 	body, err := Get(url)
 	if err != nil {
-		return nil, 0, "", err
+		return nil, nil, 0, "", err
 	}
 
 	doc, err := htmlquery.Parse(strings.NewReader(*body))
 	if err != nil {
-		return nil, 0, "", err
+		return nil, nil, 0, "", err
 	}
 
 	total := util.ParseNumber(htmlquery.InnerText(htmlquery.FindOne(doc, "//div[@id='db-usr-profile']/div[@class='info']/h1")))
 
 	list := htmlquery.Find(doc, "//div[@class='common-item']")
-	comments := make([]*model.Comment, len(list))
+	var comments []model.Comment
+	var games []model.Game
+
 	for i := range list {
 		link := htmlquery.FindOne(list[i], "//div[@class='title']/a")
 		href := htmlquery.SelectAttr(link, "href")
 		doubanId := util.ParseNumber(href)
+		title := htmlquery.InnerText(link)
+		thumbnail := htmlquery.SelectAttr(htmlquery.FindOne(list[i], "//div[@class='pic']//img"), "src")
+
+		games = append(games, model.Game{
+			DoubanId:  doubanId,
+			Title:     title,
+			Thumbnail: thumbnail,
+		})
 
 		ratingNumber := uint8(0)
 		rating := htmlquery.FindOne(list[i], "//div[@class='rating-info']//span[contains(@class,'rating-star')]")
@@ -100,7 +106,7 @@ func scrollGame(doubanUid uint64, url string, action consts.Action) ([]*model.Co
 			tags = strings.TrimSpace(strings.Trim(htmlquery.InnerText(tagsNode), "标签:"))
 		}
 
-		comment := &model.Comment{
+		comment := model.Comment{
 			DoubanUid: doubanUid,
 			DoubanId:  doubanId,
 			Type:      consts.TypeGame,
@@ -110,15 +116,15 @@ func scrollGame(doubanUid uint64, url string, action consts.Action) ([]*model.Co
 			Action:    action.Code,
 			MarkDate:  markDate,
 		}
-		comments[i] = comment
+		comments = append(comments, comment)
 	}
 
 	nextBtn := htmlquery.FindOne(doc, "//link[@rel='next']")
 	if nextBtn == nil {
-		return comments, uint32(total), "", err
+		return &comments, &games, uint32(total), "", err
 	} else {
 		nextLink := htmlquery.SelectAttr(nextBtn, "href")
-		return comments, uint32(total), fmt.Sprintf("https://www.douban.com/people/%d/games%s", doubanUid, nextLink), err
+		return &comments, &games, uint32(total), fmt.Sprintf("https://www.douban.com/people/%d/games%s", doubanUid, nextLink), err
 	}
 
 }

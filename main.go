@@ -4,18 +4,14 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
 	"mouban/controller"
+	"net/http"
 )
 
 func main() {
 
 	router := gin.Default()
 
-	router = collectRoute(router)
-
-	panic(router.Run(":" + viper.GetString("server.port")))
-}
-
-func collectRoute(router *gin.Engine) *gin.Engine {
+	router.Use(Recover)
 
 	queryGroup := router.Group("/guest")
 	{
@@ -34,5 +30,17 @@ func collectRoute(router *gin.Engine) *gin.Engine {
 		adminGroup.GET("/crawl_game", controller.CrawlGame)
 	}
 
-	return router
+	panic(router.Run(":" + viper.GetString("server.port")))
+}
+
+func Recover(ctx *gin.Context) {
+	defer func() {
+		if r := recover(); r != nil {
+			ctx.JSON(http.StatusOK, gin.H{
+				"success": false,
+				"msg":     r,
+			})
+		}
+	}()
+	ctx.Next()
 }

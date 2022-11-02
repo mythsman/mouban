@@ -1,7 +1,7 @@
 package logic
 
 func DispatchUser(doubanUid uint64) {
-
+	panic("")
 }
 
 func DispatchBook() {

@@ -21,8 +21,12 @@ func GetComment(doubanId uint64, doubanUid uint64, t uint8) *model.Comment {
 	return comment
 }
 
-func ListComment(doubanIds *[]uint64, doubanUid uint64, t uint8) *[]model.Comment {
+func SearchComment(doubanUid uint64, t uint8, action uint8, offset int, limit int) *[]model.Comment {
 	var comment *[]model.Comment
-	common.Db.Where("douban_id IN ? AND douban_uid = ? type = ?", *doubanIds, doubanUid, t).Find(&comment)
+	common.Db.Where("douban_uid = ? AND type = ? AND action = ? ", doubanUid, t, action).
+		Order("mark_date desc").
+		Offset(offset).
+		Limit(limit).
+		Find(&comment)
 	return comment
 }
