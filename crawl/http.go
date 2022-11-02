@@ -70,7 +70,7 @@ func Get(url string) (*string, error) {
 
 	req, err := http.NewRequest("GET", url, nil)
 	req.Header.Set("User-Agent", userAgent[rand.Intn(len(userAgent))])
-	cookies, err := cookiemonster.ParseFile("../cookie.txt")
+	cookies, err := cookiemonster.ParseFile("./cookie.txt")
 	if err != nil {
 		panic(err)
 	}

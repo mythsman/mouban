@@ -3,7 +3,9 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
+	"log"
 	"mouban/controller"
+	"mouban/util"
 	"net/http"
 )
 
@@ -40,6 +42,7 @@ func Recover(ctx *gin.Context) {
 				"success": false,
 				"msg":     r,
 			})
+			log.Println(util.GetCurrentGoroutineStack())
 		}
 	}()
 	ctx.Next()

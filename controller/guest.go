@@ -4,7 +4,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"mouban/consts"
 	"mouban/dao"
-	"mouban/logic"
 	"net/http"
 	"strconv"
 )
@@ -15,7 +14,7 @@ func CheckUser(ctx *gin.Context) {
 	schedule := dao.GetSchedule(doubanUid, consts.TypeUser)
 
 	if schedule == nil {
-		logic.Dispatch(doubanUid, consts.TypeUser)
+		dao.CreateSchedule(doubanUid, consts.TypeUser, consts.ScheduleStatusToCrawl, consts.ScheduleResultUnready)
 		panic("未录入当前用户，已发起录入，请等待后台数据更新")
 	}
 
