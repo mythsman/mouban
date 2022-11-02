@@ -29,8 +29,26 @@ func (User) TableName() string {
 	return "user"
 }
 
+func (user User) Show() *UserVO {
+	return &UserVO{
+		ID:           user.DoubanUid,
+		Domain:       user.Domain,
+		Name:         user.Name,
+		Thumbnail:    user.Thumbnail,
+		BookWish:     user.BookWish,
+		BookDo:       user.BookDo,
+		BookCollect:  user.BookCollect,
+		GameWish:     user.GameWish,
+		GameDo:       user.GameDo,
+		GameCollect:  user.GameCollect,
+		MovieWish:    user.MovieWish,
+		MovieDo:      user.MovieDo,
+		MovieCollect: user.MovieCollect,
+	}
+}
+
 type UserVO struct {
-	DoubanUid    uint64 `json:"douban_uid"`
+	ID           uint64 `json:"id"`
 	Domain       string `json:"domain"`
 	Name         string `json:"name"`
 	Thumbnail    string `json:"thumbnail"`

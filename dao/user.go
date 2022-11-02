@@ -3,8 +3,6 @@ package dao
 import (
 	"mouban/common"
 	"mouban/model"
-	"mouban/util"
-	"strconv"
 )
 
 func UpsertUser(user *model.User) {
@@ -13,15 +11,9 @@ func UpsertUser(user *model.User) {
 	}
 }
 
-func GetUser(doubanUidOrDomain string) *model.User {
-	parsable := util.IsParsable(doubanUidOrDomain)
+func GetUser(doubanUid uint64) *model.User {
 	user := &model.User{}
-	if parsable {
-		result, _ := strconv.ParseUint(doubanUidOrDomain, 10, 64)
-		common.Db.Where("douban_uid = ? ", result).Find(user)
-	} else {
-		common.Db.Where("domain = ? ", doubanUidOrDomain).Find(user)
-	}
+	common.Db.Where("douban_uid = ? ", doubanUid).Find(user)
 	if user.ID == 0 {
 		return nil
 	}
