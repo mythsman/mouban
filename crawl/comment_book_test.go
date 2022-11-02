@@ -8,24 +8,23 @@ import (
 )
 
 func Test_scrollBook(t *testing.T) {
-	book, total, next, err := scrollBook(162448367, "", consts.ActionCollect)
+	comments, books, total, next, err := scrollBook(162448367, "", consts.ActionCollect)
 	if err != nil {
 		return
 	}
-	for i := range book {
-		fmt.Println(util.ToJson(book[i]))
-	}
+	fmt.Println(util.ToJson(*comments))
+	fmt.Println(util.ToJson(*books))
 	fmt.Println(total)
 	fmt.Println(next)
 }
 
 func Test_CommentBook(t *testing.T) {
-	user, comments, err := CommentBook(162448367)
+	user, comments, books, err := CommentBook(162448367)
 	if err != nil {
 		return
 	}
-	fmt.Println(util.ToJson(user))
-	for _, c := range comments {
-		fmt.Println(util.ToJson(c))
-	}
+	fmt.Println(util.ToJson(*user))
+	fmt.Println(util.ToJson(*comments))
+	fmt.Println(util.ToJson(*books))
+
 }

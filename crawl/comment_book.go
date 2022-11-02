@@ -9,77 +9,83 @@ import (
 	"strings"
 )
 
-func CommentBook(doubanUid uint64) (*model.User, []*model.Comment, error) {
-	var allComments []*model.Comment
+func CommentBook(doubanUid uint64) (*model.User, *[]model.Comment, *[]model.Book, error) {
+	var allComments []model.Comment
+	var allBooks []model.Book
 	user := &model.User{}
-	url := ""
-	for {
-		comments, total, next, err := scrollBook(doubanUid, url, consts.ActionDo)
-		if err != nil {
-			return nil, nil, err
-		}
-		user.BookDo = total
-		url = next
-		allComments = append(allComments, comments...)
-		if next == "" {
-			break
-		}
-	}
 
-	url = ""
-	for {
-		comments, total, next, err := scrollBook(doubanUid, url, consts.ActionWish)
-		if err != nil {
-			return nil, nil, err
-		}
-		user.BookWish = total
-		url = next
-		allComments = append(allComments, comments...)
+	comments, books, total := scrollAllBook(doubanUid, consts.ActionDo)
+	user.BookDo = total
+	allComments = append(allComments, *comments...)
+	allBooks = append(allBooks, *books...)
 
-		if next == "" {
-			break
-		}
-	}
+	comments, books, total = scrollAllBook(doubanUid, consts.ActionWish)
+	user.BookWish = total
+	allComments = append(allComments, *comments...)
+	allBooks = append(allBooks, *books...)
 
-	url = ""
-	for {
-		comments, total, next, err := scrollBook(doubanUid, url, consts.ActionCollect)
-		if err != nil {
-			return nil, nil, err
-		}
-		user.BookCollect = total
-		url = next
-		allComments = append(allComments, comments...)
+	comments, books, total = scrollAllBook(doubanUid, consts.ActionCollect)
+	user.BookCollect = total
+	allComments = append(allComments, *comments...)
+	allBooks = append(allBooks, *books...)
 
-		if next == "" {
-			break
-		}
-	}
-	return user, allComments, nil
+	return user, &allComments, &allBooks, nil
 }
 
-func scrollBook(doubanUid uint64, url string, action consts.Action) ([]*model.Comment, uint32, string, error) {
+func scrollAllBook(doubanUid uint64, action consts.Action) (*[]model.Comment, *[]model.Book, uint32) {
+	total := uint32(0)
+	var allComments []model.Comment
+	var allBooks []model.Book
+
+	url := ""
+	for {
+		comments, books, count, next, err := scrollBook(doubanUid, url, action)
+		if err != nil {
+			panic(err)
+		}
+		total = count
+		url = next
+		allComments = append(allComments, *comments...)
+		allBooks = append(allBooks, *books...)
+		if next == "" {
+			break
+		}
+	}
+	return &allComments, &allBooks, total
+}
+
+func scrollBook(doubanUid uint64, url string, action consts.Action) (*[]model.Comment, *[]model.Book, uint32, string, error) {
 	if url == "" {
 		url = fmt.Sprintf(consts.BookCommentUrl, doubanUid, action.Name)
 	}
 	body, err := Get(url)
 	if err != nil {
-		return nil, 0, "", err
+		return nil, nil, 0, "", err
 	}
 
 	doc, err := htmlquery.Parse(strings.NewReader(*body))
 	if err != nil {
-		return nil, 0, "", err
+		return nil, nil, 0, "", err
 	}
 
 	total := util.ParseNumber(htmlquery.InnerText(htmlquery.FindOne(doc, "//div[@id='db-usr-profile']/div[@class='info']/h1")))
 
 	list := htmlquery.Find(doc, "//li[@class='subject-item']")
-	comments := make([]*model.Comment, len(list))
+	var comments []model.Comment
+	var books []model.Book
+
 	for i := range list {
 		link := htmlquery.FindOne(list[i], "//div[@class='info']/h2/a")
 		href := htmlquery.SelectAttr(link, "href")
 		doubanId := util.ParseNumber(href)
+		title := htmlquery.SelectAttr(link, "title")
+		thumbnail := htmlquery.SelectAttr(htmlquery.FindOne(list[i], "//div[@class='pic']//img"), "src")
+
+		books = append(books, model.Book{
+			DoubanId:  doubanId,
+			Title:     title,
+			Thumbnail: thumbnail,
+		})
 
 		ratingNumber := uint8(0)
 		rating := htmlquery.FindOne(list[i], "//div[@class='short-note']//span[contains(@class,'rating')]")
@@ -100,7 +106,7 @@ func scrollBook(doubanUid uint64, url string, action consts.Action) ([]*model.Co
 			tags = strings.TrimSpace(strings.Trim(htmlquery.InnerText(tagsNode), "标签:"))
 		}
 
-		comment := &model.Comment{
+		comment := model.Comment{
 			DoubanUid: doubanUid,
 			DoubanId:  doubanId,
 			Type:      consts.TypeBook,
@@ -110,15 +116,15 @@ func scrollBook(doubanUid uint64, url string, action consts.Action) ([]*model.Co
 			Action:    action.Code,
 			MarkDate:  markDate,
 		}
-		comments[i] = comment
+		comments = append(comments, comment)
 	}
 
 	nextBtn := htmlquery.FindOne(doc, "//link[@rel='next']")
 	if nextBtn == nil {
-		return comments, uint32(total), "", err
+		return &comments, &books, uint32(total), "", err
 	} else {
 		nextLink := htmlquery.SelectAttr(nextBtn, "href")
-		return comments, uint32(total), "https://book.douban.com" + nextLink, err
+		return &comments, &books, uint32(total), "https://book.douban.com" + nextLink, err
 	}
 
 }
