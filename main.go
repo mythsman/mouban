@@ -19,6 +19,7 @@ func collectRoute(router *gin.Engine) *gin.Engine {
 
 	queryGroup := router.Group("/guest")
 	{
+		queryGroup.GET("/check_user", controller.CheckUser)
 		queryGroup.GET("/user_book", controller.ListUserBook)
 		queryGroup.GET("/user_game", controller.ListUserGame)
 		queryGroup.GET("/user_movie", controller.ListUserMovie)

@@ -18,8 +18,10 @@ const TypeBook = 1
 const TypeMovie = 2
 const TypeGame = 3
 
-const ScheduleToCrawl = 0
-const ScheduleCrawling = 1
-const ScheduleSucceeded = 2
-const ScheduleFailed = 3
-const ScheduleInvalid = 4
+const ScheduleStatusToCrawl = 0
+const ScheduleStatusCrawling = 1
+const ScheduleStatusCrawled = 2
+
+const ScheduleResultUnready = 0
+const ScheduleResultReady = 1
+const ScheduleResultInvalid = 2
