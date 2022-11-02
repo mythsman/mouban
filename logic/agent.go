@@ -1,11 +1,12 @@
 package logic
 
 import (
+	"log"
 	"mouban/consts"
 	"mouban/crawl"
 	"mouban/dao"
 	"mouban/model"
-	"strconv"
+	"mouban/util"
 	"time"
 )
 
@@ -61,11 +62,11 @@ func processUser(doubanUid uint64) {
 	}()
 
 	//user
-	user, err := crawl.UserOverview(strconv.FormatUint(doubanUid, 10))
-	if err != nil {
-		panic(err)
-	}
-	dao.UpsertUser(user)
+	//user, err := crawl.UserOverview(strconv.FormatUint(doubanUid, 10))
+	//if err != nil {
+	//	panic(err)
+	//}
+	//dao.UpsertUser(user)
 
 	//game
 	_, comment, game, err := crawl.CommentGame(doubanUid)
@@ -80,33 +81,33 @@ func processUser(doubanUid uint64) {
 		dao.UpsertComment(&c)
 	}
 
-	//book
-	_, comment, book, err := crawl.CommentBook(doubanUid)
-	if err != nil {
-		panic(err)
-	}
-
-	for _, b := range *book {
-		dao.CreateBookNx(&b)
-	}
-
-	for _, c := range *comment {
-		dao.UpsertComment(&c)
-	}
-
-	//movie
-	_, comment, movie, err := crawl.CommentMovie(doubanUid)
-	if err != nil {
-		panic(err)
-	}
-
-	for _, m := range *movie {
-		dao.CreateMovie(&m)
-	}
-
-	for _, c := range *comment {
-		dao.UpsertComment(&c)
-	}
+	////book
+	//_, comment, book, err := crawl.CommentBook(doubanUid)
+	//if err != nil {
+	//	panic(err)
+	//}
+	//
+	//for _, b := range *book {
+	//	dao.CreateBookNx(&b)
+	//}
+	//
+	//for _, c := range *comment {
+	//	dao.UpsertComment(&c)
+	//}
+	//
+	////movie
+	//_, comment, movie, err := crawl.CommentMovie(doubanUid)
+	//if err != nil {
+	//	panic(err)
+	//}
+	//
+	//for _, m := range *movie {
+	//	dao.CreateMovie(&m)
+	//}
+	//
+	//for _, c := range *comment {
+	//	dao.UpsertComment(&c)
+	//}
 }
 
 func init() {
@@ -114,42 +115,52 @@ func init() {
 
 	for i := 0; i < 10; i++ {
 		go func(id int) {
+			defer func() {
+				if r := recover(); r != nil {
+					log.Println(util.GetCurrentGoroutineStack())
+				}
+			}()
+
 			for {
-				schedule, ok := <-ch
-				if !ok {
-					switch schedule.Type {
-					case consts.TypeBook:
-						processBook(schedule.DoubanId)
-						break
-					case consts.TypeMovie:
-						processMovie(schedule.DoubanId)
-						break
-					case consts.TypeGame:
-						processGame(schedule.DoubanId)
-						break
-					case consts.TypeUser:
-						processUser(schedule.DoubanId)
-						break
-					}
-					return
+				schedule := <-ch
+				log.Println("agent consume ", schedule)
+				switch schedule.Type {
+				case consts.TypeBook:
+					processBook(schedule.DoubanId)
+					break
+				case consts.TypeMovie:
+					processMovie(schedule.DoubanId)
+					break
+				case consts.TypeGame:
+					processGame(schedule.DoubanId)
+					break
+				case consts.TypeUser:
+					processUser(schedule.DoubanId)
+					break
 				}
 			}
 		}(i)
 	}
 
 	go func() {
+		defer func() {
+			if r := recover(); r != nil {
+				log.Println(util.GetCurrentGoroutineStack())
+			}
+		}()
 		for {
 			schedule := dao.SearchScheduleByStatus(consts.ScheduleStatusToCrawl)
 			if schedule == nil {
 				time.Sleep(time.Second * 5)
+				log.Println("agent idle")
 				continue
 			}
 			changed := dao.CasScheduleStatus(schedule.DoubanId, schedule.Type, consts.ScheduleStatusCrawling, consts.ScheduleStatusToCrawl)
 			if changed {
+				log.Println("agent submit")
 				ch <- *schedule
 			}
 		}
 	}()
 
-	close(ch)
 }
