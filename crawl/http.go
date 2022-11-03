@@ -3,6 +3,7 @@ package crawl
 import (
 	"crypto/tls"
 	"fmt"
+	cookiemonster "github.com/MercuryEngineering/CookieMonster"
 	"github.com/spf13/viper"
 	"golang.org/x/net/context"
 	"golang.org/x/time/rate"
@@ -10,6 +11,7 @@ import (
 	"math/rand"
 	"net/http"
 	"net/http/cookiejar"
+	"strings"
 	"time"
 )
 
@@ -65,14 +67,14 @@ func Get(url string) (*string, error) {
 	req.Header.Set("User-Agent", userAgent)
 	req.Header.Set("Referer", "https://www.douban.com/")
 
-	//cookies, err := cookiemonster.ParseFile("./cookie.txt")
-	//if err != nil {
-	//	panic(err)
-	//}
-	//for _, c := range cookies {
-	//	c.Value = strings.Trim(c.Value, "\"")
-	//	req.AddCookie(c)
-	//}
+	cookies, err := cookiemonster.ParseFile("./cookie.txt")
+	if err != nil {
+		panic(err)
+	}
+	for _, c := range cookies {
+		c.Value = strings.Trim(c.Value, "\"")
+		req.AddCookie(c)
+	}
 
 	if err != nil {
 		return nil, err
