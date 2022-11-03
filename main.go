@@ -38,11 +38,11 @@ func main() {
 func Recover(ctx *gin.Context) {
 	defer func() {
 		if r := recover(); r != nil {
-			ctx.JSON(http.StatusOK, gin.H{
+			ctx.JSON(http.StatusInternalServerError, gin.H{
 				"success": false,
-				"msg":     r,
+				"msg":     "服务内部错误，请联系开发者处理",
 			})
-			log.Println(util.GetCurrentGoroutineStack())
+			log.Println(r, " => ", util.GetCurrentGoroutineStack())
 		}
 	}()
 	ctx.Next()

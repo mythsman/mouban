@@ -11,8 +11,8 @@ func UpsertBook(book *model.Book) {
 	}
 }
 
-func CreateBookNx(book *model.Book) {
-	common.Db.Create(book)
+func CreateBookNx(book *model.Book) bool {
+	return common.Db.Create(book).RowsAffected > 0
 }
 
 func GetBookDetail(doubanId uint64) *model.Book {

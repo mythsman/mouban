@@ -11,8 +11,8 @@ func UpsertGame(game *model.Game) {
 	}
 }
 
-func CreateGameNx(game *model.Game) {
-	common.Db.Create(game)
+func CreateGameNx(game *model.Game) bool {
+	return common.Db.Create(game).RowsAffected > 0
 }
 
 func GetGameDetail(doubanId uint64) *model.Game {
