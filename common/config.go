@@ -1,8 +1,8 @@
 package common
 
 import (
-	"fmt"
 	"github.com/spf13/viper"
+	"log"
 	"os"
 )
 
@@ -13,9 +13,9 @@ func init() {
 	viper.AddConfigPath(workDir)
 	err := viper.ReadInConfig()
 	if err != nil {
-		fmt.Println("获取配置文件错误")
+		log.Println("获取配置文件错误")
 		panic(err)
 	}
-	fmt.Println("配置初始化成功")
+	log.Println("配置初始化成功")
 
 }
