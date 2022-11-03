@@ -38,8 +38,16 @@ func Book(doubanId uint64) (*model.Book, *model.Rating, error) {
 		}
 		selected = append(selected, intro)
 	}
-	contentIntro := util.TrimBookParagraph(selected[0])
-	authorIntro := util.TrimBookParagraph(selected[1])
+
+	contentIntro := ""
+	if len(selected) >= 1 {
+		contentIntro = util.TrimBookParagraph(selected[0])
+	}
+
+	authorIntro := ""
+	if len(selected) >= 2 {
+		authorIntro = util.TrimBookParagraph(selected[1])
+	}
 
 	data := util.TrimInfo(htmlquery.OutputHTML(htmlquery.FindOne(doc, "//div[@id='info']"), false))
 
