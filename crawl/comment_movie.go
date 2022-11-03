@@ -7,6 +7,7 @@ import (
 	"mouban/model"
 	"mouban/util"
 	"strings"
+	"time"
 )
 
 func CommentMovie(doubanUid uint64) (*model.User, *[]model.Comment, *[]model.Movie, error) {
@@ -93,7 +94,12 @@ func scrollMovie(doubanUid uint64, url string, action consts.Action) (*[]model.C
 		if rating != nil {
 			ratingNumber = uint8(util.ParseNumber(htmlquery.SelectAttr(rating, "class")))
 		}
-		markDate := util.ParseDate(htmlquery.InnerText(htmlquery.FindOne(list[i], "//span[@class='date']")))
+		date := htmlquery.FindOne(list[i], "//span[@class='date']")
+
+		markDate := time.Unix(0, 0)
+		if date != nil {
+			markDate = util.ParseDate(htmlquery.InnerText(date))
+		}
 
 		shortComment := ""
 		shortCommentNode := htmlquery.FindOne(list[i], "//span[@class='comment']")

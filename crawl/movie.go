@@ -35,7 +35,9 @@ func Movie(doubanId uint64) (*model.Movie, *model.Rating, error) {
 		intro = util.TrimParagraph(htmlquery.InnerText(allHiddenIntro))
 	} else {
 		shortIntro := htmlquery.FindOne(doc, "//div[@id='link-report-intra']/span[@property='v:summary']")
-		intro = util.TrimParagraph(htmlquery.InnerText(shortIntro))
+		if shortIntro != nil {
+			intro = util.TrimParagraph(htmlquery.InnerText(shortIntro))
+		}
 	}
 
 	data := util.TrimInfo(htmlquery.OutputHTML(htmlquery.FindOne(doc, "//div[@id='info']"), false))
@@ -54,7 +56,7 @@ func Movie(doubanId uint64) (*model.Movie, *model.Rating, error) {
 		duration = util.ParseNumber(data["单集片长"]) * 60
 	}
 	alias := data["又名"]
-	imdb := data["Imdb"]
+	imdb := data["IMDb"]
 	episode := util.ParseNumber(data["集数"])
 	releaseData := data["上映日期"]
 
