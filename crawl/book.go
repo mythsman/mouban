@@ -1,6 +1,7 @@
 package crawl
 
 import (
+	"errors"
 	"fmt"
 	"github.com/antchfx/htmlquery"
 	"mouban/consts"
@@ -16,9 +17,16 @@ func Book(doubanId uint64) (*model.Book, *model.Rating, error) {
 	}
 
 	doc, err := htmlquery.Parse(strings.NewReader(*body))
+
 	if err != nil {
 		return nil, nil, err
 	}
+
+	t := htmlquery.InnerText(htmlquery.FindOne(doc, "//head//title"))
+	if strings.TrimSpace(t) == "页面不存在" {
+		return nil, nil, errors.New("页面不存在")
+	}
+
 	title := htmlquery.SelectAttr(htmlquery.FindOne(doc, "//meta[@property='og:title']"), "content")
 	thumbnail := htmlquery.SelectAttr(htmlquery.FindOne(doc, "//a[@class='nbg']/img"), "src")
 	intros := htmlquery.Find(doc, "//div[@class='intro']")
@@ -33,7 +41,7 @@ func Book(doubanId uint64) (*model.Book, *model.Rating, error) {
 	press := data["出版社"]
 	producer := data["出品方"]
 	translator := data["译者"]
-	serial := data["丛书"]
+	serial := strings.TrimSpace(data["丛书"])
 	publishAt := data["出版年"]
 	framing := data["装帧"]
 	page := uint32(util.ParseNumber(data["页数"]))

@@ -1,6 +1,7 @@
 package crawl
 
 import (
+	"errors"
 	"fmt"
 	"github.com/antchfx/htmlquery"
 	"mouban/consts"
@@ -19,6 +20,12 @@ func Movie(doubanId uint64) (*model.Movie, *model.Rating, error) {
 	if err != nil {
 		return nil, nil, err
 	}
+
+	t := htmlquery.InnerText(htmlquery.FindOne(doc, "//head//title"))
+	if strings.TrimSpace(t) == "页面不存在" {
+		return nil, nil, errors.New("页面不存在")
+	}
+
 	title := htmlquery.SelectAttr(htmlquery.FindOne(doc, "//meta[@property='og:title']"), "content")
 	thumbnail := htmlquery.SelectAttr(htmlquery.FindOne(doc, "//a[@class='nbg']/img"), "src")
 
