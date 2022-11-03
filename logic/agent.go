@@ -13,11 +13,14 @@ import (
 
 func processBook(doubanId uint64) {
 	defer func() {
-		dao.ChangeScheduleResult(doubanId, consts.TypeBook, consts.ScheduleResultUnready)
+		if r := recover(); r != nil {
+			log.Println(r, " => ", util.GetCurrentGoroutineStack())
+		}
 	}()
 	book, rating, err := crawl.Book(doubanId)
 
 	if err != nil {
+		dao.ChangeScheduleResult(doubanId, consts.TypeBook, consts.ScheduleResultInvalid)
 		panic(err)
 	}
 	dao.UpsertBook(book)
@@ -28,11 +31,14 @@ func processBook(doubanId uint64) {
 
 func processMovie(doubanId uint64) {
 	defer func() {
-		dao.ChangeScheduleResult(doubanId, consts.TypeMovie, consts.ScheduleResultUnready)
+		if r := recover(); r != nil {
+			log.Println(r, " => ", util.GetCurrentGoroutineStack())
+		}
 	}()
 	movie, rating, err := crawl.Movie(doubanId)
 
 	if err != nil {
+		dao.ChangeScheduleResult(doubanId, consts.TypeBook, consts.ScheduleResultInvalid)
 		panic(err)
 	}
 	dao.UpsertMovie(movie)
@@ -43,12 +49,15 @@ func processMovie(doubanId uint64) {
 
 func processGame(doubanId uint64) {
 	defer func() {
-		dao.ChangeScheduleResult(doubanId, consts.TypeGame, consts.ScheduleResultUnready)
+		if r := recover(); r != nil {
+			log.Println(r, " => ", util.GetCurrentGoroutineStack())
+		}
 	}()
 
 	game, rating, err := crawl.Game(doubanId)
 
 	if err != nil {
+		dao.ChangeScheduleResult(doubanId, consts.TypeBook, consts.ScheduleResultInvalid)
 		panic(err)
 	}
 	dao.UpsertGame(game)
@@ -59,12 +68,15 @@ func processGame(doubanId uint64) {
 
 func processUser(doubanUid uint64) {
 	defer func() {
-		dao.ChangeScheduleResult(doubanUid, consts.TypeUser, consts.ScheduleResultUnready)
+		if r := recover(); r != nil {
+			log.Println(r, " => ", util.GetCurrentGoroutineStack())
+		}
 	}()
 
 	//user
 	user, err := crawl.UserOverview(strconv.FormatUint(doubanUid, 10))
 	if err != nil {
+		dao.ChangeScheduleResult(doubanUid, consts.TypeBook, consts.ScheduleResultInvalid)
 		panic(err)
 	}
 	dao.UpsertUser(user)
@@ -127,12 +139,6 @@ func init() {
 
 	for i := 0; i < 5; i++ {
 		go func(id int) {
-			defer func() {
-				if r := recover(); r != nil {
-					log.Println(r, " => ", util.GetCurrentGoroutineStack())
-				}
-			}()
-
 			for {
 				schedule := <-ch
 				log.Println("agent consume ", util.ToJson(schedule))
