@@ -7,6 +7,7 @@ import (
 	"github.com/spf13/viper"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"log"
 	"mouban/model"
 	"net/url"
 )
@@ -38,7 +39,7 @@ func tryCreateDB(username string, password string, host string, port string, dat
 	defer func(db *sql.DB) {
 		err := db.Close()
 		if err != nil {
-			fmt.Println("database close failed")
+			log.Println("database close failed")
 		}
 	}(db)
 
@@ -46,7 +47,7 @@ func tryCreateDB(username string, password string, host string, port string, dat
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("Create db success.")
+	log.Println("Create db success.")
 }
 
 func getConnection(username string, password string, host string, port string, database string, charset string, loc string) {
@@ -64,7 +65,7 @@ func getConnection(username string, password string, host string, port string, d
 	db, err := gorm.Open(mysql.Open(sqlStr))
 
 	if err != nil {
-		fmt.Println("打开数据库失败", err)
+		log.Println("打开数据库失败", err)
 		panic("打开数据库失败" + err.Error())
 	}
 	Db = db
