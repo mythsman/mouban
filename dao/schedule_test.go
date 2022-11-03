@@ -20,3 +20,7 @@ func TestSearchSchedule(t *testing.T) {
 	schedule := SearchScheduleByStatus(consts.ScheduleStatusToCrawl)
 	fmt.Println(util.ToJson(schedule))
 }
+
+func TestChangeScheduleResult(t *testing.T) {
+	ChangeScheduleResult(162448367, consts.TypeUser, consts.ScheduleResultReady)
+}

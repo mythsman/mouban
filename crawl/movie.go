@@ -13,17 +13,17 @@ import (
 func Movie(doubanId uint64) (*model.Movie, *model.Rating, error) {
 	body, err := Get(fmt.Sprintf(consts.MovieDetailUrl, doubanId))
 	if err != nil {
-		return nil, nil, err
+		panic(err)
 	}
 
 	doc, err := htmlquery.Parse(strings.NewReader(*body))
 	if err != nil {
-		return nil, nil, err
+		panic(err)
 	}
 
 	t := htmlquery.InnerText(htmlquery.FindOne(doc, "//head//title"))
-	if strings.TrimSpace(t) == "页面不存在" {
-		return nil, nil, errors.New("页面不存在")
+	if strings.TrimSpace(t) == "页面不存在" || strings.TrimSpace(t) == "条目不存在" {
+		return nil, nil, errors.New(strings.TrimSpace(t))
 	}
 
 	title := htmlquery.SelectAttr(htmlquery.FindOne(doc, "//meta[@property='og:title']"), "content")

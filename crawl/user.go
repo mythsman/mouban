@@ -121,12 +121,12 @@ func bookOverview(id string) (*model.User, error) {
 func movieOverview(id string) (*model.User, error) {
 	body, err := Get(fmt.Sprintf(consts.MovieOverviewUrl, id))
 	if err != nil {
-		return nil, err
+		panic(err)
 	}
 
 	doc, err := htmlquery.Parse(strings.NewReader(*body))
 	if err != nil {
-		return nil, err
+		panic(err)
 	}
 	domain := htmlquery.SelectAttr(htmlquery.FindOne(doc, "//div[@id='db-usr-profile']//div[@class='pic']/a"), "href")
 	domain = util.ParseDomain(domain)
@@ -165,12 +165,12 @@ func movieOverview(id string) (*model.User, error) {
 func gameOverview(id string) (*model.User, error) {
 	body, err := Get(fmt.Sprintf(consts.GameOverviewUrl, id))
 	if err != nil {
-		return nil, err
+		panic(err)
 	}
 
 	doc, err := htmlquery.Parse(strings.NewReader(*body))
 	if err != nil {
-		return nil, err
+		panic(err)
 	}
 
 	domain := htmlquery.SelectAttr(htmlquery.FindOne(doc, "//div[@id='db-usr-profile']//div[@class='pic']/a"), "href")
