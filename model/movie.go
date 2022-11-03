@@ -10,7 +10,7 @@ type Movie struct {
 	Title       string `gorm:"not null;type:varchar(512)"`
 	Director    string `gorm:"type:varchar(512)"`
 	Writer      string `gorm:"type:varchar(512)"`
-	Actor       string `gorm:"type:varchar(512)"`
+	Actor       string `gorm:"type:varchar(1024)"`
 	Style       string `gorm:"type:varchar(512)"`
 	Site        string `gorm:"type:varchar(512)"`
 	Country     string `gorm:"type:varchar(512)"`
@@ -19,7 +19,7 @@ type Movie struct {
 	Episode     uint32
 	Duration    uint32
 	Alias       string `gorm:"type:varchar(512)"`
-	IMDb        string `gorm:"type:varchar(512)"`
+	IMDb        string `gorm:"type:varchar(512);column:imdb"`
 	Intro       string `gorm:"type:mediumtext"`
 	Thumbnail   string `gorm:"type:varchar(512)"`
 	CreatedAt   time.Time
