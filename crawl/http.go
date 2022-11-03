@@ -3,14 +3,13 @@ package crawl
 import (
 	"crypto/tls"
 	"fmt"
-	"github.com/MercuryEngineering/CookieMonster"
 	"github.com/spf13/viper"
 	"golang.org/x/net/context"
 	"golang.org/x/time/rate"
 	"io/ioutil"
 	"math/rand"
 	"net/http"
-	"strings"
+	"net/http/cookiejar"
 	"time"
 )
 
@@ -19,30 +18,24 @@ var userAgent = []string{
 	"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:105.0) Gecko/20100101 Firefox/105.0",
 	"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36",
 	"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36",
-	"Mozilla/5.0 (X11; Linux x86_64; rv:105.0) Gecko/20100101 Firefox/105.0",
 	"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36",
 	"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:106.0) Gecko/20100101 Firefox/106.0",
 	"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:105.0) Gecko/20100101 Firefox/105.0",
 	"Mozilla/5.0 (Windows NT 10.0; rv:105.0) Gecko/20100101 Firefox/105.0",
-	"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36",
 	"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Safari/605.1.15",
-	"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:105.0) Gecko/20100101 Firefox/105.0",
-	"Mozilla/5.0 (X11; Linux x86_64; rv:106.0) Gecko/20100101 Firefox/106.0",
-	"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36",
 	"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36 Edg/106.0.1370.42",
 	"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36 Edg/106.0.1370.47",
-	"Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101 Firefox/102.0", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36 Edg/105.0.1343.53",
 	"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36 Edg/106.0.1370.52",
 	"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:104.0) Gecko/20100101 Firefox/104.0",
-	"Mozilla/5.0 (X11; Linux x86_64; rv:104.0) Gecko/20100101 Firefox/104.0",
-	"Mozilla/5.0 (X11; Linux x86_64; rv:103.0) Gecko/20100101 Firefox/103.0", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:106.0) Gecko/20100101 Firefox/106.0",
-}
+}[rand.Intn(13)]
 
 var client http.Client
 var limiter *rate.Limiter
 
 func init() {
+	jar, _ := cookiejar.New(nil)
 	client = http.Client{
+		Jar:     jar,
 		Timeout: time.Duration(viper.GetInt("http.timeout")) * time.Second,
 		Transport: &http.Transport{
 			TLSHandshakeTimeout: 10 * time.Second,
@@ -58,7 +51,7 @@ func init() {
 				},
 			},
 		}}
-	limiter = rate.NewLimiter(rate.Every(3*time.Second), 1)
+	limiter = rate.NewLimiter(rate.Every(5*time.Second), 1)
 }
 
 func Get(url string) (*string, error) {
@@ -69,15 +62,17 @@ func Get(url string) (*string, error) {
 	}
 
 	req, err := http.NewRequest("GET", url, nil)
-	req.Header.Set("User-Agent", userAgent[rand.Intn(len(userAgent))])
-	cookies, err := cookiemonster.ParseFile("./cookie.txt")
-	if err != nil {
-		panic(err)
-	}
-	for _, c := range cookies {
-		c.Value = strings.Trim(c.Value, "\"")
-		req.AddCookie(c)
-	}
+	req.Header.Set("User-Agent", userAgent)
+	req.Header.Set("Referer", "https://www.douban.com/")
+
+	//cookies, err := cookiemonster.ParseFile("./cookie.txt")
+	//if err != nil {
+	//	panic(err)
+	//}
+	//for _, c := range cookies {
+	//	c.Value = strings.Trim(c.Value, "\"")
+	//	req.AddCookie(c)
+	//}
 
 	if err != nil {
 		return nil, err

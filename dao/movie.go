@@ -11,8 +11,8 @@ func UpsertMovie(movie *model.Movie) {
 	}
 }
 
-func CreateMovie(movie *model.Movie) {
-	common.Db.Create(movie)
+func CreateMovieNx(movie *model.Movie) bool {
+	return common.Db.Create(movie).RowsAffected > 0
 }
 
 func GetMovieDetail(doubanId uint64) *model.Movie {

@@ -7,6 +7,7 @@ import (
 	"mouban/dao"
 	"mouban/model"
 	"mouban/util"
+	"strconv"
 	"time"
 )
 
@@ -62,11 +63,11 @@ func processUser(doubanUid uint64) {
 	}()
 
 	//user
-	//user, err := crawl.UserOverview(strconv.FormatUint(doubanUid, 10))
-	//if err != nil {
-	//	panic(err)
-	//}
-	//dao.UpsertUser(user)
+	user, err := crawl.UserOverview(strconv.FormatUint(doubanUid, 10))
+	if err != nil {
+		panic(err)
+	}
+	dao.UpsertUser(user)
 
 	//game
 	_, comment, game, err := crawl.CommentGame(doubanUid)
@@ -74,40 +75,51 @@ func processUser(doubanUid uint64) {
 		panic(err)
 	}
 	for _, g := range *game {
-		dao.CreateGameNx(&g)
+		added := dao.CreateGameNx(&g)
+		if added {
+			dao.CreateSchedule(g.DoubanId, consts.TypeGame, consts.ScheduleStatusToCrawl, consts.ScheduleResultUnready)
+		}
 	}
 
 	for _, c := range *comment {
 		dao.UpsertComment(&c)
 	}
 
-	////book
-	//_, comment, book, err := crawl.CommentBook(doubanUid)
-	//if err != nil {
-	//	panic(err)
-	//}
-	//
-	//for _, b := range *book {
-	//	dao.CreateBookNx(&b)
-	//}
-	//
-	//for _, c := range *comment {
-	//	dao.UpsertComment(&c)
-	//}
-	//
-	////movie
-	//_, comment, movie, err := crawl.CommentMovie(doubanUid)
-	//if err != nil {
-	//	panic(err)
-	//}
-	//
-	//for _, m := range *movie {
-	//	dao.CreateMovie(&m)
-	//}
-	//
-	//for _, c := range *comment {
-	//	dao.UpsertComment(&c)
-	//}
+	//book
+	_, comment, book, err := crawl.CommentBook(doubanUid)
+	if err != nil {
+		panic(err)
+	}
+
+	for _, b := range *book {
+		added := dao.CreateBookNx(&b)
+		if added {
+			dao.CreateSchedule(b.DoubanId, consts.TypeBook, consts.ScheduleStatusToCrawl, consts.ScheduleResultUnready)
+		}
+	}
+
+	for _, c := range *comment {
+		dao.UpsertComment(&c)
+	}
+
+	//movie
+	_, comment, movie, err := crawl.CommentMovie(doubanUid)
+	if err != nil {
+		panic(err)
+	}
+
+	for _, m := range *movie {
+		added := dao.CreateMovieNx(&m)
+		if added {
+			dao.CreateSchedule(m.DoubanId, consts.TypeMovie, consts.ScheduleStatusToCrawl, consts.ScheduleResultUnready)
+		}
+	}
+
+	for _, c := range *comment {
+		dao.UpsertComment(&c)
+	}
+
+	dao.ChangeScheduleResult(doubanUid, consts.TypeUser, consts.ScheduleResultReady)
 }
 
 func init() {
@@ -117,7 +129,7 @@ func init() {
 		go func(id int) {
 			defer func() {
 				if r := recover(); r != nil {
-					log.Println(util.GetCurrentGoroutineStack())
+					log.Println(r, " => ", util.GetCurrentGoroutineStack())
 				}
 			}()
 
@@ -145,7 +157,7 @@ func init() {
 	go func() {
 		defer func() {
 			if r := recover(); r != nil {
-				log.Println(util.GetCurrentGoroutineStack())
+				log.Println(r, " => ", util.GetCurrentGoroutineStack())
 			}
 		}()
 		for {

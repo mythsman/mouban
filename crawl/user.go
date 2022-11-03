@@ -78,10 +78,22 @@ func bookOverview(id string) (*model.User, error) {
 	domain := htmlquery.SelectAttr(htmlquery.FindOne(doc, "//div[@id='db-usr-profile']//div[@class='pic']/a"), "href")
 	username := htmlquery.InnerText(htmlquery.FindOne(doc, "//div[contains(@class,'book-user-profile')]//div[@class='username']"))
 	registerAt := htmlquery.InnerText(htmlquery.FindOne(doc, "//div[contains(@class,'book-user-profile')]//div[@class='time-registered']"))
-	list := htmlquery.Find(doc, "//div[@id='db-book-mine']//span[@class='pl']/a")
-	do := htmlquery.InnerText(list[0])
-	collect := htmlquery.InnerText(list[1])
-	wish := htmlquery.InnerText(list[2])
+	list := htmlquery.Find(doc, "//div[@id='db-book-mine']//h2")
+	do := ""
+	wish := ""
+	collect := ""
+	for _, h := range list {
+		txt := htmlquery.InnerText(h)
+		if strings.Contains(txt, "读过") {
+			collect = txt
+		}
+		if strings.Contains(txt, "想读") {
+			wish = txt
+		}
+		if strings.Contains(txt, "在读") {
+			do = txt
+		}
+	}
 
 	thumbnail = strings.TrimSpace(thumbnail)
 	domain = util.ParseDomain(domain)
@@ -119,10 +131,22 @@ func movieOverview(id string) (*model.User, error) {
 	domain := htmlquery.SelectAttr(htmlquery.FindOne(doc, "//div[@id='db-usr-profile']//div[@class='pic']/a"), "href")
 	domain = util.ParseDomain(domain)
 
-	list := htmlquery.Find(doc, "//div[@id='db-movie-mine']//span[@class='pl']/a")
-	do := htmlquery.InnerText(list[0])
-	collect := htmlquery.InnerText(list[1])
-	wish := htmlquery.InnerText(list[2])
+	list := htmlquery.Find(doc, "//div[@id='db-movie-mine']//h2")
+	do := ""
+	wish := ""
+	collect := ""
+	for _, h := range list {
+		txt := htmlquery.InnerText(h)
+		if strings.Contains(txt, "看过") {
+			collect = txt
+		}
+		if strings.Contains(txt, "想看") {
+			wish = txt
+		}
+		if strings.Contains(txt, "在看") {
+			do = txt
+		}
+	}
 
 	doNum := util.ParseNumber(do)
 	wishNum := util.ParseNumber(wish)
@@ -152,10 +176,22 @@ func gameOverview(id string) (*model.User, error) {
 	domain := htmlquery.SelectAttr(htmlquery.FindOne(doc, "//div[@id='db-usr-profile']//div[@class='pic']/a"), "href")
 	domain = util.ParseDomain(domain)
 
-	list := htmlquery.Find(doc, "//div[@class='tabs']/a")
-	wish := htmlquery.InnerText(list[0])
-	do := htmlquery.InnerText(list[1])
-	collect := htmlquery.InnerText(list[2])
+	list := htmlquery.Find(doc, "//div[@class='tabs']//a")
+	do := ""
+	wish := ""
+	collect := ""
+	for _, h := range list {
+		txt := htmlquery.InnerText(h)
+		if strings.Contains(txt, "玩过") {
+			collect = txt
+		}
+		if strings.Contains(txt, "想玩") {
+			wish = txt
+		}
+		if strings.Contains(txt, "在玩") {
+			do = txt
+		}
+	}
 
 	wishNum := util.ParseNumber(wish)
 	doNum := util.ParseNumber(do)
