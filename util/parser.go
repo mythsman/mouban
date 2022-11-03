@@ -2,6 +2,7 @@ package util
 
 import (
 	"github.com/antchfx/htmlquery"
+	"golang.org/x/net/html"
 	"regexp"
 	"strconv"
 	"strings"
@@ -59,6 +60,13 @@ func ParseFloat(float string) float32 {
 func ParseDomain(link string) string {
 	result := domainParser.FindStringSubmatch(link)
 	return result[1]
+}
+
+func TrimBookParagraph(node *html.Node) string {
+	output := htmlquery.OutputHTML(node, true)
+	outputWithLine := strings.ReplaceAll(output, "</p>", "</p>\n")
+	body, _ := htmlquery.Parse(strings.NewReader(outputWithLine))
+	return TrimParagraph(htmlquery.InnerText(body))
 }
 
 func TrimParagraph(info string) string {

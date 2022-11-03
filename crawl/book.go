@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/antchfx/htmlquery"
+	"golang.org/x/net/html"
 	"mouban/consts"
 	"mouban/model"
 	"mouban/util"
@@ -30,7 +31,15 @@ func Book(doubanId uint64) (*model.Book, *model.Rating, error) {
 	title := htmlquery.SelectAttr(htmlquery.FindOne(doc, "//meta[@property='og:title']"), "content")
 	thumbnail := htmlquery.SelectAttr(htmlquery.FindOne(doc, "//a[@class='nbg']/img"), "src")
 	intros := htmlquery.Find(doc, "//div[@class='intro']")
-	intro := util.TrimParagraph(strings.TrimSpace(htmlquery.InnerText(intros[len(intros)-1])))
+	var selected []*html.Node
+	for _, intro := range intros {
+		if strings.Contains(htmlquery.InnerText(intro), "(展开全部)") {
+			continue
+		}
+		selected = append(selected, intro)
+	}
+	contentIntro := util.TrimBookParagraph(selected[0])
+	authorIntro := util.TrimBookParagraph(selected[1])
 
 	data := util.TrimInfo(htmlquery.OutputHTML(htmlquery.FindOne(doc, "//div[@id='info']"), false))
 
@@ -48,22 +57,23 @@ func Book(doubanId uint64) (*model.Book, *model.Rating, error) {
 	price := uint32(util.ParseFloat(data["定价"]) * 100)
 
 	book := &model.Book{
-		DoubanId:   doubanId,
-		Title:      title,
-		Subtitle:   subtitle,
-		Orititle:   orititle,
-		Author:     author,
-		Translator: translator,
-		Press:      press,
-		Producer:   producer,
-		Serial:     serial,
-		PublishAt:  publishAt,
-		ISBN:       isbn,
-		Framing:    framing,
-		Page:       page,
-		Price:      price,
-		Intro:      intro,
-		Thumbnail:  thumbnail,
+		DoubanId:    doubanId,
+		Title:       title,
+		Subtitle:    subtitle,
+		Orititle:    orititle,
+		Author:      author,
+		Translator:  translator,
+		Press:       press,
+		Producer:    producer,
+		Serial:      serial,
+		PublishAt:   publishAt,
+		ISBN:        isbn,
+		Framing:     framing,
+		Page:        page,
+		Price:       price,
+		BookIntro:   contentIntro,
+		AuthorIntro: authorIntro,
+		Thumbnail:   thumbnail,
 	}
 
 	rating := Rating(htmlquery.FindOne(doc, "//div[@id='interest_sectl']"))
