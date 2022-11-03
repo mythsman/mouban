@@ -10,12 +10,12 @@ type Movie struct {
 	Title       string `gorm:"not null;type:varchar(512)"`
 	Director    string `gorm:"type:varchar(512)"`
 	Writer      string `gorm:"type:varchar(512)"`
-	Actor       string `gorm:"type:varchar(1024)"`
+	Actor       string `gorm:"type:varchar(2048)"`
 	Style       string `gorm:"type:varchar(512)"`
 	Site        string `gorm:"type:varchar(512)"`
 	Country     string `gorm:"type:varchar(512)"`
 	Language    string `gorm:"type:varchar(512)"`
-	PublishDate string `gorm:"type:varchar(64)"`
+	PublishDate string `gorm:"type:varchar(512)"`
 	Episode     uint32
 	Duration    uint32
 	Alias       string `gorm:"type:varchar(512)"`

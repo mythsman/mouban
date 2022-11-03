@@ -38,7 +38,7 @@ func processMovie(doubanId uint64) {
 	movie, rating, err := crawl.Movie(doubanId)
 
 	if err != nil {
-		dao.ChangeScheduleResult(doubanId, consts.TypeBook, consts.ScheduleResultInvalid)
+		dao.ChangeScheduleResult(doubanId, consts.TypeMovie, consts.ScheduleResultInvalid)
 		panic(err)
 	}
 	dao.UpsertMovie(movie)
@@ -57,7 +57,7 @@ func processGame(doubanId uint64) {
 	game, rating, err := crawl.Game(doubanId)
 
 	if err != nil {
-		dao.ChangeScheduleResult(doubanId, consts.TypeBook, consts.ScheduleResultInvalid)
+		dao.ChangeScheduleResult(doubanId, consts.TypeGame, consts.ScheduleResultInvalid)
 		panic(err)
 	}
 	dao.UpsertGame(game)
@@ -76,7 +76,7 @@ func processUser(doubanUid uint64) {
 	//user
 	user, err := crawl.UserOverview(strconv.FormatUint(doubanUid, 10))
 	if err != nil {
-		dao.ChangeScheduleResult(doubanUid, consts.TypeBook, consts.ScheduleResultInvalid)
+		dao.ChangeScheduleResult(doubanUid, consts.TypeUser, consts.ScheduleResultInvalid)
 		panic(err)
 	}
 	dao.UpsertUser(user)
