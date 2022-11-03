@@ -167,17 +167,22 @@ func init() {
 				log.Println(r, " => ", util.GetCurrentGoroutineStack())
 			}
 		}()
+		lastIdle := true
 		for {
 			schedule := dao.SearchScheduleByStatus(consts.ScheduleStatusToCrawl)
 			if schedule == nil {
 				time.Sleep(time.Second * 5)
-				log.Println("agent idle")
-				continue
-			}
-			changed := dao.CasScheduleStatus(schedule.DoubanId, schedule.Type, consts.ScheduleStatusCrawling, consts.ScheduleStatusToCrawl)
-			if changed {
-				log.Println("agent submit")
-				ch <- *schedule
+				if !lastIdle {
+					log.Println("agent idle")
+				}
+				lastIdle = true
+			} else {
+				lastIdle = false
+				changed := dao.CasScheduleStatus(schedule.DoubanId, schedule.Type, consts.ScheduleStatusCrawling, consts.ScheduleStatusToCrawl)
+				if changed {
+					log.Println("agent submit")
+					ch <- *schedule
+				}
 			}
 		}
 	}()
