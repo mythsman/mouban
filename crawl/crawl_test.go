@@ -16,7 +16,7 @@ func TestMovie(t *testing.T) {
 }
 
 func TestGame(t *testing.T) {
-	game, rating, err := Game(26667882)
+	game, rating, err := Game(35447696)
 	if err != nil {
 		return
 	}

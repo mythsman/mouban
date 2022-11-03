@@ -19,7 +19,7 @@ func Rating(interestSelect *html.Node) *model.Rating {
 	}
 
 	ratingRaw := htmlquery.InnerText(htmlquery.FindOne(interestSelect, "//strong[@property='v:average']"))
-	if len(ratingRaw) == 0 {
+	if len(strings.TrimSpace(ratingRaw)) == 0 {
 		result := &model.Rating{
 			Status: consts.RatingNotEnough,
 		}

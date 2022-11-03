@@ -125,7 +125,7 @@ func processUser(doubanUid uint64) {
 func init() {
 	ch := make(chan model.Schedule)
 
-	for i := 0; i < 10; i++ {
+	for i := 0; i < 5; i++ {
 		go func(id int) {
 			defer func() {
 				if r := recover(); r != nil {
@@ -135,7 +135,7 @@ func init() {
 
 			for {
 				schedule := <-ch
-				log.Println("agent consume ", schedule)
+				log.Println("agent consume ", util.ToJson(schedule))
 				switch schedule.Type {
 				case consts.TypeBook:
 					processBook(schedule.DoubanId)
@@ -150,6 +150,7 @@ func init() {
 					processUser(schedule.DoubanId)
 					break
 				}
+				dao.CasScheduleStatus(schedule.DoubanId, schedule.Type, consts.ScheduleStatusCrawled, consts.ScheduleStatusCrawling)
 			}
 		}(i)
 	}

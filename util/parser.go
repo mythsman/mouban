@@ -34,6 +34,9 @@ func ParseDate(date string) time.Time {
 
 func ParseNumber(number string) uint64 {
 	result := numberParser.FindStringSubmatch(number)
+	if result == nil {
+		return 0
+	}
 	num, err := strconv.ParseUint(result[1], 10, 64)
 	if err != nil {
 		return 0
@@ -43,6 +46,9 @@ func ParseNumber(number string) uint64 {
 
 func ParseFloat(float string) float32 {
 	result := floatParser.FindStringSubmatch(float)
+	if result == nil {
+		return 0
+	}
 	f, err := strconv.ParseFloat(result[1], 32)
 	if err != nil {
 		return 0
@@ -111,13 +117,4 @@ func TrimLine(text string) string {
 	}
 
 	return strings.TrimSpace(data.String())
-}
-
-func IsParsable(str string) bool {
-	_, err := strconv.ParseUint(str, 10, 64)
-	if err != nil {
-		return false
-	} else {
-		return true
-	}
 }

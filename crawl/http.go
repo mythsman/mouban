@@ -55,7 +55,7 @@ func init() {
 }
 
 func Get(url string) (*string, error) {
-	ctx, _ := context.WithTimeout(context.Background(), time.Second*10)
+	ctx, _ := context.WithTimeout(context.Background(), time.Minute*10)
 	err := limiter.Wait(ctx)
 	if err != nil {
 		return nil, err
