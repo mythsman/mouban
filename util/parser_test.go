@@ -61,7 +61,7 @@ func TestParseDate(t *testing.T) {
 		args args
 		want time.Time
 	}{
-		{"1", args{date: "  2017-09-01 读过"}, time.Date(2017, 9, 1, 0, 0, 0, 0, time.UTC)},
+		{"1", args{date: "  2017-09-01 读过"}, time.Date(2017, 9, 1, 0, 0, 0, 0, time.Local)},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
