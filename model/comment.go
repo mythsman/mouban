@@ -22,10 +22,22 @@ func (Comment) TableName() string {
 	return "comment"
 }
 
+func (comment Comment) Show(item interface{}) *CommentVO {
+	return &CommentVO{
+		Item:     item,
+		Rate:     comment.Rate,
+		Label:    comment.Label,
+		Comment:  comment.Comment,
+		Action:   comment.Action,
+		MarkDate: comment.MarkDate,
+	}
+}
+
 type CommentVO struct {
-	Rate     uint8     `json:"rate"`
-	Label    string    `json:"label"`
-	Comment  string    `json:"comment"`
-	Action   uint8     `json:"action"`
-	MarkDate time.Time `json:"mark_date"`
+	Item     interface{} `json:"item"`
+	Rate     uint8       `json:"rate"`
+	Label    string      `json:"label"`
+	Comment  string      `json:"comment"`
+	Action   uint8       `json:"action"`
+	MarkDate time.Time   `json:"mark_date"`
 }

@@ -58,7 +58,7 @@ func Movie(doubanId uint64) (*model.Movie, *model.Rating, error) {
 	alias := data["又名"]
 	imdb := data["IMDb"]
 	episode := util.ParseNumber(data["集数"])
-	releaseData := data["上映日期"]
+	releaseDate := data["上映日期"]
 
 	movie := &model.Movie{
 		DoubanId:    doubanId,
@@ -70,7 +70,7 @@ func Movie(doubanId uint64) (*model.Movie, *model.Rating, error) {
 		Site:        site,
 		Country:     country,
 		Language:    language,
-		PublishDate: releaseData,
+		PublishDate: releaseDate,
 		Episode:     uint32(episode),
 		Duration:    uint32(duration),
 		Alias:       alias,
