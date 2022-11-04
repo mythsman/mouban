@@ -1,9 +1,9 @@
 package consts
 
-const UserRssUrl = "https://www.douban.com/feed/people/%s/interests"
-const BookOverviewUrl = "https://book.douban.com/people/%s/"
-const MovieOverviewUrl = "https://movie.douban.com/people/%s/"
-const GameOverviewUrl = "https://www.douban.com/people/%s/games/"
+const UserRssUrl = "https://www.douban.com/feed/people/%d/interests"
+const BookOverviewUrl = "https://book.douban.com/people/%d/"
+const MovieOverviewUrl = "https://movie.douban.com/people/%d/"
+const GameOverviewUrl = "https://www.douban.com/people/%d/games/"
 
 const BookCommentUrl = "https://book.douban.com/people/%d/%s"
 const MovieCommentUrl = "https://movie.douban.com/people/%d/%s"

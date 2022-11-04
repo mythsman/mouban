@@ -33,7 +33,7 @@ func TestBook(t *testing.T) {
 }
 
 func TestUserHash(t *testing.T) {
-	hash, err := UserHash("mythsman")
+	hash, err := UserHash(162448367)
 	if err != nil {
 		return
 	}
@@ -41,7 +41,7 @@ func TestUserHash(t *testing.T) {
 }
 
 func TestUserOverview(t *testing.T) {
-	overview, err := UserOverview("mythsman")
+	overview, err := UserOverview(162448367)
 	if err != nil {
 		return
 

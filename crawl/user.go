@@ -10,22 +10,22 @@ import (
 	"strings"
 )
 
-func UserOverview(id string) (*model.User, error) {
-	hash, err := UserHash(id)
+func UserOverview(doubanUid uint64) (*model.User, error) {
+	hash, err := UserHash(doubanUid)
 	if err != nil {
 		return nil, err
 	}
 
-	book, err := bookOverview(id)
+	book, err := bookOverview(doubanUid)
 	if err != nil {
 		return nil, err
 	}
 
-	movie, err := movieOverview(id)
+	movie, err := movieOverview(doubanUid)
 	if err != nil {
 		return nil, err
 	}
-	game, err := gameOverview(id)
+	game, err := gameOverview(doubanUid)
 	if err != nil {
 		return nil, err
 
@@ -51,8 +51,8 @@ func UserOverview(id string) (*model.User, error) {
 	return user, nil
 }
 
-func UserHash(id string) (string, error) {
-	body, err := Get(fmt.Sprintf(consts.UserRssUrl, id))
+func UserHash(doubanUid uint64) (string, error) {
+	body, err := Get(fmt.Sprintf(consts.UserRssUrl, doubanUid))
 	if err != nil {
 		return "", err
 	}
@@ -63,8 +63,8 @@ func UserHash(id string) (string, error) {
 	return md5str, nil
 }
 
-func bookOverview(id string) (*model.User, error) {
-	body, err := Get(fmt.Sprintf(consts.BookOverviewUrl, id))
+func bookOverview(doubanUid uint64) (*model.User, error) {
+	body, err := Get(fmt.Sprintf(consts.BookOverviewUrl, doubanUid))
 	if err != nil {
 		return nil, err
 	}
@@ -97,7 +97,6 @@ func bookOverview(id string) (*model.User, error) {
 
 	thumbnail = strings.TrimSpace(thumbnail)
 	domain = util.ParseDomain(domain)
-	doubanUid := util.ParseDoubanUid(thumbnail)
 	username = strings.TrimSpace(username)
 	registerTime := util.ParseDate(registerAt)
 	doNum := util.ParseNumber(do)
@@ -118,8 +117,8 @@ func bookOverview(id string) (*model.User, error) {
 
 }
 
-func movieOverview(id string) (*model.User, error) {
-	body, err := Get(fmt.Sprintf(consts.MovieOverviewUrl, id))
+func movieOverview(doubanUid uint64) (*model.User, error) {
+	body, err := Get(fmt.Sprintf(consts.MovieOverviewUrl, doubanUid))
 	if err != nil {
 		panic(err)
 	}
@@ -162,8 +161,8 @@ func movieOverview(id string) (*model.User, error) {
 
 }
 
-func gameOverview(id string) (*model.User, error) {
-	body, err := Get(fmt.Sprintf(consts.GameOverviewUrl, id))
+func gameOverview(doubanUid uint64) (*model.User, error) {
+	body, err := Get(fmt.Sprintf(consts.GameOverviewUrl, doubanUid))
 	if err != nil {
 		panic(err)
 	}
