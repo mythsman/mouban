@@ -15,7 +15,7 @@ type Book struct {
 	Press       string `gorm:"type:varchar(512)"`
 	Producer    string `gorm:"type:varchar(512)"`
 	Serial      string `gorm:"type:varchar(512)"`
-	PublishAt   string `gorm:"type:varchar(64)"`
+	PublishDate string `gorm:"type:varchar(64)"`
 	ISBN        string `gorm:"type:varchar(64)"`
 	Framing     string `gorm:"type:varchar(64)"`
 	Page        uint32
@@ -31,22 +31,30 @@ func (Book) TableName() string {
 	return "book"
 }
 
+func (book Book) Show() *BookVO {
+	return &BookVO{
+		DoubanId:    book.DoubanId,
+		Title:       book.Title,
+		Subtitle:    book.Subtitle,
+		Orititle:    book.Orititle,
+		Author:      book.Author,
+		Translator:  book.Translator,
+		Press:       book.Press,
+		Producer:    book.Producer,
+		PublishDate: book.PublishDate,
+		Thumbnail:   book.Thumbnail,
+	}
+}
+
 type BookVO struct {
-	DoubanId    uint64   `json:"douban_id"`
-	Title       string   `json:"title"`
-	Subtitle    string   `json:"subtitle"`
-	Orititle    string   `json:"orititle"`
-	Author      []string `json:"author"`
-	Translator  []string `json:"translator"`
-	Press       string   `json:"press"`
-	Producer    string   `json:"producer"`
-	Serial      string   `json:"serial"`
-	PublishAt   string   `json:"publish_at"`
-	ISBN        string   `json:"isbn"`
-	Framing     string   `json:"framing"`
-	Page        uint32   `json:"page"`
-	Price       uint32   `json:"price"`
-	BookIntro   string   `json:"book_intro"`
-	AuthorIntro string   `json:"author_intro"`
-	Thumbnail   string   `json:"thumbnail"`
+	DoubanId    uint64 `json:"douban_id"`
+	Title       string `json:"title"`
+	Subtitle    string `json:"subtitle"`
+	Orititle    string `json:"orititle"`
+	Author      string `json:"author"`
+	Translator  string `json:"translator"`
+	Press       string `json:"press"`
+	Producer    string `json:"producer"`
+	PublishDate string `json:"publish_date"`
+	Thumbnail   string `json:"thumbnail"`
 }

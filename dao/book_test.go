@@ -18,7 +18,7 @@ func TestUpsertBook(t *testing.T) {
 		Press:       "press",
 		Producer:    "producer",
 		Serial:      "serial",
-		PublishAt:   "publishAt",
+		PublishDate: "publishDate",
 		ISBN:        "isbn",
 		Framing:     "framing",
 		Page:        0,

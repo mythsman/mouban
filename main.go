@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
 	"log"
+	"mouban/consts"
 	"mouban/controller"
 	"mouban/util"
 	"net/http"
@@ -18,9 +19,15 @@ func main() {
 	queryGroup := router.Group("/guest")
 	{
 		queryGroup.GET("/check_user", controller.CheckUser)
-		queryGroup.GET("/user_book", controller.ListUserBook)
-		queryGroup.GET("/user_game", controller.ListUserGame)
-		queryGroup.GET("/user_movie", controller.ListUserMovie)
+		queryGroup.GET("/user_book", func(ctx *gin.Context) {
+			controller.ListUserItem(ctx, consts.TypeBook)
+		})
+		queryGroup.GET("/user_game", func(ctx *gin.Context) {
+			controller.ListUserItem(ctx, consts.TypeGame)
+		})
+		queryGroup.GET("/user_movie", func(ctx *gin.Context) {
+			controller.ListUserItem(ctx, consts.TypeBook)
+		})
 	}
 
 	adminGroup := router.Group("/admin")

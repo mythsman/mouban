@@ -45,7 +45,7 @@ func CheckUser(ctx *gin.Context) {
 
 }
 
-func ListUserMovie(ctx *gin.Context) {
+func ListUserItem(ctx *gin.Context, t uint8) {
 	id := ctx.Query("id")
 	doubanUid, err := strconv.ParseUint(id, 10, 64)
 	if err != nil || id == "0" {
@@ -84,23 +84,52 @@ func ListUserMovie(ctx *gin.Context) {
 
 	user := dao.GetUser(doubanUid)
 
-	comments := dao.SearchComment(doubanUid, consts.TypeMovie, parseAction(action), offset, 20)
+	comments := dao.SearchComment(doubanUid, t, parseAction(action), offset, 20)
 
 	var ids []uint64
 	for _, c := range *comments {
 		ids = append(ids, c.DoubanId)
 	}
 
-	briefs := dao.ListMovieBrief(&ids)
-	briefMap := make(map[uint64]*model.Movie)
-	for i, _ := range *briefs {
-		briefMap[(*briefs)[i].DoubanId] = &(*briefs)[i]
-	}
-
 	var commentsVO []model.CommentVO
-	for i, _ := range *comments {
-		movie := briefMap[(*comments)[i].DoubanId]
-		commentsVO = append(commentsVO, *(*comments)[i].Show(movie.Show()))
+
+	switch t {
+	case consts.TypeMovie:
+		briefs := dao.ListMovieBrief(&ids)
+		briefMap := make(map[uint64]*model.Movie)
+		for i, _ := range *briefs {
+			briefMap[(*briefs)[i].DoubanId] = &(*briefs)[i]
+		}
+
+		for i, _ := range *comments {
+			movie := briefMap[(*comments)[i].DoubanId]
+			commentsVO = append(commentsVO, *(*comments)[i].Show(movie.Show()))
+		}
+		break
+	case consts.TypeBook:
+		briefs := dao.ListBookBrief(&ids)
+		briefMap := make(map[uint64]*model.Book)
+		for i, _ := range *briefs {
+			briefMap[(*briefs)[i].DoubanId] = &(*briefs)[i]
+		}
+
+		for i, _ := range *comments {
+			book := briefMap[(*comments)[i].DoubanId]
+			commentsVO = append(commentsVO, *(*comments)[i].Show(book.Show()))
+		}
+		break
+	case consts.TypeGame:
+		briefs := dao.ListGameBrief(&ids)
+		briefMap := make(map[uint64]*model.Game)
+		for i, _ := range *briefs {
+			briefMap[(*briefs)[i].DoubanId] = &(*briefs)[i]
+		}
+
+		for i, _ := range *comments {
+			game := briefMap[(*comments)[i].DoubanId]
+			commentsVO = append(commentsVO, *(*comments)[i].Show(game.Show()))
+		}
+		break
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{
@@ -110,76 +139,6 @@ func ListUserMovie(ctx *gin.Context) {
 			"comment": commentsVO,
 		},
 	})
-}
-
-func ListUserBook(ctx *gin.Context) {
-	id := ctx.Query("id")
-	doubanUid, err := strconv.ParseUint(id, 10, 64)
-	if err != nil || id == "0" {
-		BizError(ctx, "用户ID输入错误")
-		return
-	}
-	logAccess(ctx, doubanUid)
-
-	action := ctx.Query("action")
-	if action == "" {
-		BizError(ctx, "参数错误")
-		return
-	}
-	schedule := dao.GetSchedule(doubanUid, consts.TypeUser)
-
-	if schedule == nil {
-		BizError(ctx, "当前用户未录入")
-		return
-	}
-
-	if schedule.Result == consts.ScheduleResultUnready {
-		BizError(ctx, "当前用户录入中")
-		return
-	}
-
-	if schedule.Result == consts.ScheduleResultInvalid {
-		BizError(ctx, "当前用户不存在")
-		return
-	}
-
-	//user := dao.GetUser(doubanUid)
-
-}
-
-func ListUserGame(ctx *gin.Context) {
-	id := ctx.Query("id")
-	doubanUid, err := strconv.ParseUint(id, 10, 64)
-	if err != nil || id == "0" {
-		BizError(ctx, "用户ID输入错误")
-		return
-	}
-	logAccess(ctx, doubanUid)
-
-	action := ctx.Query("action")
-	if action == "" {
-		BizError(ctx, "参数错误")
-		return
-	}
-
-	schedule := dao.GetSchedule(doubanUid, consts.TypeUser)
-
-	if schedule == nil {
-		BizError(ctx, "当前用户未录入")
-		return
-	}
-
-	if schedule.Result == consts.ScheduleResultUnready {
-		BizError(ctx, "当前用户录入中")
-		return
-	}
-
-	if schedule.Result == consts.ScheduleResultInvalid {
-		BizError(ctx, "当前用户不存在")
-		return
-	}
-
-	//user := dao.GetUser(doubanUid)
 }
 
 func logAccess(ctx *gin.Context, doubanUid uint64) {

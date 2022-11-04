@@ -24,15 +24,28 @@ func (Game) TableName() string {
 	return "game"
 }
 
+func (game Game) Show() *GameVO {
+	return &GameVO{
+		DoubanId:    game.DoubanId,
+		Title:       game.Title,
+		Platform:    game.Platform,
+		Genre:       game.Genre,
+		Alias:       game.Alias,
+		Developer:   game.Developer,
+		Publisher:   game.Publisher,
+		PublishDate: game.PublishDate,
+		Thumbnail:   game.Thumbnail,
+	}
+}
+
 type GameVO struct {
-	DoubanId    uint64   `json:"douban_id"`
-	Title       string   `json:"title"`
-	Platform    string   `json:"platform"`
-	Genre       string   `json:"genre"`
-	Alias       string   `json:"alias"`
-	Developer   []string `json:"developer"`
-	Publisher   []string `json:"publisher"`
-	PublishDate string   `json:"publish_date"`
-	Intro       string   `json:"intro"`
-	Thumbnail   string   `json:"thumbnail"`
+	DoubanId    uint64 `json:"douban_id"`
+	Title       string `json:"title"`
+	Platform    string `json:"platform"`
+	Genre       string `json:"genre"`
+	Alias       string `json:"alias"`
+	Developer   string `json:"developer"`
+	Publisher   string `json:"publisher"`
+	PublishDate string `json:"publish_date"`
+	Thumbnail   string `json:"thumbnail"`
 }
