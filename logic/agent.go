@@ -7,7 +7,6 @@ import (
 	"mouban/dao"
 	"mouban/model"
 	"mouban/util"
-	"strconv"
 	"time"
 )
 
@@ -74,7 +73,7 @@ func processUser(doubanUid uint64) {
 	}()
 
 	//user
-	user, err := crawl.UserOverview(strconv.FormatUint(doubanUid, 10))
+	user, err := crawl.UserOverview(doubanUid)
 	if err != nil {
 		dao.ChangeScheduleResult(doubanUid, consts.TypeUser, consts.ScheduleResultInvalid)
 		panic(err)
