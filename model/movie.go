@@ -30,21 +30,26 @@ func (Movie) TableName() string {
 	return "movie"
 }
 
+func (movie Movie) Show() *MovieVO {
+	return &MovieVO{
+		DoubanId:    movie.DoubanId,
+		Title:       movie.Title,
+		Director:    movie.Director,
+		Writer:      movie.Writer,
+		Actor:       movie.Actor,
+		PublishDate: movie.PublishDate,
+		Alias:       movie.Alias,
+		Thumbnail:   movie.Thumbnail,
+	}
+}
+
 type MovieVO struct {
-	DoubanId    uint64   `json:"douban_id"`
-	Title       string   `json:"title"`
-	Director    []string `json:"director"`
-	Writer      []string `json:"writer"`
-	Actor       []string `json:"actor"`
-	Style       []string `json:"style"`
-	Site        string   `json:"site"`
-	Country     []string `json:"country"`
-	Language    []string `json:"language"`
-	PublishDate []string `json:"publish_date"`
-	Episode     uint32   `json:"episode"`
-	Duration    uint32   `json:"duration"`
-	Alias       string   `json:"alias"`
-	IMDb        string   `json:"imdb"`
-	Intro       string   `json:"intro"`
-	Thumbnail   string   `json:"thumbnail"`
+	DoubanId    uint64 `json:"douban_id"`
+	Title       string `json:"title"`
+	Director    string `json:"director"`
+	Writer      string `json:"writer"`
+	Actor       string `json:"actor"`
+	PublishDate string `json:"publish_date"`
+	Alias       string `json:"alias"`
+	Thumbnail   string `json:"thumbnail"`
 }

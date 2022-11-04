@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"mouban/consts"
 	"mouban/dao"
+	"mouban/model"
 	"net/http"
 	"strconv"
 )
@@ -85,11 +86,28 @@ func ListUserMovie(ctx *gin.Context) {
 
 	comments := dao.SearchComment(doubanUid, consts.TypeMovie, parseAction(action), offset, 20)
 
+	var ids []uint64
+	for _, c := range *comments {
+		ids = append(ids, c.DoubanId)
+	}
+
+	briefs := dao.ListMovieBrief(&ids)
+	briefMap := make(map[uint64]*model.Movie)
+	for i, _ := range *briefs {
+		briefMap[(*briefs)[i].DoubanId] = &(*briefs)[i]
+	}
+
+	var commentsVO []model.CommentVO
+	for i, _ := range *comments {
+		movie := briefMap[(*comments)[i].DoubanId]
+		commentsVO = append(commentsVO, *(*comments)[i].Show(movie.Show()))
+	}
+
 	ctx.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"result": gin.H{
-			"user":     user,
-			"comments": comments,
+			"user":    user.Show(),
+			"comment": commentsVO,
 		},
 	})
 }
