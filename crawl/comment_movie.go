@@ -62,7 +62,7 @@ func scrollMovie(doubanUid uint64, url string, action consts.Action) (*[]model.C
 	}
 	body, err := Get(url)
 	if err != nil {
-		return nil, nil, 0, "", err
+		panic(err)
 	}
 
 	doc, err := htmlquery.Parse(strings.NewReader(*body))
