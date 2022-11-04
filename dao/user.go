@@ -6,7 +6,7 @@ import (
 )
 
 func UpsertUser(user *model.User) {
-	if common.Db.Where("douban_Uid = ? ", user.DoubanUid).Updates(user).RowsAffected == 0 {
+	if common.Db.Where("douban_uid = ? ", user.DoubanUid).Updates(user).RowsAffected == 0 {
 		common.Db.Create(user)
 	}
 }
