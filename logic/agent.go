@@ -81,53 +81,61 @@ func processUser(doubanUid uint64) {
 	dao.UpsertUser(user)
 
 	//game
-	_, comment, game, err := crawl.CommentGame(doubanUid)
-	if err != nil {
-		panic(err)
-	}
-	for _, g := range *game {
-		added := dao.CreateGameNx(&g)
-		if added {
-			dao.CreateSchedule(g.DoubanId, consts.TypeGame, consts.ScheduleStatusToCrawl, consts.ScheduleResultUnready)
+	if user.GameDo > 0 || user.GameWish > 0 || user.GameCollect > 0 {
+		_, comment, game, err := crawl.CommentGame(doubanUid)
+		if err != nil {
+			panic(err)
+		}
+		for _, g := range *game {
+			added := dao.CreateGameNx(&g)
+			if added {
+				dao.CreateSchedule(g.DoubanId, consts.TypeGame, consts.ScheduleStatusToCrawl, consts.ScheduleResultUnready)
+			}
+		}
+
+		for _, c := range *comment {
+			dao.UpsertComment(&c)
 		}
 	}
 
-	for _, c := range *comment {
-		dao.UpsertComment(&c)
-	}
+	//
+	if user.BookDo > 0 || user.BookWish > 0 || user.BookCollect > 0 {
 
-	//book
-	_, comment, book, err := crawl.CommentBook(doubanUid)
-	if err != nil {
-		panic(err)
-	}
-
-	for _, b := range *book {
-		added := dao.CreateBookNx(&b)
-		if added {
-			dao.CreateSchedule(b.DoubanId, consts.TypeBook, consts.ScheduleStatusToCrawl, consts.ScheduleResultUnready)
+		_, comment, book, err := crawl.CommentBook(doubanUid)
+		if err != nil {
+			panic(err)
 		}
-	}
 
-	for _, c := range *comment {
-		dao.UpsertComment(&c)
+		for _, b := range *book {
+			added := dao.CreateBookNx(&b)
+			if added {
+				dao.CreateSchedule(b.DoubanId, consts.TypeBook, consts.ScheduleStatusToCrawl, consts.ScheduleResultUnready)
+			}
+		}
+
+		for _, c := range *comment {
+			dao.UpsertComment(&c)
+		}
 	}
 
 	//movie
-	_, comment, movie, err := crawl.CommentMovie(doubanUid)
-	if err != nil {
-		panic(err)
-	}
+	if user.MovieDo > 0 || user.MovieWish > 0 || user.MovieCollect > 0 {
 
-	for _, m := range *movie {
-		added := dao.CreateMovieNx(&m)
-		if added {
-			dao.CreateSchedule(m.DoubanId, consts.TypeMovie, consts.ScheduleStatusToCrawl, consts.ScheduleResultUnready)
+		_, comment, movie, err := crawl.CommentMovie(doubanUid)
+		if err != nil {
+			panic(err)
 		}
-	}
 
-	for _, c := range *comment {
-		dao.UpsertComment(&c)
+		for _, m := range *movie {
+			added := dao.CreateMovieNx(&m)
+			if added {
+				dao.CreateSchedule(m.DoubanId, consts.TypeMovie, consts.ScheduleStatusToCrawl, consts.ScheduleResultUnready)
+			}
+		}
+
+		for _, c := range *comment {
+			dao.UpsertComment(&c)
+		}
 	}
 
 	dao.ChangeScheduleResult(doubanUid, consts.TypeUser, consts.ScheduleResultReady)

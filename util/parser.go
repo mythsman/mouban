@@ -57,8 +57,11 @@ func ParseFloat(float string) float32 {
 	return float32(f)
 }
 
-func ParseDomain(link string) string {
+func ParseDomain(doubanUid uint64, link string) string {
 	result := domainParser.FindStringSubmatch(link)
+	if len(result) == 0 || result[1] == strconv.FormatUint(doubanUid, 10) {
+		return ""
+	}
 	return result[1]
 }
 
