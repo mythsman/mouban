@@ -58,6 +58,12 @@ func ListUserMovie(ctx *gin.Context) {
 		BizError(ctx, "参数错误")
 		return
 	}
+
+	offset := 0
+	if ctx.Query("offset") != "" {
+		offset, _ = strconv.Atoi(ctx.Query("offset"))
+	}
+
 	schedule := dao.GetSchedule(doubanUid, consts.TypeUser)
 
 	if schedule == nil {
@@ -75,8 +81,17 @@ func ListUserMovie(ctx *gin.Context) {
 		return
 	}
 
-	//user := dao.GetUser(doubanUid)
+	user := dao.GetUser(doubanUid)
 
+	comments := dao.SearchComment(doubanUid, consts.TypeMovie, parseAction(action), offset, 20)
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"result": gin.H{
+			"user":     user,
+			"comments": comments,
+		},
+	})
 }
 
 func ListUserBook(ctx *gin.Context) {
@@ -155,4 +170,16 @@ func logAccess(ctx *gin.Context, doubanUid uint64) {
 	ip := ctx.RemoteIP()
 
 	dao.AddAccess(doubanUid, ctx.FullPath(), ip, ua, referer)
+}
+
+func parseAction(action string) uint8 {
+	switch action {
+	case consts.ActionWish.Name:
+		return consts.ActionWish.Code
+	case consts.ActionCollect.Name:
+		return consts.ActionCollect.Code
+	case consts.ActionDo.Name:
+		return consts.ActionDo.Code
+	}
+	return consts.ActionCollect.Code
 }

@@ -26,7 +26,7 @@ func ParseDoubanUid(thumbnail string) uint64 {
 
 func ParseDate(date string) time.Time {
 	result := dateParser.FindStringSubmatch(date)
-	dateTime, err := time.Parse("2006-01-02", result[1])
+	dateTime, err := time.ParseInLocation("2006-01-02", result[1], time.Local)
 	if err != nil {
 		return time.Time{}
 	}
