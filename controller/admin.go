@@ -20,32 +20,12 @@ func CrawlUser(ctx *gin.Context) {
 	logic.Dispatch(idInt, consts.TypeUser)
 }
 
-func CrawlGame(ctx *gin.Context) {
+func CrawlItem(ctx *gin.Context, t uint8) {
 	id := ctx.Query("id")
 	idInt, err := strconv.ParseUint(id, 10, 64)
 	if err != nil {
 		BizError(ctx, "参数错误")
 		return
 	}
-	logic.Dispatch(idInt, consts.TypeGame)
-}
-
-func CrawlBook(ctx *gin.Context) {
-	id := ctx.Query("id")
-	idInt, err := strconv.ParseUint(id, 10, 64)
-	if err != nil {
-		BizError(ctx, "参数错误")
-		return
-	}
-	logic.Dispatch(idInt, consts.TypeBook)
-}
-
-func CrawlMovie(ctx *gin.Context) {
-	id := ctx.Query("id")
-	idInt, err := strconv.ParseUint(id, 10, 64)
-	if err != nil {
-		BizError(ctx, "参数错误")
-		return
-	}
-	logic.Dispatch(idInt, consts.TypeMovie)
+	logic.Dispatch(idInt, t)
 }

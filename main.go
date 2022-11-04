@@ -34,9 +34,15 @@ func main() {
 	{
 		adminGroup.GET("/overview", controller.GetOverview)
 		adminGroup.GET("/crawl_user", controller.CrawlUser)
-		adminGroup.GET("/crawl_book", controller.CrawlBook)
-		adminGroup.GET("/crawl_movie", controller.CrawlMovie)
-		adminGroup.GET("/crawl_game", controller.CrawlGame)
+		adminGroup.GET("/crawl_book", func(ctx *gin.Context) {
+			controller.CrawlItem(ctx, consts.TypeBook)
+		})
+		adminGroup.GET("/crawl_movie", func(ctx *gin.Context) {
+			controller.CrawlItem(ctx, consts.TypeMovie)
+		})
+		adminGroup.GET("/crawl_game", func(ctx *gin.Context) {
+			controller.CrawlItem(ctx, consts.TypeGame)
+		})
 	}
 
 	panic(router.Run(":" + viper.GetString("server.port")))
