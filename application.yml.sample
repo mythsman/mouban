@@ -11,3 +11,5 @@ datasource:
   loc: Asia/Shanghai
 http:
   timeout: 10
+admin:
+  token: ewfdcjojdi
