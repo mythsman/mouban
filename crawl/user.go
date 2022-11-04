@@ -54,7 +54,7 @@ func UserOverview(doubanUid uint64) (*model.User, error) {
 func UserHash(doubanUid uint64) (string, error) {
 	body, err := Get(fmt.Sprintf(consts.UserRssUrl, doubanUid))
 	if err != nil {
-		return "", err
+		panic(err)
 	}
 	data := []byte(*body)
 	has := md5.Sum(data)
@@ -66,7 +66,7 @@ func UserHash(doubanUid uint64) (string, error) {
 func bookOverview(doubanUid uint64) (*model.User, error) {
 	body, err := Get(fmt.Sprintf(consts.BookOverviewUrl, doubanUid))
 	if err != nil {
-		return nil, err
+		panic(err)
 	}
 
 	doc, err := htmlquery.Parse(strings.NewReader(*body))
