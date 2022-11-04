@@ -96,7 +96,7 @@ func bookOverview(doubanUid uint64) (*model.User, error) {
 	}
 
 	thumbnail = strings.TrimSpace(thumbnail)
-	domain = util.ParseDomain(domain)
+	domain = util.ParseDomain(doubanUid, domain)
 	username = strings.TrimSpace(username)
 	registerTime := util.ParseDate(registerAt)
 	doNum := util.ParseNumber(do)
@@ -128,7 +128,7 @@ func movieOverview(doubanUid uint64) (*model.User, error) {
 		panic(err)
 	}
 	domain := htmlquery.SelectAttr(htmlquery.FindOne(doc, "//div[@id='db-usr-profile']//div[@class='pic']/a"), "href")
-	domain = util.ParseDomain(domain)
+	domain = util.ParseDomain(doubanUid, domain)
 
 	list := htmlquery.Find(doc, "//div[@id='db-movie-mine']//h2")
 	do := ""
@@ -173,7 +173,7 @@ func gameOverview(doubanUid uint64) (*model.User, error) {
 	}
 
 	domain := htmlquery.SelectAttr(htmlquery.FindOne(doc, "//div[@id='db-usr-profile']//div[@class='pic']/a"), "href")
-	domain = util.ParseDomain(domain)
+	domain = util.ParseDomain(doubanUid, domain)
 
 	list := htmlquery.Find(doc, "//div[@class='tabs']//a")
 	do := ""
