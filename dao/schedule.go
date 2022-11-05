@@ -36,14 +36,14 @@ func SearchScheduleByResult(t uint8, result uint8, limit int) *[]model.Schedule 
 func CasScheduleStatus(doubanId uint64, t uint8, status uint8, rawStatus uint8) bool {
 	row := common.Db.Model(&model.Schedule{}).
 		Where("douban_id = ? AND type = ? AND status = ?", doubanId, t, rawStatus).
-		UpdateColumn("status", status).RowsAffected
+		Update("status", status).RowsAffected
 	return row > 0
 }
 
 func ChangeScheduleResult(doubanId uint64, t uint8, result uint8) {
 	common.Db.Model(&model.Schedule{}).
 		Where("douban_id = ? AND type = ?", doubanId, t).
-		UpdateColumn("result", result)
+		Update("result", result)
 }
 
 func CreateSchedule(doubanId uint64, t uint8, status uint8, result uint8) {
