@@ -73,6 +73,12 @@ func processUser(doubanUid uint64) {
 		}
 	}()
 
+	hash, _ := crawl.UserHash(doubanUid)
+	rawUser := dao.GetUser(doubanUid)
+	if rawUser != nil && rawUser.RssHash == hash {
+		log.Println("user ", doubanUid, " not changed")
+		return
+	}
 	//user
 	user, err := crawl.UserOverview(doubanUid)
 	if err != nil {
@@ -91,11 +97,8 @@ func processUser(doubanUid uint64) {
 			added := dao.CreateGameNx(&(*game)[i])
 			if added {
 				dao.CreateSchedule((*game)[i].DoubanId, consts.TypeGame, consts.ScheduleStatusToCrawl, consts.ScheduleResultUnready)
+				dao.UpsertComment(&(*comment)[i])
 			}
-		}
-
-		for i, _ := range *comment {
-			dao.UpsertComment(&(*comment)[i])
 		}
 	}
 
@@ -111,11 +114,9 @@ func processUser(doubanUid uint64) {
 			added := dao.CreateBookNx(&(*book)[i])
 			if added {
 				dao.CreateSchedule((*book)[i].DoubanId, consts.TypeBook, consts.ScheduleStatusToCrawl, consts.ScheduleResultUnready)
-			}
-		}
+				dao.UpsertComment(&(*comment)[i])
 
-		for i, _ := range *comment {
-			dao.UpsertComment(&(*comment)[i])
+			}
 		}
 	}
 
@@ -131,11 +132,8 @@ func processUser(doubanUid uint64) {
 			added := dao.CreateMovieNx(&(*movie)[i])
 			if added {
 				dao.CreateSchedule((*movie)[i].DoubanId, consts.TypeMovie, consts.ScheduleStatusToCrawl, consts.ScheduleResultUnready)
+				dao.UpsertComment(&(*comment)[i])
 			}
-		}
-
-		for i, _ := range *comment {
-			dao.UpsertComment(&(*comment)[i])
 		}
 	}
 
