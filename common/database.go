@@ -47,7 +47,6 @@ func tryCreateDB(username string, password string, host string, port string, dat
 	if err != nil {
 		panic(err)
 	}
-	log.Println("Create db success.")
 }
 
 func getConnection(username string, password string, host string, port string, database string, charset string, loc string) {
@@ -69,6 +68,7 @@ func getConnection(username string, password string, host string, port string, d
 		panic("打开数据库失败" + err.Error())
 	}
 	Db = db
+	log.Println("db connect success")
 }
 
 func migrateTables() {

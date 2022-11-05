@@ -7,6 +7,7 @@ import (
 	"mouban/dao"
 	"mouban/model"
 	"mouban/util"
+	"sync"
 	"time"
 )
 
@@ -144,11 +145,11 @@ func processUser(doubanUid uint64) {
 func main() {
 	ch := make(chan model.Schedule)
 
-	for i := 0; i < 5; i++ {
+	for i := 1; i <= 5; i++ {
 		go func(id int) {
 			for {
 				schedule := <-ch
-				log.Println("agent consume ", util.ToJson(schedule))
+				log.Println("agent ", id, " consume ", util.ToJson(schedule))
 				switch schedule.Type {
 				case consts.TypeBook:
 					processBook(schedule.DoubanId)
@@ -174,24 +175,27 @@ func main() {
 				log.Println(r, " => ", util.GetCurrentGoroutineStack())
 			}
 		}()
-		lastIdle := true
+		lastIdle := false
 		for {
 			schedule := dao.SearchScheduleByStatus(consts.ScheduleStatusToCrawl)
 			if schedule == nil {
 				time.Sleep(time.Second * 5)
 				if !lastIdle {
-					log.Println("agent idle")
+					log.Println("scanner idle")
 				}
 				lastIdle = true
 			} else {
 				lastIdle = false
 				changed := dao.CasScheduleStatus(schedule.DoubanId, schedule.Type, consts.ScheduleStatusCrawling, consts.ScheduleStatusToCrawl)
 				if changed {
-					log.Println("agent submit")
+					log.Println("scanner submit")
 					ch <- *schedule
 				}
 			}
 		}
 	}()
 
+	group := sync.WaitGroup{}
+	group.Add(1)
+	group.Wait()
 }
