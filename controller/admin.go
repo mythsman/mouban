@@ -4,7 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
 	"mouban/consts"
-	"mouban/logic"
+	"mouban/dao"
 	"strconv"
 )
 
@@ -24,7 +24,7 @@ func CrawlUser(ctx *gin.Context) {
 		BizError(ctx, "参数错误")
 		return
 	}
-	logic.Dispatch(idInt, consts.TypeUser)
+	dispatch(idInt, consts.TypeUser)
 }
 
 func CrawlItem(ctx *gin.Context, t uint8) {
@@ -37,7 +37,7 @@ func CrawlItem(ctx *gin.Context, t uint8) {
 		BizError(ctx, "参数错误")
 		return
 	}
-	logic.Dispatch(idInt, t)
+	dispatch(idInt, t)
 }
 
 func checkPermission(ctx *gin.Context) bool {
@@ -47,4 +47,22 @@ func checkPermission(ctx *gin.Context) bool {
 		return false
 	}
 	return true
+}
+
+func dispatch(doubanId uint64, t uint8) bool {
+	schedule := dao.GetSchedule(doubanId, t)
+	triggered := false
+	switch schedule.Status {
+	case consts.ScheduleStatusCrawled:
+		dao.CasScheduleStatus(schedule.DoubanId, schedule.Type, consts.ScheduleStatusToCrawl, consts.ScheduleStatusCrawled)
+		triggered = true
+		break
+	case consts.ScheduleStatusCrawling:
+		break
+	case consts.ScheduleStatusToCrawl:
+		break
+	default:
+		break
+	}
+	return triggered
 }
