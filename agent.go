@@ -1,4 +1,4 @@
-package logic
+package main
 
 import (
 	"log"
@@ -141,7 +141,7 @@ func processUser(doubanUid uint64) {
 	dao.ChangeScheduleResult(doubanUid, consts.TypeUser, consts.ScheduleResultReady)
 }
 
-func init() {
+func main() {
 	ch := make(chan model.Schedule)
 
 	for i := 0; i < 5; i++ {
