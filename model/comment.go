@@ -29,7 +29,7 @@ func (comment Comment) Show(item interface{}) *CommentVO {
 		Label:    comment.Label,
 		Comment:  comment.Comment,
 		Action:   comment.Action,
-		MarkDate: comment.MarkDate,
+		MarkDate: comment.MarkDate.Format("2006-01-02"),
 	}
 }
 
@@ -39,5 +39,5 @@ type CommentVO struct {
 	Label    string      `json:"label"`
 	Comment  string      `json:"comment"`
 	Action   uint8       `json:"action"`
-	MarkDate time.Time   `json:"mark_date"`
+	MarkDate string      `json:"mark_date"`
 }
