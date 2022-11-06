@@ -132,6 +132,10 @@ func ListUserItem(ctx *gin.Context, t uint8) {
 		break
 	}
 
+	if commentsVO == nil {
+		commentsVO = []model.CommentVO{}
+	}
+
 	ctx.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"result": gin.H{
