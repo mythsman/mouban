@@ -26,7 +26,7 @@ func main() {
 			controller.ListUserItem(ctx, consts.TypeGame)
 		})
 		queryGroup.GET("/user_movie", func(ctx *gin.Context) {
-			controller.ListUserItem(ctx, consts.TypeBook)
+			controller.ListUserItem(ctx, consts.TypeMovie)
 		})
 	}
 

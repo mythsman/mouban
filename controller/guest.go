@@ -84,7 +84,7 @@ func ListUserItem(ctx *gin.Context, t uint8) {
 
 	user := dao.GetUser(doubanUid)
 
-	comments := dao.SearchComment(doubanUid, t, parseAction(action), offset, 20)
+	comments := dao.SearchComment(doubanUid, t, parseAction(action), offset)
 
 	var ids []uint64
 	for _, c := range *comments {
