@@ -42,23 +42,23 @@ func Movie(doubanId uint64) (*model.Movie, *model.Rating, error) {
 
 	data := util.TrimInfo(htmlquery.OutputHTML(htmlquery.FindOne(doc, "//div[@id='info']"), false))
 
-	director := data["编剧"]
-	actor := data["主演"]
-	writer := data["编剧"]
-	site := data["官方网站"]
-	style := data["类型"]
-	country := data["制片国家/地区"]
-	language := data["语言"]
+	director := strings.TrimSpace(data["编剧"])
+	actor := strings.TrimSpace(data["主演"])
+	writer := strings.TrimSpace(data["编剧"])
+	site := strings.TrimSpace(data["官方网站"])
+	style := strings.TrimSpace(data["类型"])
+	country := strings.TrimSpace(data["制片国家/地区"])
+	language := strings.TrimSpace(data["语言"])
 	duration := uint64(0)
 	if data["片长"] != "" {
 		duration = util.ParseNumber(data["片长"]) * 60
 	} else if data["单集片长"] != "" {
 		duration = util.ParseNumber(data["单集片长"]) * 60
 	}
-	alias := data["又名"]
-	imdb := data["IMDb"]
+	alias := strings.TrimSpace(data["又名"])
+	imdb := strings.TrimSpace(data["IMDb"])
 	episode := util.ParseNumber(data["集数"])
-	releaseDate := data["上映日期"]
+	releaseDate := strings.TrimSpace(data["上映日期"])
 
 	movie := &model.Movie{
 		DoubanId:    doubanId,

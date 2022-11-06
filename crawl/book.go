@@ -51,16 +51,16 @@ func Book(doubanId uint64) (*model.Book, *model.Rating, error) {
 
 	data := util.TrimInfo(htmlquery.OutputHTML(htmlquery.FindOne(doc, "//div[@id='info']"), false))
 
-	isbn := data["ISBN"]
-	subtitle := data["副标题"]
-	orititle := data["原作名"]
-	author := data["作者"]
-	press := data["出版社"]
-	producer := data["出品方"]
-	translator := data["译者"]
+	isbn := strings.TrimSpace(data["ISBN"])
+	subtitle := strings.TrimSpace(data["副标题"])
+	orititle := strings.TrimSpace(data["原作名"])
+	author := strings.TrimSpace(data["作者"])
+	press := strings.TrimSpace(data["出版社"])
+	producer := strings.TrimSpace(data["出品方"])
+	translator := strings.TrimSpace(data["译者"])
 	serial := strings.TrimSpace(data["丛书"])
-	publishDate := data["出版年"]
-	framing := data["装帧"]
+	publishDate := strings.TrimSpace(data["出版年"])
+	framing := strings.TrimSpace(data["装帧"])
 	page := uint32(util.ParseNumber(data["页数"]))
 	price := uint32(util.ParseFloat(data["定价"]) * 100)
 

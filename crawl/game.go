@@ -41,12 +41,12 @@ func Game(doubanId uint64) (*model.Game, *model.Rating, error) {
 	game := &model.Game{
 		DoubanId:    doubanId,
 		Title:       title,
-		Platform:    data["平台"],
-		Genre:       data["类型"],
-		Alias:       data["别名"],
-		Developer:   data["开发商"],
-		Publisher:   data["发行商"],
-		PublishDate: data["发行日期"],
+		Platform:    strings.TrimSpace(data["平台"]),
+		Genre:       strings.TrimSpace(data["类型"]),
+		Alias:       strings.TrimSpace(data["别名"]),
+		Developer:   strings.TrimSpace(data["开发商"]),
+		Publisher:   strings.TrimSpace(data["发行商"]),
+		PublishDate: strings.TrimSpace(data["发行日期"]),
 		Intro:       intro,
 		Thumbnail:   thumbnail,
 	}
