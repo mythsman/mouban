@@ -85,7 +85,7 @@ func scrollMovie(doubanUid uint64, url string, action consts.Action) (*[]model.C
 
 		movies = append(movies, model.Movie{
 			DoubanId:  doubanId,
-			Title:     title,
+			Title:     strings.TrimSpace(title),
 			Thumbnail: thumbnail,
 		})
 
