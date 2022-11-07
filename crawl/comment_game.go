@@ -83,7 +83,7 @@ func scrollGame(doubanUid uint64, url string, action consts.Action) (*[]model.Co
 
 		games = append(games, model.Game{
 			DoubanId:  doubanId,
-			Title:     title,
+			Title:     strings.TrimSpace(title),
 			Thumbnail: thumbnail,
 		})
 
