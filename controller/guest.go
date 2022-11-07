@@ -7,6 +7,7 @@ import (
 	"mouban/model"
 	"net/http"
 	"strconv"
+	"time"
 )
 
 func CheckUser(ctx *gin.Context) {
@@ -42,6 +43,13 @@ func CheckUser(ctx *gin.Context) {
 		"success": true,
 		"result":  user.Show(),
 	})
+
+	if schedule.Status == consts.ScheduleStatusCrawled {
+		oneDayBefore, _ := time.ParseDuration("-24h")
+		if schedule.UpdatedAt.Before(time.Now().Add(oneDayBefore)) {
+			dao.CasScheduleStatus(doubanUid, consts.TypeUser, consts.ScheduleStatusToCrawl, consts.ScheduleStatusCrawled)
+		}
+	}
 
 }
 
