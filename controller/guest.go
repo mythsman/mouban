@@ -156,7 +156,7 @@ func ListUserItem(ctx *gin.Context, t uint8) {
 func logAccess(ctx *gin.Context, doubanUid uint64) {
 	ua := ctx.GetHeader("User-Agent")
 	referer := ctx.GetHeader("Referer")
-	ip := ctx.RemoteIP()
+	ip := ctx.ClientIP()
 
 	dao.AddAccess(doubanUid, ctx.FullPath(), ip, ua, referer)
 }
