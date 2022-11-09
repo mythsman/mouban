@@ -56,11 +56,11 @@ func init() {
 	limiter = rate.NewLimiter(rate.Every(5*time.Second), 1)
 }
 
-func Get(url string) (*string, error) {
+func Get(url string) (*string, int, error) {
 	ctx, _ := context.WithTimeout(context.Background(), time.Minute*10)
 	err := limiter.Wait(ctx)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
 	req, err := http.NewRequest("GET", url, nil)
@@ -77,12 +77,12 @@ func Get(url string) (*string, error) {
 	}
 
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
 	resp, err := client.Do(req)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
 	fmt.Printf(" code is %d for %s\n", resp.StatusCode, url)
@@ -90,8 +90,8 @@ func Get(url string) (*string, error) {
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 	bodyStr := string(body)
-	return &bodyStr, err
+	return &bodyStr, resp.StatusCode, err
 }

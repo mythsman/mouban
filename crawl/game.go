@@ -7,11 +7,12 @@ import (
 	"mouban/consts"
 	"mouban/model"
 	"mouban/util"
+	"strconv"
 	"strings"
 )
 
 func Game(doubanId uint64) (*model.Game, *model.Rating, error) {
-	body, err := Get(fmt.Sprintf(consts.GameDetailUrl, doubanId))
+	body, _, err := Get(fmt.Sprintf(consts.GameDetailUrl, doubanId))
 	if err != nil {
 		panic(err)
 	}
@@ -21,7 +22,11 @@ func Game(doubanId uint64) (*model.Game, *model.Rating, error) {
 		panic(err)
 	}
 
-	t := htmlquery.InnerText(htmlquery.FindOne(doc, "//head//title"))
+	tt := htmlquery.FindOne(doc, "//head//title")
+	if tt == nil {
+		panic("title is nil for " + strconv.FormatUint(doubanId, 10))
+	}
+	t := htmlquery.InnerText(tt)
 	if strings.TrimSpace(t) == "页面不存在" || strings.TrimSpace(t) == "条目不存在" {
 		return nil, nil, errors.New(strings.TrimSpace(t))
 	}
