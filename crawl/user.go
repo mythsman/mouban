@@ -2,6 +2,7 @@ package crawl
 
 import (
 	"crypto/md5"
+	"errors"
 	"fmt"
 	"github.com/antchfx/htmlquery"
 	"mouban/consts"
@@ -52,10 +53,15 @@ func UserOverview(doubanUid uint64) (*model.User, error) {
 }
 
 func UserHash(doubanUid uint64) (string, error) {
-	body, err := Get(fmt.Sprintf(consts.UserRssUrl, doubanUid))
+	body, code, err := Get(fmt.Sprintf(consts.UserRssUrl, doubanUid))
 	if err != nil {
 		panic(err)
 	}
+
+	if code == 404 {
+		return "", errors.New("code is 404")
+	}
+
 	data := []byte(*body)
 	has := md5.Sum(data)
 	md5str := fmt.Sprintf("%x", has)
@@ -64,7 +70,7 @@ func UserHash(doubanUid uint64) (string, error) {
 }
 
 func bookOverview(doubanUid uint64) (*model.User, error) {
-	body, err := Get(fmt.Sprintf(consts.BookOverviewUrl, doubanUid))
+	body, _, err := Get(fmt.Sprintf(consts.BookOverviewUrl, doubanUid))
 	if err != nil {
 		panic(err)
 	}
@@ -118,7 +124,7 @@ func bookOverview(doubanUid uint64) (*model.User, error) {
 }
 
 func movieOverview(doubanUid uint64) (*model.User, error) {
-	body, err := Get(fmt.Sprintf(consts.MovieOverviewUrl, doubanUid))
+	body, _, err := Get(fmt.Sprintf(consts.MovieOverviewUrl, doubanUid))
 	if err != nil {
 		panic(err)
 	}
@@ -162,7 +168,7 @@ func movieOverview(doubanUid uint64) (*model.User, error) {
 }
 
 func gameOverview(doubanUid uint64) (*model.User, error) {
-	body, err := Get(fmt.Sprintf(consts.GameOverviewUrl, doubanUid))
+	body, _, err := Get(fmt.Sprintf(consts.GameOverviewUrl, doubanUid))
 	if err != nil {
 		panic(err)
 	}
