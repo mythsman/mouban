@@ -6,6 +6,7 @@ import (
 	"log"
 	"mouban/consts"
 	"mouban/controller"
+	_ "mouban/routine"
 	"mouban/util"
 	"net/http"
 )
