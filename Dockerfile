@@ -12,10 +12,12 @@ RUN GOOS=linux CGO_ENABLED=0 GOARCH=amd64 go build -ldflags="-s -w" -installsuff
 FROM scratch as prod
 
 WORKDIR /srv
+ENV TZ=Asia/Shanghai
 
 COPY --from=build /srv/main /srv
 COPY --from=build /srv/application.yml.sample /srv/application.yml
 COPY --from=build /srv/cookie.txt.sample /srv/cookie.txt
+COPY --from=build /usr/share/zoneinfo /usr/share/zoneinfo
 
 EXPOSE 8080
 
