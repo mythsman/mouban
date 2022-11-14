@@ -4,9 +4,10 @@ import (
 	"github.com/spf13/viper"
 	"log"
 	"os"
+	"strings"
 )
 
-func init() {
+func initFromYaml() {
 	workDir, _ := os.Getwd()
 	viper.SetConfigName("application")
 	viper.SetConfigType("yml")
@@ -16,6 +17,20 @@ func init() {
 		log.Println("viper init error")
 		panic(err)
 	}
-	log.Println("viper init success")
+}
 
+func initFromEnv() {
+	for _, s := range viper.AllKeys() {
+		yamlCfg := strings.ReplaceAll(s, ".", "__")
+		envCfg := os.Getenv(yamlCfg)
+		if envCfg != "" {
+			viper.Set(s, envCfg)
+		}
+	}
+}
+
+func init() {
+	initFromYaml()
+	initFromEnv()
+	log.Println("config init success")
 }
