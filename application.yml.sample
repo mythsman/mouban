@@ -1,5 +1,7 @@
 server:
   port: 8080
+agent:
+  enable: true
 datasource:
   driver: mysql
   host: localhost

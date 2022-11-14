@@ -1,13 +1,13 @@
-package main
+package routine
 
 import (
+	"github.com/spf13/viper"
 	"log"
 	"mouban/consts"
 	"mouban/crawl"
 	"mouban/dao"
 	"mouban/model"
 	"mouban/util"
-	"sync"
 	"time"
 )
 
@@ -139,7 +139,12 @@ func processUser(doubanUid uint64) {
 	dao.ChangeScheduleResult(doubanUid, consts.TypeUser, consts.ScheduleResultReady)
 }
 
-func main() {
+func init() {
+	if viper.GetString("agent.enable") != "true" {
+		log.Println("agent disabled")
+		return
+	}
+
 	ch := make(chan model.Schedule)
 
 	for i := 1; i <= 5; i++ {
@@ -192,7 +197,5 @@ func main() {
 		}
 	}()
 
-	group := sync.WaitGroup{}
-	group.Add(1)
-	group.Wait()
+	log.Println("agent enabled")
 }
