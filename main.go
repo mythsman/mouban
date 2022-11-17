@@ -17,6 +17,10 @@ func main() {
 
 	router.Use(Recover)
 
+	router.GET("/", func(ctx *gin.Context) {
+		ctx.String(http.StatusOK, "")
+	})
+
 	queryGroup := router.Group("/guest")
 	{
 		queryGroup.GET("/check_user", controller.CheckUser)
