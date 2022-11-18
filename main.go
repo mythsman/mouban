@@ -16,6 +16,7 @@ func main() {
 	router := gin.Default()
 
 	router.Use(Recover)
+	router.Use(Cors)
 
 	router.GET("/", func(ctx *gin.Context) {
 		ctx.String(http.StatusOK, "")
@@ -64,4 +65,20 @@ func Recover(ctx *gin.Context) {
 		}
 	}()
 	ctx.Next()
+}
+
+func Cors(c *gin.Context) {
+	cors := viper.GetString("server.cors")
+	method := c.Request.Method
+	origin := c.Request.Header.Get("Origin")
+	if cors == "*" || origin == cors {
+		c.Header("Access-Control-Allow-Origin", origin)
+		c.Header("Access-Control-Allow-Methods", "*")
+	}
+
+	if method == "OPTIONS" {
+		c.AbortWithStatus(http.StatusNoContent)
+	}
+
+	c.Next()
 }
