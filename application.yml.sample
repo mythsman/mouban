@@ -1,5 +1,5 @@
 server:
-  cors: *
+  cors: "*"
   port: 8080
 agent:
   enable: true

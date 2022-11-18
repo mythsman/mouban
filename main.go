@@ -9,6 +9,7 @@ import (
 	_ "mouban/routine"
 	"mouban/util"
 	"net/http"
+	"strings"
 )
 
 func main() {
@@ -71,7 +72,7 @@ func Cors(c *gin.Context) {
 	cors := viper.GetString("server.cors")
 	method := c.Request.Method
 	origin := c.Request.Header.Get("Origin")
-	if cors == "*" || origin == cors {
+	if cors == "*" || strings.Contains(cors, origin) {
 		c.Header("Access-Control-Allow-Origin", origin)
 		c.Header("Access-Control-Allow-Methods", "*")
 	}
