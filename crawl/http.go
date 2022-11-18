@@ -38,6 +38,12 @@ func init() {
 	jar, _ := cookiejar.New(nil)
 	client = http.Client{
 		Jar:     jar,
+		CheckRedirect: func(req *http.Request, via []*http.Request) error {
+			if len(via) > 0 && req.Header.Get("cookie") == "" {
+				req.Header.Set("Cookie", via[len(via)-1].Header.Get("Cookie"))
+			}
+			return nil
+		},
 		Timeout: time.Duration(viper.GetInt("http.timeout")) * time.Second,
 		Transport: &http.Transport{
 			TLSHandshakeTimeout: 10 * time.Second,

@@ -41,7 +41,7 @@ func TestUserHash(t *testing.T) {
 }
 
 func TestUserOverview(t *testing.T) {
-	overview, err := UserOverview(162448367)
+	overview, err := UserOverview(235599547)
 	if err != nil {
 		return
 
