@@ -22,6 +22,10 @@ docker push mythsman/mouban:arm64-latest
 
 docker manifest rm mythsman/mouban
 
+sleep 1
+
 docker manifest create mythsman/mouban mythsman/mouban:arm64-latest mythsman/mouban:amd64-latest
+
+sleep 1
 
 docker manifest push mythsman/mouban
