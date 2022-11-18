@@ -78,8 +78,16 @@ func bookOverview(doubanUid uint64) (*model.User, error) {
 	doc, err := htmlquery.Parse(strings.NewReader(*body))
 	if err != nil {
 		return nil, err
-
 	}
+
+	bannedNode := htmlquery.FindOne(doc, "//div[@class='mn']")
+	if bannedNode != nil {
+		prompt := htmlquery.InnerText(bannedNode)
+		if strings.Contains(prompt, "此帐号已被永久停用") {
+			return nil, errors.New("account banned")
+		}
+	}
+
 	thumbnail := htmlquery.SelectAttr(htmlquery.FindOne(doc, "//div[contains(@class,'book-user-profile')]//img[@class='avatar']"), "src")
 	domain := htmlquery.SelectAttr(htmlquery.FindOne(doc, "//div[@id='db-usr-profile']//div[@class='pic']/a"), "href")
 	username := htmlquery.InnerText(htmlquery.FindOne(doc, "//div[contains(@class,'book-user-profile')]//div[@class='username']"))

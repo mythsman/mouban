@@ -7,6 +7,7 @@ import (
 	"mouban/model"
 	"mouban/util"
 	"strings"
+	"time"
 )
 
 func CommentBook(doubanUid uint64) (*model.User, *[]model.Comment, *[]model.Book, error) {
@@ -92,7 +93,12 @@ func scrollBook(doubanUid uint64, url string, action consts.Action) (*[]model.Co
 		if rating != nil {
 			ratingNumber = uint8(util.ParseNumber(htmlquery.SelectAttr(rating, "class")))
 		}
-		markDate := util.ParseDate(htmlquery.InnerText(htmlquery.FindOne(list[i], "//div[@class='short-note']//span[@class='date']")))
+
+		markDate := time.Unix(0, 0)
+		markDateNode := htmlquery.FindOne(list[i], "//div[@class='short-note']//span[@class='date']")
+		if markDateNode != nil {
+			markDate = util.ParseDate(htmlquery.InnerText(markDateNode))
+		}
 
 		shortComment := ""
 		shortCommentNode := htmlquery.FindOne(list[i], "//div[@class='short-note']//p[@class='comment']")
