@@ -90,7 +90,11 @@ func bookOverview(doubanUid uint64) (*model.User, error) {
 
 	thumbnail := htmlquery.SelectAttr(htmlquery.FindOne(doc, "//div[contains(@class,'book-user-profile')]//img[@class='avatar']"), "src")
 	domain := htmlquery.SelectAttr(htmlquery.FindOne(doc, "//div[@id='db-usr-profile']//div[@class='pic']/a"), "href")
-	username := htmlquery.InnerText(htmlquery.FindOne(doc, "//div[contains(@class,'book-user-profile')]//div[@class='username']"))
+	usernameNode := htmlquery.FindOne(doc, "//div[contains(@class,'book-user-profile')]//div[@class='username']")
+	if usernameNode == nil {
+		panic("username is nil for " + htmlquery.OutputHTML(doc, true))
+	}
+	username := htmlquery.InnerText(usernameNode)
 	registerAt := htmlquery.InnerText(htmlquery.FindOne(doc, "//div[contains(@class,'book-user-profile')]//div[@class='time-registered']"))
 	list := htmlquery.Find(doc, "//div[@id='db-book-mine']//h2")
 	do := ""
