@@ -37,7 +37,7 @@ var limiter *rate.Limiter
 func init() {
 	jar, _ := cookiejar.New(nil)
 	client = http.Client{
-		Jar:     jar,
+		Jar: jar,
 		CheckRedirect: func(req *http.Request, via []*http.Request) error {
 			if len(via) > 0 && req.Header.Get("cookie") == "" {
 				req.Header.Set("Cookie", via[len(via)-1].Header.Get("Cookie"))
@@ -63,7 +63,7 @@ func init() {
 }
 
 func Get(url string) (*string, int, error) {
-	ctx, _ := context.WithTimeout(context.Background(), time.Minute*10)
+	ctx, _ := context.WithTimeout(context.Background(), time.Minute*120)
 	err := limiter.Wait(ctx)
 	if err != nil {
 		return nil, 0, err
