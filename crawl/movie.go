@@ -24,7 +24,7 @@ func Movie(doubanId uint64) (*model.Movie, *model.Rating, error) {
 
 	tt := htmlquery.FindOne(doc, "//head//title")
 	if tt == nil {
-		panic("title is nil for " + strconv.FormatUint(doubanId, 10))
+		panic("title is nil for " + strconv.FormatUint(doubanId, 10) + ", html: {}" + htmlquery.OutputHTML(doc, true))
 	}
 	t := htmlquery.InnerText(tt)
 	if strings.TrimSpace(t) == "页面不存在" || strings.TrimSpace(t) == "条目不存在" {

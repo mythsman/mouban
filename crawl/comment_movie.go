@@ -70,7 +70,11 @@ func scrollMovie(doubanUid uint64, url string, action consts.Action) (*[]model.C
 		return nil, nil, 0, "", err
 	}
 
-	total := util.ParseNumber(htmlquery.InnerText(htmlquery.FindOne(doc, "//div[@id='db-usr-profile']/div[@class='info']/h1")))
+	totalNode := htmlquery.FindOne(doc, "//div[@id='db-usr-profile']/div[@class='info']/h1")
+	if totalNode == nil {
+		panic("total is nil for " + url + ", html: {}" + htmlquery.OutputHTML(doc, true))
+	}
+	total := util.ParseNumber(htmlquery.InnerText(totalNode))
 
 	list := htmlquery.Find(doc, "//div[@class='item']")
 	var comments []model.Comment
