@@ -20,6 +20,8 @@ docker push mythsman/mouban:amd64-latest
 
 docker push mythsman/mouban:arm64-latest
 
+sleep 1
+
 docker manifest rm mythsman/mouban
 
 sleep 1
