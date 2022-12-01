@@ -1,9 +1,7 @@
 package dao
 
 import (
-	"log"
 	"mouban/common"
-	"mouban/consts"
 	"mouban/model"
 )
 
@@ -47,26 +45,6 @@ func ChangeScheduleResult(doubanId uint64, t uint8, result uint8) {
 }
 
 func CreateSchedule(doubanId uint64, t uint8, status uint8, result uint8) {
-	if t != consts.TypeBook &&
-		t != consts.TypeMovie &&
-		t != consts.TypeGame &&
-		t != consts.TypeUser {
-		log.Println("type invalid : ", t)
-		return
-	}
-	if status != consts.ScheduleStatusToCrawl &&
-		status != consts.ScheduleStatusCrawling &&
-		status != consts.ScheduleStatusCrawled {
-		log.Println("status invalid : ", status)
-		return
-	}
-
-	if result != consts.ScheduleResultUnready &&
-		result != consts.ScheduleResultReady &&
-		result != consts.ScheduleResultInvalid {
-		log.Println("result invalid : ", status)
-		return
-	}
 
 	schedule := &model.Schedule{
 		DoubanId: doubanId,
