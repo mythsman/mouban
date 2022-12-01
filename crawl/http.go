@@ -75,7 +75,10 @@ func Get(url string) (*string, int, error) {
 
 	cookies, err := cookiemonster.ParseFile("./cookie.txt")
 	if err != nil {
-		panic(err)
+		cookies, err = cookiemonster.ParseFile("../cookie.txt")
+		if err != nil {
+			panic(err)
+		}
 	}
 	for _, c := range cookies {
 		c.Value = strings.Trim(c.Value, "\"")

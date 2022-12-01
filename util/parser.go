@@ -57,12 +57,38 @@ func ParseFloat(float string) float32 {
 	return float32(f)
 }
 
+func ParseUidOrDomain(link string) string {
+	result := domainParser.FindStringSubmatch(link)
+	if len(result) == 0 {
+		return ""
+	}
+	return result[1]
+}
+
 func ParseDomain(doubanUid uint64, link string) string {
 	result := domainParser.FindStringSubmatch(link)
 	if len(result) == 0 || result[1] == strconv.FormatUint(doubanUid, 10) {
 		return ""
 	}
 	return result[1]
+}
+
+func ParseNewUsers(doc *html.Node) *[]string {
+	var newUsers []string
+	newUserSet := make(map[string]bool)
+
+	newUserNodes := htmlquery.Find(doc, "//a[contains(@href,'www.douban.com/people/')]")
+	for _, node := range newUserNodes {
+		userLink := htmlquery.SelectAttr(node, "href")
+		uidOrDomain := ParseUidOrDomain(userLink)
+		if uidOrDomain != "" {
+			if !newUserSet[uidOrDomain] {
+				newUsers = append(newUsers, uidOrDomain)
+				newUserSet[uidOrDomain] = true
+			}
+		}
+	}
+	return &newUsers
 }
 
 func TrimBookParagraph(node *html.Node) string {

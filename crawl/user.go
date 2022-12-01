@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/antchfx/htmlquery"
+	"log"
 	"mouban/consts"
 	"mouban/model"
 	"mouban/util"
@@ -67,6 +68,31 @@ func UserHash(doubanUid uint64) (string, error) {
 	md5str := fmt.Sprintf("%x", has)
 
 	return md5str, nil
+}
+
+func UserId(domain string) uint64 {
+	defer func() {
+		if r := recover(); r != nil {
+			log.Println(r, " => ", util.GetCurrentGoroutineStack())
+		}
+	}()
+
+	body, _, err := Get(fmt.Sprintf(consts.BookOverviewForDomainUrl, domain))
+	if err != nil {
+		panic(err)
+	}
+
+	doc, err := htmlquery.Parse(strings.NewReader(*body))
+	if err != nil {
+		panic(err)
+	}
+
+	avatarNode := htmlquery.FindOne(doc, "//div[@id='db-usr-profile']//img")
+	if avatarNode == nil {
+		panic("avatar not found for " + domain)
+	}
+	avatarSrc := htmlquery.SelectAttr(avatarNode, "src")
+	return util.ParseDoubanUid(avatarSrc)
 }
 
 func bookOverview(doubanUid uint64) (*model.User, error) {

@@ -11,7 +11,7 @@ import (
 	"strings"
 )
 
-func Movie(doubanId uint64) (*model.Movie, *model.Rating, error) {
+func Movie(doubanId uint64) (*model.Movie, *model.Rating, *[]string, error) {
 	body, _, err := Get(fmt.Sprintf(consts.MovieDetailUrl, doubanId))
 	if err != nil {
 		panic(err)
@@ -28,7 +28,7 @@ func Movie(doubanId uint64) (*model.Movie, *model.Rating, error) {
 	}
 	t := htmlquery.InnerText(tt)
 	if strings.TrimSpace(t) == "页面不存在" || strings.TrimSpace(t) == "条目不存在" {
-		return nil, nil, errors.New(strings.TrimSpace(t))
+		return nil, nil, nil, errors.New(strings.TrimSpace(t))
 	}
 
 	title := htmlquery.SelectAttr(htmlquery.FindOne(doc, "//meta[@property='og:title']"), "content")
@@ -88,5 +88,7 @@ func Movie(doubanId uint64) (*model.Movie, *model.Rating, error) {
 	rating.DoubanId = doubanId
 	rating.Type = consts.TypeMovie
 
-	return movie, rating, nil
+	newUsers := util.ParseNewUsers(doc)
+
+	return movie, rating, newUsers, nil
 }
