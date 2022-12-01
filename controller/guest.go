@@ -2,6 +2,7 @@ package controller
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/spf13/viper"
 	"mouban/consts"
 	"mouban/dao"
 	"mouban/model"
@@ -45,8 +46,8 @@ func CheckUser(ctx *gin.Context) {
 	})
 
 	if schedule.Status == consts.ScheduleStatusCrawled {
-		oneDayBefore, _ := time.ParseDuration("-24h")
-		if schedule.UpdatedAt.Before(time.Now().Add(oneDayBefore)) {
+		timeLimit, _ := time.ParseDuration("-" + viper.GetString("server.limit"))
+		if schedule.UpdatedAt.Before(time.Now().Add(timeLimit)) {
 			dao.CasScheduleStatus(doubanUid, consts.TypeUser, consts.ScheduleStatusToCrawl, consts.ScheduleStatusCrawled)
 		}
 	}
