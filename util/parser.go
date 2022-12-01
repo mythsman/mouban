@@ -17,6 +17,9 @@ var domainParser = regexp.MustCompile(`.*people/(.*)/`)
 
 func ParseDoubanUid(thumbnail string) uint64 {
 	result := doubanUidParser.FindStringSubmatch(thumbnail)
+	if len(result) == 0 {
+		return 0
+	}
 	doubanUid, err := strconv.ParseUint(result[1], 10, 64)
 	if err != nil {
 		return 0
@@ -26,6 +29,9 @@ func ParseDoubanUid(thumbnail string) uint64 {
 
 func ParseDate(date string) time.Time {
 	result := dateParser.FindStringSubmatch(date)
+	if len(result) == 0 {
+		return time.Time{}
+	}
 	dateTime, err := time.ParseInLocation("2006-01-02", result[1], time.Local)
 	if err != nil {
 		return time.Time{}
