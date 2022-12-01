@@ -21,6 +21,7 @@ const TypeGame = 3
 const ScheduleStatusToCrawl = 0
 const ScheduleStatusCrawling = 1
 const ScheduleStatusCrawled = 2
+const ScheduleStatusCanCrawl = 3
 
 const ScheduleResultUnready = 0
 const ScheduleResultReady = 1

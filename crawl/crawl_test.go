@@ -7,29 +7,33 @@ import (
 )
 
 func TestMovie(t *testing.T) {
-	movie, rating, err := Movie(6026035)
+	movie, rating, newUsers, err := Movie(6026035)
 	if err != nil {
 		return
 	}
 	fmt.Println(util.ToJson(movie))
 	fmt.Println(util.ToJson(rating))
+	fmt.Println(util.ToJson(newUsers))
 }
 
 func TestGame(t *testing.T) {
-	game, rating, err := Game(35447696)
+	game, rating, newUsers, err := Game(35447696)
 	if err != nil {
 		return
 	}
 	fmt.Println(util.ToJson(game))
 	fmt.Println(util.ToJson(rating))
+	fmt.Println(util.ToJson(newUsers))
 }
+
 func TestBook(t *testing.T) {
-	book, rating, err := Book(35948443)
+	book, rating, newUser, err := Book(35948443)
 	if err != nil {
 		return
 	}
 	fmt.Println(util.ToJson(book))
 	fmt.Println(util.ToJson(rating))
+	fmt.Println(util.ToJson(newUser))
 }
 
 func TestUserHash(t *testing.T) {
@@ -47,4 +51,10 @@ func TestUserOverview(t *testing.T) {
 
 	}
 	fmt.Println(util.ToJson(overview))
+}
+
+func TestUserId(t *testing.T) {
+	id := UserId("162448367")
+
+	t.Logf("UserId is %d", id)
 }

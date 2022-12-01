@@ -8,6 +8,7 @@ import (
 	"mouban/dao"
 	"mouban/model"
 	"mouban/util"
+	"strconv"
 	"time"
 )
 
@@ -17,7 +18,9 @@ func processBook(doubanId uint64) {
 			log.Println(r, " => ", util.GetCurrentGoroutineStack())
 		}
 	}()
-	book, rating, err := crawl.Book(doubanId)
+	book, rating, newUser, err := crawl.Book(doubanId)
+
+	processNewUsers(newUser)
 
 	if err != nil {
 		dao.ChangeScheduleResult(doubanId, consts.TypeBook, consts.ScheduleResultInvalid)
@@ -35,7 +38,9 @@ func processMovie(doubanId uint64) {
 			log.Println(r, " => ", util.GetCurrentGoroutineStack())
 		}
 	}()
-	movie, rating, err := crawl.Movie(doubanId)
+	movie, rating, newUser, err := crawl.Movie(doubanId)
+
+	processNewUsers(newUser)
 
 	if err != nil {
 		dao.ChangeScheduleResult(doubanId, consts.TypeMovie, consts.ScheduleResultInvalid)
@@ -54,7 +59,9 @@ func processGame(doubanId uint64) {
 		}
 	}()
 
-	game, rating, err := crawl.Game(doubanId)
+	game, rating, newUser, err := crawl.Game(doubanId)
+
+	processNewUsers(newUser)
 
 	if err != nil {
 		dao.ChangeScheduleResult(doubanId, consts.TypeGame, consts.ScheduleResultInvalid)
@@ -137,6 +144,25 @@ func processUser(doubanUid uint64) {
 	}
 
 	dao.ChangeScheduleResult(doubanUid, consts.TypeUser, consts.ScheduleResultReady)
+}
+
+func processNewUsers(newUsers *[]string) {
+	go func() {
+		defer func() {
+			if r := recover(); r != nil {
+				log.Println(r, " => ", util.GetCurrentGoroutineStack())
+			}
+		}()
+		for _, idOrDomain := range *newUsers {
+			id, err := strconv.ParseUint(idOrDomain, 10, 64)
+			if err != nil {
+				id = crawl.UserId(idOrDomain)
+			}
+			if id > 0 {
+				dao.CreateSchedule(id, consts.TypeUser, consts.ScheduleStatusCanCrawl, consts.ScheduleResultUnready)
+			}
+		}
+	}()
 }
 
 func init() {

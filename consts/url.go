@@ -2,6 +2,7 @@ package consts
 
 const UserRssUrl = "https://www.douban.com/feed/people/%d/interests"
 const BookOverviewUrl = "https://book.douban.com/people/%d/"
+const BookOverviewForDomainUrl = "https://book.douban.com/people/%s/"
 const MovieOverviewUrl = "https://movie.douban.com/people/%d/"
 const GameOverviewUrl = "https://www.douban.com/people/%d/games/"
 
