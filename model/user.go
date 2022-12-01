@@ -7,7 +7,7 @@ import (
 type User struct {
 	ID           uint64
 	DoubanUid    uint64 `gorm:"not null;uniqueIndex"`
-	Domain       string `gorm:"not hull;type:varchar(64)"`
+	Domain       string `gorm:"not hull;index;type:varchar(64)"`
 	Name         string `gorm:"not null;type:varchar(512);"`
 	Thumbnail    string `gorm:"type:varchar(512);"`
 	BookWish     uint32

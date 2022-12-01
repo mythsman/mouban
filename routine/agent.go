@@ -156,7 +156,10 @@ func processNewUsers(newUsers *[]string) {
 		for _, idOrDomain := range *newUsers {
 			id, err := strconv.ParseUint(idOrDomain, 10, 64)
 			if err != nil {
-				id = crawl.UserId(idOrDomain)
+				user := dao.GetUserByDomain(idOrDomain)
+				if user == nil {
+					id = crawl.UserId(idOrDomain)
+				}
 			}
 			if id > 0 {
 				dao.CreateSchedule(id, consts.TypeUser, consts.ScheduleStatusCanCrawl, consts.ScheduleResultUnready)
