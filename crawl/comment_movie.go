@@ -60,7 +60,7 @@ func scrollMovie(doubanUid uint64, url string, action consts.Action) (*[]model.C
 	if url == "" {
 		url = fmt.Sprintf(consts.MovieCommentUrl, doubanUid, action.Name)
 	}
-	body, _, err := Get(url)
+	body, _, err := Get(url, DefaultLimiter)
 	if err != nil {
 		panic(err)
 	}

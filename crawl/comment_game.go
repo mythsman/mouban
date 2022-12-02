@@ -58,7 +58,7 @@ func scrollGame(doubanUid uint64, url string, action consts.Action) (*[]model.Co
 	if url == "" {
 		url = fmt.Sprintf(consts.GameCommentUrl, doubanUid, action.Name)
 	}
-	body, _, err := Get(url)
+	body, _, err := Get(url, DefaultLimiter)
 	if err != nil {
 		panic(err)
 	}
