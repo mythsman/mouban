@@ -59,7 +59,7 @@ func scrollBook(doubanUid uint64, url string, action consts.Action) (*[]model.Co
 	if url == "" {
 		url = fmt.Sprintf(consts.BookCommentUrl, doubanUid, action.Name)
 	}
-	body, _, err := Get(url)
+	body, _, err := Get(url, DefaultLimiter)
 	if err != nil {
 		panic(err)
 	}

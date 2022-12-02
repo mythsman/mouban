@@ -12,7 +12,7 @@ import (
 )
 
 func Movie(doubanId uint64) (*model.Movie, *model.Rating, *[]string, error) {
-	body, _, err := Get(fmt.Sprintf(consts.MovieDetailUrl, doubanId))
+	body, _, err := Get(fmt.Sprintf(consts.MovieDetailUrl, doubanId), DefaultLimiter)
 	if err != nil {
 		panic(err)
 	}
