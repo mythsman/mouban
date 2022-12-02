@@ -101,11 +101,14 @@ func processUser(doubanUid uint64) {
 			panic(err)
 		}
 		for i, _ := range *game {
-			dao.UpsertComment(&(*comment)[i])
-			added := dao.CreateGameNx(&(*game)[i])
-			if added {
-				dao.CreateSchedule((*game)[i].DoubanId, consts.TypeGame, consts.ScheduleStatusToCrawl, consts.ScheduleResultUnready)
-			}
+			i := i
+			go func() {
+				dao.UpsertComment(&(*comment)[i])
+				added := dao.CreateGameNx(&(*game)[i])
+				if added {
+					dao.CreateSchedule((*game)[i].DoubanId, consts.TypeGame, consts.ScheduleStatusToCrawl, consts.ScheduleResultUnready)
+				}
+			}()
 		}
 	}
 
@@ -118,11 +121,14 @@ func processUser(doubanUid uint64) {
 		}
 
 		for i, _ := range *book {
-			added := dao.CreateBookNx(&(*book)[i])
-			dao.UpsertComment(&(*comment)[i])
-			if added {
-				dao.CreateSchedule((*book)[i].DoubanId, consts.TypeBook, consts.ScheduleStatusToCrawl, consts.ScheduleResultUnready)
-			}
+			i := i
+			go func() {
+				added := dao.CreateBookNx(&(*book)[i])
+				dao.UpsertComment(&(*comment)[i])
+				if added {
+					dao.CreateSchedule((*book)[i].DoubanId, consts.TypeBook, consts.ScheduleStatusToCrawl, consts.ScheduleResultUnready)
+				}
+			}()
 		}
 	}
 
@@ -135,11 +141,14 @@ func processUser(doubanUid uint64) {
 		}
 
 		for i, _ := range *movie {
-			dao.UpsertComment(&(*comment)[i])
-			added := dao.CreateMovieNx(&(*movie)[i])
-			if added {
-				dao.CreateSchedule((*movie)[i].DoubanId, consts.TypeMovie, consts.ScheduleStatusToCrawl, consts.ScheduleResultUnready)
-			}
+			i := i
+			go func() {
+				dao.UpsertComment(&(*comment)[i])
+				added := dao.CreateMovieNx(&(*movie)[i])
+				if added {
+					dao.CreateSchedule((*movie)[i].DoubanId, consts.TypeMovie, consts.ScheduleStatusToCrawl, consts.ScheduleResultUnready)
+				}
+			}()
 		}
 	}
 
