@@ -77,7 +77,7 @@ func UserId(domain string) uint64 {
 		}
 	}()
 
-	body, _, err := Get(fmt.Sprintf(consts.BookOverviewForDomainUrl, domain), Backlimiter)
+	body, _, err := Get(fmt.Sprintf(consts.BookOverviewForDomainUrl, domain), BackLimiter)
 	if err != nil {
 		panic(err)
 	}

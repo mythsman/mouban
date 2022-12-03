@@ -33,7 +33,7 @@ var userAgent = []string{
 
 var client http.Client
 var DefaultLimiter *rate.Limiter
-var Backlimiter *rate.Limiter
+var BackLimiter *rate.Limiter
 
 func init() {
 	jar, _ := cookiejar.New(nil)
@@ -61,7 +61,7 @@ func init() {
 			},
 		}}
 	DefaultLimiter = rate.NewLimiter(rate.Every(time.Duration(viper.GetInt("http.default_interval"))*time.Second), 1)
-	Backlimiter = rate.NewLimiter(rate.Every(time.Duration(viper.GetInt("http.back_interval"))*time.Second), 1)
+	BackLimiter = rate.NewLimiter(rate.Every(time.Duration(viper.GetInt("http.back_interval"))*time.Second), 1)
 }
 
 func Get(url string, limiter *rate.Limiter) (*string, int, error) {
