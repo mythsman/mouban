@@ -156,6 +156,9 @@ func processUser(doubanUid uint64) {
 }
 
 func processNewUsers(newUsers *[]string) {
+	if viper.GetString("agent.discover") != "true" {
+		return
+	}
 	go func() {
 		defer func() {
 			if r := recover(); r != nil {
