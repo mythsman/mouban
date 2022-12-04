@@ -26,6 +26,18 @@ func SearchScheduleByStatus(t uint8, status uint8) *model.Schedule {
 	return schedule
 }
 
+func SearchScheduleByAll(t uint8, status uint8, result uint8) *model.Schedule {
+	schedule := &model.Schedule{}
+	common.Db.Where("type = ? AND `status`= ? AND result = ?", t, status, result).
+		Order("updated_at asc").
+		Limit(1).
+		Find(&schedule)
+	if schedule.ID == 0 {
+		return nil
+	}
+	return schedule
+}
+
 func SearchSchedule(status uint8, result uint8) *model.Schedule {
 	schedule := &model.Schedule{}
 	common.Db.Where("`status`= ? AND result = ?", status, result).
