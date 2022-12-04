@@ -36,6 +36,7 @@ func runRetry() {
 				processMovie(schedule.DoubanId)
 				break
 			}
+			dao.CasScheduleStatus(schedule.DoubanId, schedule.Type, consts.ScheduleStatusCrawled, consts.ScheduleStatusCrawling)
 		}
 	}
 }
