@@ -35,7 +35,7 @@ func runDiscover() {
 }
 func init() {
 	if viper.GetString("agent.enable") != "true" {
-		log.Println("discover agent disabled")
+		log.Println("discover marker disabled")
 		return
 	}
 	go func() {
@@ -44,5 +44,5 @@ func init() {
 		}
 	}()
 
-	log.Println("discover agent enabled")
+	log.Println("discover marker enabled")
 }

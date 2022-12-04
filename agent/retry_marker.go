@@ -13,7 +13,7 @@ import (
 func runRetry() {
 	defer func() {
 		if r := recover(); r != nil {
-			log.Println(r, "retry agent crashed  => ", util.GetCurrentGoroutineStack())
+			log.Println(r, "retry marker crashed  => ", util.GetCurrentGoroutineStack())
 		}
 		time.Sleep(time.Second * 5)
 	}()
@@ -27,7 +27,7 @@ func runRetry() {
 }
 func init() {
 	if viper.GetString("agent.enable") != "true" {
-		log.Println("retry agent disabled")
+		log.Println("retry marker disabled")
 		return
 	}
 	go func() {
@@ -36,5 +36,5 @@ func init() {
 		}
 	}()
 
-	log.Println("retry agent enabled")
+	log.Println("retry marker enabled")
 }
