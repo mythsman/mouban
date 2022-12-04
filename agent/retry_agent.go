@@ -15,11 +15,10 @@ func runRetry() {
 		if r := recover(); r != nil {
 			log.Println(r, "retry agent crashed  => ", util.GetCurrentGoroutineStack())
 		}
+		time.Sleep(time.Second * 5)
 	}()
 	schedule := dao.SearchSchedule(consts.ScheduleStatusCrawled, consts.ScheduleResultUnready)
-	if schedule == nil {
-		time.Sleep(time.Second * 5)
-	} else {
+	if schedule != nil {
 		changed := dao.CasScheduleStatus(schedule.DoubanId, schedule.Type, consts.ScheduleStatusCrawling, consts.ScheduleStatusCanCrawl)
 		if changed {
 			log.Println("start process retry " + strconv.FormatUint(schedule.DoubanId, 10))
