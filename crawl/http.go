@@ -2,15 +2,16 @@ package crawl
 
 import (
 	"crypto/tls"
-	"fmt"
 	"github.com/MercuryEngineering/CookieMonster"
 	"github.com/spf13/viper"
 	"golang.org/x/net/context"
 	"golang.org/x/time/rate"
 	"io/ioutil"
+	"log"
 	"math/rand"
 	"net/http"
 	"net/http/cookiejar"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -92,7 +93,7 @@ func Get(url string, limiter *rate.Limiter) (*string, int, error) {
 		return nil, 0, err
 	}
 
-	fmt.Printf(" code is %d for %s\n", resp.StatusCode, url)
+	log.Println(" code is " + strconv.Itoa(resp.StatusCode) + " for" + url)
 
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
