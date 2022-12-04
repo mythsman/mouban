@@ -23,6 +23,7 @@ func runDiscover() {
 		if changed {
 			log.Println("start process discover " + strconv.FormatUint(schedule.DoubanId, 10))
 			processUser(schedule.DoubanId)
+			dao.CasScheduleStatus(schedule.DoubanId, schedule.Type, consts.ScheduleStatusCrawled, consts.ScheduleStatusCrawling)
 		}
 	}
 }
