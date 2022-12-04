@@ -19,7 +19,7 @@ func runRetry() {
 	}()
 	schedule := dao.SearchSchedule(consts.ScheduleStatusCrawled, consts.ScheduleResultUnready)
 	if schedule != nil {
-		changed := dao.CasScheduleStatus(schedule.DoubanId, schedule.Type, consts.ScheduleStatusCrawling, consts.ScheduleStatusCanCrawl)
+		changed := dao.CasScheduleStatus(schedule.DoubanId, schedule.Type, consts.ScheduleStatusCrawling, consts.ScheduleStatusCrawled)
 		if changed {
 			log.Println("start process retry " + strconv.FormatUint(schedule.DoubanId, 10))
 			switch schedule.Type {
