@@ -36,6 +36,7 @@ func init() {
 	jar, _ := cookiejar.New(nil)
 	retryClient = retryablehttp.NewClient()
 	retryClient.RetryMax = 7
+	retryClient.Logger = nil
 	retryClient.RetryWaitMin = time.Duration(1) * time.Second
 	retryClient.RetryWaitMax = time.Duration(60) * time.Second
 	retryClient.HTTPClient = &http.Client{
