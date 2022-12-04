@@ -1,0 +1,42 @@
+package agent
+
+import (
+	"github.com/spf13/viper"
+	"log"
+	"mouban/consts"
+	"mouban/dao"
+	"mouban/util"
+	"strconv"
+	"time"
+)
+
+func runMovie() {
+	defer func() {
+		if r := recover(); r != nil {
+			log.Println(r, "movie agent crashed  => ", util.GetCurrentGoroutineStack())
+		}
+	}()
+	schedule := dao.SearchScheduleByStatus(consts.TypeGame, consts.ScheduleStatusToCrawl)
+	if schedule == nil {
+		time.Sleep(time.Second * 5)
+	} else {
+		changed := dao.CasScheduleStatus(schedule.DoubanId, schedule.Type, consts.ScheduleStatusCrawling, consts.ScheduleStatusToCrawl)
+		if changed {
+			log.Println("start process movie " + strconv.FormatUint(schedule.DoubanId, 10))
+			processBook(schedule.DoubanId)
+		}
+	}
+}
+func init() {
+	if viper.GetString("agent.enable") != "true" {
+		log.Println("movie agent disabled")
+		return
+	}
+	go func() {
+		for {
+			runMovie()
+		}
+	}()
+
+	log.Println("movie agent enabled")
+}

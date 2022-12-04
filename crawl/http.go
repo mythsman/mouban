@@ -3,7 +3,7 @@ package crawl
 import (
 	"crypto/tls"
 	"fmt"
-	cookiemonster "github.com/MercuryEngineering/CookieMonster"
+	"github.com/MercuryEngineering/CookieMonster"
 	"github.com/spf13/viper"
 	"golang.org/x/net/context"
 	"golang.org/x/time/rate"
@@ -16,24 +16,19 @@ import (
 )
 
 var userAgent = []string{
-	"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36",
-	"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:105.0) Gecko/20100101 Firefox/105.0",
-	"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36",
-	"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36",
-	"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36",
-	"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:106.0) Gecko/20100101 Firefox/106.0",
-	"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:105.0) Gecko/20100101 Firefox/105.0",
-	"Mozilla/5.0 (Windows NT 10.0; rv:105.0) Gecko/20100101 Firefox/105.0",
-	"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Safari/605.1.15",
-	"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36 Edg/106.0.1370.42",
-	"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36 Edg/106.0.1370.47",
-	"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36 Edg/106.0.1370.52",
-	"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:104.0) Gecko/20100101 Firefox/104.0",
+	"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36",
+	"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36",
+	"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36",
+	"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36",
+	"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36 Edg/106.0.1370.42",
+	"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36 Edg/106.0.1370.47",
+	"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36 Edg/106.0.1370.52",
 }[rand.Intn(13)]
 
 var client http.Client
-var DefaultLimiter *rate.Limiter
-var BackLimiter *rate.Limiter
+var UserLimiter *rate.Limiter
+var ItemLimiter *rate.Limiter
+var DiscoverLimiter *rate.Limiter
 
 func init() {
 	jar, _ := cookiejar.New(nil)
@@ -60,8 +55,9 @@ func init() {
 				},
 			},
 		}}
-	DefaultLimiter = rate.NewLimiter(rate.Every(time.Duration(viper.GetInt("http.default_interval"))*time.Second), 1)
-	BackLimiter = rate.NewLimiter(rate.Every(time.Duration(viper.GetInt("http.back_interval"))*time.Second), 1)
+	UserLimiter = rate.NewLimiter(rate.Every(time.Duration(viper.GetInt("http.user_interval"))*time.Second), 1)
+	ItemLimiter = rate.NewLimiter(rate.Every(time.Duration(viper.GetInt("http.item_interval"))*time.Second), 1)
+	DiscoverLimiter = rate.NewLimiter(rate.Every(time.Duration(viper.GetInt("http.discover_interval"))*time.Second), 1)
 }
 
 func Get(url string, limiter *rate.Limiter) (*string, int, error) {

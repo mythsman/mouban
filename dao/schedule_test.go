@@ -17,7 +17,7 @@ func TestGetSchedule(t *testing.T) {
 }
 
 func TestSearchSchedule(t *testing.T) {
-	schedule := SearchScheduleByStatus(consts.ScheduleStatusToCrawl)
+	schedule := SearchScheduleByStatus(consts.TypeBook, consts.ScheduleStatusToCrawl)
 	fmt.Println(util.ToJson(schedule))
 }
 
