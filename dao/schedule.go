@@ -16,7 +16,7 @@ func GetSchedule(doubanId uint64, t uint8) *model.Schedule {
 
 func SearchScheduleByStatus(t uint8, status uint8) *model.Schedule {
 	schedule := &model.Schedule{}
-	common.Db.Where("status = ? ", status).
+	common.Db.Where("type = ? AND status = ? ", t, status).
 		Order("updated_at asc").
 		Limit(1).
 		Find(&schedule)
