@@ -15,7 +15,8 @@ datasource:
   loc: Asia/Shanghai
 http:
   timeout: 10
-  default_interval: 4
-  back_interval: 4
+  user_interval: 4
+  item_interval: 4
+  discover_interval: 4
 admin:
   token: ewfdcjojdi
