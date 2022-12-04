@@ -15,11 +15,10 @@ func runDiscover() {
 		if r := recover(); r != nil {
 			log.Println(r, "discover agent crashed  => ", util.GetCurrentGoroutineStack())
 		}
+		time.Sleep(time.Second * 3600)
 	}()
 	schedule := dao.SearchScheduleByStatus(consts.TypeUser, consts.ScheduleStatusCanCrawl)
-	if schedule == nil {
-		time.Sleep(time.Second * 3600)
-	} else {
+	if schedule != nil {
 		changed := dao.CasScheduleStatus(schedule.DoubanId, schedule.Type, consts.ScheduleStatusCrawling, consts.ScheduleStatusCanCrawl)
 		if changed {
 			log.Println("start process discover " + strconv.FormatUint(schedule.DoubanId, 10))
