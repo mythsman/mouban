@@ -93,7 +93,7 @@ func Get(url string, limiter *rate.Limiter) (*string, int, error) {
 		return nil, 0, err
 	}
 
-	log.Println(" code is " + strconv.Itoa(resp.StatusCode) + " for" + url)
+	log.Println("code is " + strconv.Itoa(resp.StatusCode) + " for" + url)
 
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
