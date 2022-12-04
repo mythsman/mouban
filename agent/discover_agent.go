@@ -15,7 +15,7 @@ func runDiscover() {
 		if r := recover(); r != nil {
 			log.Println(r, "discover agent crashed  => ", util.GetCurrentGoroutineStack())
 		}
-		time.Sleep(time.Second * 3600)
+		time.Sleep(time.Second * 60)
 	}()
 	schedule := dao.SearchScheduleByStatus(consts.TypeUser, consts.ScheduleStatusCanCrawl)
 	if schedule != nil {
