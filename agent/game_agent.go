@@ -22,7 +22,7 @@ func runGame() {
 		changed := dao.CasScheduleStatus(schedule.DoubanId, schedule.Type, consts.ScheduleStatusCrawling, consts.ScheduleStatusToCrawl)
 		if changed {
 			log.Println("start process game " + strconv.FormatUint(schedule.DoubanId, 10))
-			processBook(schedule.DoubanId)
+			processGame(schedule.DoubanId)
 		}
 	}
 }
