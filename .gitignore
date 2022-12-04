@@ -2,8 +2,6 @@
 .idea/
 application.yml
 cookie.txt
-server
-agent
 
 # Binaries for programs and plugins
 *.exe

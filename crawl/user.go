@@ -54,7 +54,7 @@ func UserOverview(doubanUid uint64) (*model.User, error) {
 }
 
 func UserHash(doubanUid uint64) (string, error) {
-	body, code, err := Get(fmt.Sprintf(consts.UserRssUrl, doubanUid), DefaultLimiter)
+	body, code, err := Get(fmt.Sprintf(consts.UserRssUrl, doubanUid), UserLimiter)
 	if err != nil {
 		panic(err)
 	}
@@ -77,7 +77,7 @@ func UserId(domain string) uint64 {
 		}
 	}()
 
-	body, _, err := Get(fmt.Sprintf(consts.BookOverviewForDomainUrl, domain), BackLimiter)
+	body, _, err := Get(fmt.Sprintf(consts.BookOverviewForDomainUrl, domain), DiscoverLimiter)
 	if err != nil {
 		panic(err)
 	}
@@ -96,7 +96,7 @@ func UserId(domain string) uint64 {
 }
 
 func bookOverview(doubanUid uint64) (*model.User, error) {
-	body, _, err := Get(fmt.Sprintf(consts.BookOverviewUrl, doubanUid), DefaultLimiter)
+	body, _, err := Get(fmt.Sprintf(consts.BookOverviewUrl, doubanUid), UserLimiter)
 	if err != nil {
 		panic(err)
 	}
@@ -162,7 +162,7 @@ func bookOverview(doubanUid uint64) (*model.User, error) {
 }
 
 func movieOverview(doubanUid uint64) (*model.User, error) {
-	body, _, err := Get(fmt.Sprintf(consts.MovieOverviewUrl, doubanUid), DefaultLimiter)
+	body, _, err := Get(fmt.Sprintf(consts.MovieOverviewUrl, doubanUid), UserLimiter)
 	if err != nil {
 		panic(err)
 	}
@@ -206,7 +206,7 @@ func movieOverview(doubanUid uint64) (*model.User, error) {
 }
 
 func gameOverview(doubanUid uint64) (*model.User, error) {
-	body, _, err := Get(fmt.Sprintf(consts.GameOverviewUrl, doubanUid), DefaultLimiter)
+	body, _, err := Get(fmt.Sprintf(consts.GameOverviewUrl, doubanUid), UserLimiter)
 	if err != nil {
 		panic(err)
 	}

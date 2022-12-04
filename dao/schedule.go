@@ -14,10 +14,11 @@ func GetSchedule(doubanId uint64, t uint8) *model.Schedule {
 	return schedule
 }
 
-func SearchScheduleByStatus(status uint8) *model.Schedule {
+func SearchScheduleByStatus(t uint8, status uint8) *model.Schedule {
 	schedule := &model.Schedule{}
 	common.Db.Where("status = ? ", status).
 		Order("updated_at asc").
+		Limit(1).
 		Find(&schedule)
 	if schedule.ID == 0 {
 		return nil
@@ -25,10 +26,16 @@ func SearchScheduleByStatus(status uint8) *model.Schedule {
 	return schedule
 }
 
-func SearchScheduleByResult(t uint8, result uint8, limit int) *[]model.Schedule {
-	var schedules []model.Schedule
-	common.Db.Limit(limit).Where("type = ? AND result = ? ", t, result).Find(&schedules)
-	return &schedules
+func SearchSchedule(status uint8, result uint8) *model.Schedule {
+	schedule := &model.Schedule{}
+	common.Db.Where("`status`= ? AND result = ?", status, result).
+		Order("updated_at asc").
+		Limit(1).
+		Find(&schedule)
+	if schedule.ID == 0 {
+		return nil
+	}
+	return schedule
 }
 
 func CasScheduleStatus(doubanId uint64, t uint8, status uint8, rawStatus uint8) bool {

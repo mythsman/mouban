@@ -12,7 +12,7 @@ import (
 )
 
 func Game(doubanId uint64) (*model.Game, *model.Rating, *[]string, error) {
-	body, _, err := Get(fmt.Sprintf(consts.GameDetailUrl, doubanId), DefaultLimiter)
+	body, _, err := Get(fmt.Sprintf(consts.GameDetailUrl, doubanId), ItemLimiter)
 	if err != nil {
 		panic(err)
 	}
