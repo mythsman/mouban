@@ -96,7 +96,7 @@ func processDiscover(newUsers *[]string) {
 	}()
 }
 
-func processUser(doubanUid uint64) {
+func processUser(doubanUid uint64, forceUpdate bool) {
 	defer func() {
 		if r := recover(); r != nil {
 			log.Println(r, " => ", util.GetCurrentGoroutineStack())
@@ -105,7 +105,7 @@ func processUser(doubanUid uint64) {
 
 	hash, _ := crawl.UserHash(doubanUid)
 	rawUser := dao.GetUser(doubanUid)
-	if rawUser != nil && rawUser.RssHash == hash {
+	if !forceUpdate && rawUser != nil && rawUser.RssHash == hash {
 		log.Println("user ", doubanUid, " not changed")
 		return
 	}
