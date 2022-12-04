@@ -24,6 +24,7 @@ func runGame() {
 			log.Println("start process game " + strconv.FormatUint(schedule.DoubanId, 10))
 			processGame(schedule.DoubanId)
 			dao.CasScheduleStatus(schedule.DoubanId, schedule.Type, consts.ScheduleStatusCrawled, consts.ScheduleStatusCrawling)
+			log.Println("end process game " + strconv.FormatUint(schedule.DoubanId, 10))
 		}
 	}
 }
