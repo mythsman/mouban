@@ -3,6 +3,7 @@ package crawl
 import (
 	"crypto/tls"
 	"github.com/MercuryEngineering/CookieMonster"
+	"github.com/hashicorp/go-retryablehttp"
 	"github.com/spf13/viper"
 	"golang.org/x/net/context"
 	"golang.org/x/time/rate"
@@ -26,14 +27,18 @@ var userAgent = []string{
 	"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36 Edg/106.0.1370.52",
 }[rand.Intn(7)]
 
-var client http.Client
+var retryClient *retryablehttp.Client
 var UserLimiter *rate.Limiter
 var ItemLimiter *rate.Limiter
 var DiscoverLimiter *rate.Limiter
 
 func init() {
 	jar, _ := cookiejar.New(nil)
-	client = http.Client{
+	retryClient = retryablehttp.NewClient()
+	retryClient.RetryMax = 7
+	retryClient.RetryWaitMin = time.Duration(1) * time.Second
+	retryClient.RetryWaitMax = time.Duration(60) * time.Second
+	retryClient.HTTPClient = &http.Client{
 		Jar: jar,
 		CheckRedirect: func(req *http.Request, via []*http.Request) error {
 			if len(via) > 0 && req.Header.Get("cookie") == "" {
@@ -43,7 +48,7 @@ func init() {
 		},
 		Timeout: time.Duration(viper.GetInt("http.timeout")) * time.Second,
 		Transport: &http.Transport{
-			TLSHandshakeTimeout: 10 * time.Second,
+			TLSHandshakeTimeout: time.Duration(viper.GetInt("http.timeout")) * time.Second,
 			TLSClientConfig: &tls.Config{
 				MinVersion: tls.VersionTLS12,
 				CipherSuites: []uint16{
@@ -62,13 +67,12 @@ func init() {
 }
 
 func Get(url string, limiter *rate.Limiter) (*string, int, error) {
-	ctx, _ := context.WithTimeout(context.Background(), time.Minute*120)
-	err := limiter.Wait(ctx)
+	err := limiter.Wait(context.Background())
 	if err != nil {
 		return nil, 0, err
 	}
 
-	req, err := http.NewRequest("GET", url, nil)
+	req, err := retryablehttp.NewRequest("GET", url, nil)
 	req.Header.Set("User-Agent", userAgent)
 	req.Header.Set("Referer", "https://www.douban.com/")
 
@@ -88,7 +92,7 @@ func Get(url string, limiter *rate.Limiter) (*string, int, error) {
 		return nil, 0, err
 	}
 
-	resp, err := client.Do(req)
+	resp, err := retryClient.Do(req)
 	if err != nil {
 		return nil, 0, err
 	}
