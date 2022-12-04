@@ -17,7 +17,7 @@ func runMovie() {
 		}
 		time.Sleep(time.Second * 5)
 	}()
-	schedule := dao.SearchScheduleByStatus(consts.TypeGame, consts.ScheduleStatusToCrawl)
+	schedule := dao.SearchScheduleByStatus(consts.TypeMovie, consts.ScheduleStatusToCrawl)
 	if schedule != nil {
 		changed := dao.CasScheduleStatus(schedule.DoubanId, schedule.Type, consts.ScheduleStatusCrawling, consts.ScheduleStatusToCrawl)
 		if changed {
