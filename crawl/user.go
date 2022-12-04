@@ -112,6 +112,9 @@ func bookOverview(doubanUid uint64) (*model.User, error) {
 		if strings.Contains(prompt, "此帐号已被永久停用") {
 			return nil, errors.New("account banned")
 		}
+		if strings.Contains(prompt,"该用户已经主动注销帐号"){
+			return nil, errors.New("account canceled")
+		}
 	}
 
 	thumbnail := htmlquery.SelectAttr(htmlquery.FindOne(doc, "//div[contains(@class,'book-user-profile')]//img[@class='avatar']"), "src")
