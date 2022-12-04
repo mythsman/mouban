@@ -21,7 +21,7 @@ func runRetry() {
 	if schedule != nil {
 		changed := dao.CasScheduleStatus(schedule.DoubanId, schedule.Type, consts.ScheduleStatusCrawling, consts.ScheduleStatusCrawled)
 		if changed {
-			log.Println("start process retry " + strconv.FormatUint(schedule.DoubanId, 10))
+			log.Println("start process retry " + string(schedule.Type) + " " + strconv.FormatUint(schedule.DoubanId, 10))
 			switch schedule.Type {
 			case consts.TypeUser:
 				processUser(schedule.DoubanId)
@@ -37,6 +37,7 @@ func runRetry() {
 				break
 			}
 			dao.CasScheduleStatus(schedule.DoubanId, schedule.Type, consts.ScheduleStatusCrawled, consts.ScheduleStatusCrawling)
+			log.Println("end process retry " + string(schedule.Type) + " " + strconv.FormatUint(schedule.DoubanId, 10))
 		}
 	}
 }

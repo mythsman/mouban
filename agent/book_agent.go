@@ -25,6 +25,7 @@ func runBook() {
 			log.Println("start process book " + strconv.FormatUint(schedule.DoubanId, 10))
 			processBook(schedule.DoubanId)
 			dao.CasScheduleStatus(schedule.DoubanId, schedule.Type, consts.ScheduleStatusCrawled, consts.ScheduleStatusCrawling)
+			log.Println("end process book " + strconv.FormatUint(schedule.DoubanId, 10))
 		}
 	}
 }

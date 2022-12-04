@@ -24,6 +24,7 @@ func runMovie() {
 			log.Println("start process movie " + strconv.FormatUint(schedule.DoubanId, 10))
 			processMovie(schedule.DoubanId)
 			dao.CasScheduleStatus(schedule.DoubanId, schedule.Type, consts.ScheduleStatusCrawled, consts.ScheduleStatusCrawling)
+			log.Println("end process movie " + strconv.FormatUint(schedule.DoubanId, 10))
 		}
 	}
 }
