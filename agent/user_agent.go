@@ -22,7 +22,7 @@ func runUser() {
 		changed := dao.CasScheduleStatus(schedule.DoubanId, schedule.Type, consts.ScheduleStatusCrawling, consts.ScheduleStatusToCrawl)
 		if changed {
 			log.Println("start process user " + strconv.FormatUint(schedule.DoubanId, 10))
-			processUser(schedule.DoubanId)
+			processUser(schedule.DoubanId, schedule.Result == consts.ScheduleResultUnready)
 			dao.CasScheduleStatus(schedule.DoubanId, schedule.Type, consts.ScheduleStatusCrawled, consts.ScheduleStatusCrawling)
 			log.Println("end process user " + strconv.FormatUint(schedule.DoubanId, 10))
 		}
