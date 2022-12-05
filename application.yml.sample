@@ -15,6 +15,7 @@ datasource:
   loc: Asia/Shanghai
 http:
   timeout: 10
+  retry_max: 20
   user_interval: 4
   book_interval: 4
   movie_interval: 4
