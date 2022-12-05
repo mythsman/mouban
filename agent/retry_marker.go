@@ -23,7 +23,7 @@ func runRetry() {
 		if retryBook != nil {
 			changed := dao.CasScheduleStatus(retryBook.DoubanId, retryBook.Type, consts.ScheduleStatusToCrawl, consts.ScheduleStatusCrawled)
 			if changed {
-				log.Printf("process retry book %d %d\n", retryBook.Type, retryBook.DoubanId)
+				log.Printf("process retry book %d\n", retryBook.DoubanId)
 			}
 		}
 	}
@@ -34,7 +34,7 @@ func runRetry() {
 		if retryMovie != nil {
 			changed := dao.CasScheduleStatus(retryMovie.DoubanId, retryMovie.Type, consts.ScheduleStatusToCrawl, consts.ScheduleStatusCrawled)
 			if changed {
-				log.Printf("process retry movie %d %d\n", retryMovie.Type, retryMovie.DoubanId)
+				log.Printf("process retry movie %d\n", retryMovie.DoubanId)
 			}
 		}
 	}
@@ -44,7 +44,7 @@ func runRetry() {
 		if retryGame != nil {
 			changed := dao.CasScheduleStatus(retryGame.DoubanId, retryGame.Type, consts.ScheduleStatusToCrawl, consts.ScheduleStatusCrawled)
 			if changed {
-				log.Printf("process retry game %d %d\n", retryGame.Type, retryGame.DoubanId)
+				log.Printf("process retry game %d\n", retryGame.DoubanId)
 			}
 		}
 	}
@@ -55,7 +55,7 @@ func runRetry() {
 		if retryUser != nil {
 			changed := dao.CasScheduleStatus(retryUser.DoubanId, retryUser.Type, consts.ScheduleStatusToCrawl, consts.ScheduleStatusCrawled)
 			if changed {
-				log.Printf("process retry user %d %d\n", retryUser.Type, retryUser.DoubanId)
+				log.Printf("process retry user %d\n", retryUser.DoubanId)
 			}
 		} else {
 			discoverUser := dao.SearchScheduleByStatus(consts.TypeUser, consts.ScheduleStatusCanCrawl)
