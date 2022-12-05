@@ -33,7 +33,7 @@ var DiscoverLimiter *rate.Limiter
 func init() {
 	jar, _ := cookiejar.New(nil)
 	retryClient = retryablehttp.NewClient()
-	retryClient.RetryMax = 7
+	retryClient.RetryMax = viper.GetInt("http.retry_max")
 	retryClient.Logger = nil
 	retryClient.RetryWaitMin = time.Duration(1) * time.Second
 	retryClient.RetryWaitMax = time.Duration(60) * time.Second
