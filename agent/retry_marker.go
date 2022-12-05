@@ -58,11 +58,13 @@ func runRetry() {
 				log.Printf("process retry user %d\n", retryUser.DoubanId)
 			}
 		} else {
-			discoverUser := dao.SearchScheduleByStatus(consts.TypeUser, consts.ScheduleStatusCanCrawl)
-			if discoverUser != nil {
-				changed := dao.CasScheduleStatus(discoverUser.DoubanId, consts.TypeUser, consts.ScheduleStatusToCrawl, consts.ScheduleStatusCanCrawl)
-				if changed {
-					log.Printf("process discover user %d\n", discoverUser.DoubanId)
+			if viper.GetString("agent.discover") == "true" {
+				discoverUser := dao.SearchScheduleByStatus(consts.TypeUser, consts.ScheduleStatusCanCrawl)
+				if discoverUser != nil {
+					changed := dao.CasScheduleStatus(discoverUser.DoubanId, consts.TypeUser, consts.ScheduleStatusToCrawl, consts.ScheduleStatusCanCrawl)
+					if changed {
+						log.Printf("process discover user %d\n", discoverUser.DoubanId)
+					}
 				}
 			}
 		}
