@@ -13,7 +13,7 @@ import (
 )
 
 func Book(doubanId uint64) (*model.Book, *model.Rating, *[]string, error) {
-	body, _, err := Get(fmt.Sprintf(consts.BookDetailUrl, doubanId), ItemLimiter)
+	body, _, err := Get(fmt.Sprintf(consts.BookDetailUrl, doubanId), BookLimiter)
 	if err != nil {
 		panic(err)
 	}

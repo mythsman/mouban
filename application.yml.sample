@@ -16,7 +16,9 @@ datasource:
 http:
   timeout: 10
   user_interval: 4
-  item_interval: 4
+  book_interval: 4
+  movie_interval: 4
+  game_interval: 4
   discover_interval: 4
 admin:
   token: ewfdcjojdi
