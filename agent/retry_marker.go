@@ -14,7 +14,7 @@ func runRetry() {
 		if r := recover(); r != nil {
 			log.Println(r, "retry marker crashed  => ", util.GetCurrentGoroutineStack())
 		}
-		time.Sleep(time.Second * 5)
+		time.Sleep(time.Second * 1)
 	}()
 
 	pendingBook := dao.SearchScheduleByStatus(consts.TypeBook, consts.ScheduleStatusToCrawl)
