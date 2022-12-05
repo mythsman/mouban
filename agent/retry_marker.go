@@ -6,7 +6,6 @@ import (
 	"mouban/consts"
 	"mouban/dao"
 	"mouban/util"
-	"strconv"
 	"time"
 )
 
@@ -21,7 +20,7 @@ func runRetry() {
 	if schedule != nil {
 		changed := dao.CasScheduleStatus(schedule.DoubanId, schedule.Type, consts.ScheduleStatusToCrawl, consts.ScheduleStatusCrawled)
 		if changed {
-			log.Println("process retry " + string(schedule.Type) + " " + strconv.FormatUint(schedule.DoubanId, 10))
+			log.Printf("process retry %d %d \n", schedule.Type, schedule.DoubanId)
 		}
 	}
 }
