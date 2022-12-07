@@ -4,15 +4,20 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
 	"log"
+	"math/rand"
 	_ "mouban/agent"
 	"mouban/consts"
 	"mouban/controller"
 	"mouban/util"
 	"net/http"
+	"os"
 	"strings"
+	"time"
 )
 
 func main() {
+	log.SetOutput(os.Stdout)
+	rand.Seed(time.Now().UnixNano())
 
 	router := gin.Default()
 
