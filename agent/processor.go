@@ -86,7 +86,8 @@ func processGame(doubanId uint64) {
 }
 
 func processDiscover(newUsers *[]string) {
-	if viper.GetString("agent.discover") != "true" {
+	level := viper.GetInt("agent.discover.level")
+	if level == 0 {
 		return
 	}
 	go func() {
@@ -98,6 +99,9 @@ func processDiscover(newUsers *[]string) {
 		for _, idOrDomain := range *newUsers {
 			id, err := strconv.ParseUint(idOrDomain, 10, 64)
 			if err != nil {
+				if level == 1 {
+					continue
+				}
 				user := dao.GetUserByDomain(idOrDomain)
 				if user == nil {
 					id = crawl.UserId(idOrDomain)

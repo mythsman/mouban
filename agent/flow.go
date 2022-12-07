@@ -9,10 +9,10 @@ import (
 	"time"
 )
 
-func runRetry() {
+func runFlow() {
 	defer func() {
 		if r := recover(); r != nil {
-			log.Println(r, "retry agent crashed  => ", util.GetCurrentGoroutineStack())
+			log.Println(r, "flow agent crashed  => ", util.GetCurrentGoroutineStack())
 		}
 		time.Sleep(time.Second * 1)
 	}()
@@ -23,7 +23,7 @@ func runRetry() {
 		if retryBook != nil {
 			changed := dao.CasScheduleStatus(retryBook.DoubanId, retryBook.Type, consts.ScheduleStatusToCrawl, consts.ScheduleStatusCrawled)
 			if changed {
-				log.Println("process retry book ", retryBook.DoubanId)
+				log.Println("flow retry book ", retryBook.DoubanId)
 			}
 		}
 	}
@@ -34,7 +34,7 @@ func runRetry() {
 		if retryMovie != nil {
 			changed := dao.CasScheduleStatus(retryMovie.DoubanId, retryMovie.Type, consts.ScheduleStatusToCrawl, consts.ScheduleStatusCrawled)
 			if changed {
-				log.Println("process retry movie ", retryMovie.DoubanId)
+				log.Println("flow retry movie ", retryMovie.DoubanId)
 			}
 		}
 	}
@@ -45,7 +45,7 @@ func runRetry() {
 		if retryGame != nil {
 			changed := dao.CasScheduleStatus(retryGame.DoubanId, retryGame.Type, consts.ScheduleStatusToCrawl, consts.ScheduleStatusCrawled)
 			if changed {
-				log.Println("process retry game ", retryGame.DoubanId)
+				log.Println("flow retry game ", retryGame.DoubanId)
 			}
 		}
 	}
@@ -56,15 +56,15 @@ func runRetry() {
 		if retryUser != nil {
 			changed := dao.CasScheduleStatus(retryUser.DoubanId, retryUser.Type, consts.ScheduleStatusToCrawl, consts.ScheduleStatusCrawled)
 			if changed {
-				log.Println("process retry user ", retryUser.DoubanId)
+				log.Println("flow retry user ", retryUser.DoubanId)
 			}
 		} else {
-			if viper.GetString("agent.discover") == "true" {
+			if viper.GetString("agent.flow.discover") == "true" {
 				discoverUser := dao.SearchScheduleByStatus(consts.TypeUser.Code, consts.ScheduleStatusCanCrawl)
 				if discoverUser != nil {
 					changed := dao.CasScheduleStatus(discoverUser.DoubanId, consts.TypeUser.Code, consts.ScheduleStatusToCrawl, consts.ScheduleStatusCanCrawl)
 					if changed {
-						log.Println("process discover user ", discoverUser.DoubanId)
+						log.Println("flow discover user ", discoverUser.DoubanId)
 					}
 				}
 			}
@@ -74,14 +74,14 @@ func runRetry() {
 }
 func init() {
 	if viper.GetString("agent.enable") != "true" {
-		log.Println("retry agent disabled")
+		log.Println("flow agent disabled")
 		return
 	}
 	go func() {
 		for {
-			runRetry()
+			runFlow()
 		}
 	}()
 
-	log.Println("retry agent enabled")
+	log.Println("flow agent enabled")
 }
