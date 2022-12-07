@@ -14,7 +14,7 @@ import (
 func runItem(index int) {
 	defer func() {
 		if r := recover(); r != nil {
-			log.Println(r, "item agent ", index, " crashed  => ", util.GetCurrentGoroutineStack())
+			log.Println(r, "item agent", index, "crashed  => ", util.GetCurrentGoroutineStack())
 		}
 		time.Sleep(time.Second * 1)
 	}()
