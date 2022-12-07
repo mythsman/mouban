@@ -59,7 +59,7 @@ func runFlow() {
 				log.Println("flow retry user ", retryUser.DoubanId)
 			}
 		} else {
-			if viper.GetString("agent.flow.discover") == "true" {
+			if viper.GetBool("agent.flow.discover") {
 				discoverUser := dao.SearchScheduleByStatus(consts.TypeUser.Code, consts.ScheduleStatusCanCrawl)
 				if discoverUser != nil {
 					changed := dao.CasScheduleStatus(discoverUser.DoubanId, consts.TypeUser.Code, consts.ScheduleStatusToCrawl, consts.ScheduleStatusCanCrawl)
@@ -73,7 +73,7 @@ func runFlow() {
 
 }
 func init() {
-	if viper.GetString("agent.enable") != "true" {
+	if !viper.GetBool("agent.enable") {
 		log.Println("flow agent disabled")
 		return
 	}
