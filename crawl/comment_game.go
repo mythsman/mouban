@@ -3,6 +3,7 @@ package crawl
 import (
 	"fmt"
 	"github.com/antchfx/htmlquery"
+	"github.com/spf13/viper"
 	"mouban/consts"
 	"mouban/model"
 	"mouban/util"
@@ -47,7 +48,7 @@ func scrollAllGame(doubanUid uint64, action consts.Action) (*[]model.Comment, *[
 		url = next
 		allComments = append(allComments, *comments...)
 		allGames = append(allGames, *games...)
-		if next == "" {
+		if next == "" || total >= viper.GetUint32("agent.item.max") {
 			break
 		}
 	}
