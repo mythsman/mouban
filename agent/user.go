@@ -33,7 +33,7 @@ func runUser() {
 }
 
 func init() {
-	if viper.GetString("agent.enable") != "true" {
+	if !viper.GetBool("agent.enable") {
 		log.Println("user agent disabled")
 		return
 	}

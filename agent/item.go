@@ -39,7 +39,7 @@ func runItem(index int) {
 }
 
 func init() {
-	if viper.GetString("agent.enable") != "true" {
+	if !viper.GetBool("agent.enable") {
 		log.Println("item agent disabled")
 		return
 	}
