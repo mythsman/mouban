@@ -8,6 +8,7 @@ agent:
     discover: false
   item:
     concurrency: 3
+    max: 3000
   discover:
     level: 0 #0-no discover;1-discover by id;2-discover by id and domain
 datasource:
