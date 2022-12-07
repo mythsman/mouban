@@ -7,15 +7,17 @@ import (
 	"github.com/spf13/viper"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 	"log"
 	"mouban/model"
 	"net/url"
+	"os"
+	"time"
 )
 
 var Db *gorm.DB
 
 func init() {
-	// 从配置文件中获取参数
 	host := viper.GetString("datasource.host")
 	port := viper.GetString("datasource.port")
 	database := viper.GetString("datasource.database")
@@ -51,7 +53,6 @@ func tryCreateDB(username string, password string, host string, port string, dat
 
 func getConnection(username string, password string, host string, port string, database string, charset string, loc string) {
 
-	// 字符串拼接
 	sqlStr := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=%s&parseTime=true&loc=%s",
 		username,
 		password,
@@ -61,11 +62,23 @@ func getConnection(username string, password string, host string, port string, d
 		charset,
 		url.QueryEscape(loc))
 
-	db, err := gorm.Open(mysql.Open(sqlStr))
+	dbLogger := logger.New(
+		log.New(os.Stderr, "\r\n", log.LstdFlags),
+		logger.Config{
+			SlowThreshold:             500 * time.Second,
+			LogLevel:                  logger.Warn,
+			IgnoreRecordNotFoundError: true,
+			Colorful:                  true,
+		},
+	)
+	
+	db, err := gorm.Open(mysql.Open(sqlStr), &gorm.Config{
+		Logger: dbLogger,
+	})
 
 	if err != nil {
-		log.Println("打开数据库失败", err)
-		panic("打开数据库失败" + err.Error())
+		log.Println("Open database failed", err)
+		panic("Open database failed" + err.Error())
 	}
 	Db = db
 	log.Println("db connect success")
@@ -84,7 +97,7 @@ func migrateTables() {
 		&model.User{},
 	)
 	if err != nil {
-		panic("初始化数据库失败" + err.Error())
+		panic("init database failed " + err.Error())
 	}
 
 }

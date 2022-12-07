@@ -27,10 +27,10 @@ func runItem(index int) {
 		if schedule != nil {
 			changed := dao.CasScheduleStatus(schedule.DoubanId, schedule.Type, consts.ScheduleStatusCrawling, consts.ScheduleStatusToCrawl)
 			if changed {
-				log.Println("start process ", t.Name, strconv.FormatUint(schedule.DoubanId, 10))
+				log.Println("item", index, "start", t.Name, strconv.FormatUint(schedule.DoubanId, 10))
 				processItem(t.Code, schedule.DoubanId)
 				dao.CasScheduleStatus(schedule.DoubanId, schedule.Type, consts.ScheduleStatusCrawled, consts.ScheduleStatusCrawling)
-				log.Println("end process ", t.Name, strconv.FormatUint(schedule.DoubanId, 10))
+				log.Println("item", index, "end", t.Name, strconv.FormatUint(schedule.DoubanId, 10))
 			}
 			break
 		}
