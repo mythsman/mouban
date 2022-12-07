@@ -60,11 +60,11 @@ func init() {
 				},
 			},
 		}}
-	UserLimiter = rate.NewLimiter(rate.Every(time.Duration(viper.GetInt("http.user_interval"))*time.Second), 1)
-	BookLimiter = rate.NewLimiter(rate.Every(time.Duration(viper.GetInt("http.book_interval"))*time.Second), 1)
-	MovieLimiter = rate.NewLimiter(rate.Every(time.Duration(viper.GetInt("http.movie_interval"))*time.Second), 1)
-	GameLimiter = rate.NewLimiter(rate.Every(time.Duration(viper.GetInt("http.game_interval"))*time.Second), 1)
-	DiscoverLimiter = rate.NewLimiter(rate.Every(time.Duration(viper.GetInt("http.discover_interval"))*time.Second), 1)
+	UserLimiter = rate.NewLimiter(rate.Every(time.Duration(viper.GetInt("http.interval.user"))*time.Second), 1)
+	BookLimiter = rate.NewLimiter(rate.Every(time.Duration(viper.GetInt("http.interval.book"))*time.Second), 1)
+	MovieLimiter = rate.NewLimiter(rate.Every(time.Duration(viper.GetInt("http.interval.movie"))*time.Second), 1)
+	GameLimiter = rate.NewLimiter(rate.Every(time.Duration(viper.GetInt("http.interval.game"))*time.Second), 1)
+	DiscoverLimiter = rate.NewLimiter(rate.Every(time.Duration(viper.GetInt("http.interval.discover"))*time.Second), 1)
 }
 
 func Get(url string, limiter *rate.Limiter) (*string, int, error) {

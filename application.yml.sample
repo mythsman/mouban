@@ -3,9 +3,13 @@ server:
   port: 8080
   limit: 1h
 agent:
-  enable: true
+  enable: false
+  flow:
+    discover: false
   item:
     concurrency: 3
+  discover:
+    level: 0 #0-no discover;1-discover by id;2-discover by id and domain
 datasource:
   driver: mysql
   host: localhost
@@ -18,8 +22,9 @@ datasource:
 http:
   timeout: 10
   retry_max: 20
-  user_interval: 4
-  book_interval: 4
-  movie_interval: 4
-  game_interval: 4
-  discover_interval: 4
+  interval:
+    user: 4
+    book: 4
+    movie: 4
+    game: 4
+    discover: 4

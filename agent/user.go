@@ -31,6 +31,7 @@ func runUser() {
 		}
 	}
 }
+
 func init() {
 	if viper.GetString("agent.enable") != "true" {
 		log.Println("user agent disabled")
