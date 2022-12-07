@@ -86,6 +86,9 @@ func processGame(doubanId uint64) {
 }
 
 func processDiscover(newUsers *[]string) {
+	if newUsers == nil {
+		return
+	}
 	level := viper.GetInt("agent.discover.level")
 	if level == 0 {
 		return
