@@ -4,6 +4,8 @@ server:
   limit: 1h
 agent:
   enable: true
+  item:
+    concurrency: 3
 datasource:
   driver: mysql
   host: localhost
@@ -21,5 +23,3 @@ http:
   movie_interval: 4
   game_interval: 4
   discover_interval: 4
-admin:
-  token: ewfdcjojdi

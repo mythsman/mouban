@@ -17,9 +17,9 @@ func runUser() {
 		}
 		time.Sleep(time.Second * 5)
 	}()
-	schedule := dao.SearchScheduleByAll(consts.TypeUser, consts.ScheduleStatusToCrawl, consts.ScheduleResultReady)
+	schedule := dao.SearchScheduleByAll(consts.TypeUser.Code, consts.ScheduleStatusToCrawl, consts.ScheduleResultReady)
 	if schedule == nil {
-		schedule = dao.SearchScheduleByAll(consts.TypeUser, consts.ScheduleStatusToCrawl, consts.ScheduleResultUnready)
+		schedule = dao.SearchScheduleByAll(consts.TypeUser.Code, consts.ScheduleStatusToCrawl, consts.ScheduleResultUnready)
 	}
 	if schedule != nil {
 		changed := dao.CasScheduleStatus(schedule.DoubanId, schedule.Type, consts.ScheduleStatusCrawling, consts.ScheduleStatusToCrawl)

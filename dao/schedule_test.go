@@ -8,19 +8,19 @@ import (
 )
 
 func TestUpsertSchedule(t *testing.T) {
-	CreateSchedule(1234, consts.TypeMovie, consts.ScheduleStatusToCrawl, consts.ScheduleResultInvalid)
+	CreateSchedule(1234, consts.TypeMovie.Code, consts.ScheduleStatusToCrawl, consts.ScheduleResultInvalid)
 }
 
 func TestGetSchedule(t *testing.T) {
-	schedule := GetSchedule(1234, consts.TypeMovie)
+	schedule := GetSchedule(1234, consts.TypeMovie.Code)
 	fmt.Println(util.ToJson(schedule))
 }
 
 func TestSearchSchedule(t *testing.T) {
-	schedule := SearchScheduleByStatus(consts.TypeBook, consts.ScheduleStatusToCrawl)
+	schedule := SearchScheduleByStatus(consts.TypeBook.Code, consts.ScheduleStatusToCrawl)
 	fmt.Println(util.ToJson(schedule))
 }
 
 func TestChangeScheduleResult(t *testing.T) {
-	ChangeScheduleResult(162448367, consts.TypeUser, consts.ScheduleResultReady)
+	ChangeScheduleResult(162448367, consts.TypeUser.Code, consts.ScheduleResultReady)
 }

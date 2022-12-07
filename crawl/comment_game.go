@@ -113,7 +113,7 @@ func scrollGame(doubanUid uint64, url string, action consts.Action) (*[]model.Co
 		comment := model.Comment{
 			DoubanUid: doubanUid,
 			DoubanId:  doubanId,
-			Type:      consts.TypeGame,
+			Type:      consts.TypeGame.Code,
 			Rate:      ratingNumber,
 			Label:     tags,
 			Comment:   shortComment,

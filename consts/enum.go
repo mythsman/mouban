@@ -13,10 +13,15 @@ var ActionDo = Action{0, "do"}
 var ActionWish = Action{1, "wish"}
 var ActionCollect = Action{2, "collect"}
 
-const TypeUser = 0
-const TypeBook = 1
-const TypeMovie = 2
-const TypeGame = 3
+type Type struct {
+	Code uint8
+	Name string
+}
+
+var TypeUser = Type{0, "user"}
+var TypeBook = Type{1, "book"}
+var TypeMovie = Type{2, "movie"}
+var TypeGame = Type{3, "game"}
 
 const ScheduleStatusToCrawl = 0
 const ScheduleStatusCrawling = 1

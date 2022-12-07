@@ -11,7 +11,7 @@ import (
 func TestUpsertRating(t *testing.T) {
 	rating := &model.Rating{
 		DoubanId: 123,
-		Type:     consts.TypeMovie,
+		Type:     consts.TypeMovie.Code,
 		Total:    100,
 		Rating:   3.3,
 		Star5:    5.2,
@@ -25,11 +25,11 @@ func TestUpsertRating(t *testing.T) {
 }
 
 func TestGetRating(t *testing.T) {
-	rating := GetRating(123, consts.TypeMovie)
+	rating := GetRating(123, consts.TypeMovie.Code)
 	fmt.Println(util.ToJson(rating))
 }
 
 func TestListRating(t *testing.T) {
-	ratings := ListRating(&[]uint64{123, 123}, consts.TypeMovie)
+	ratings := ListRating(&[]uint64{123, 123}, consts.TypeMovie.Code)
 	fmt.Println(util.ToJson(ratings))
 }
