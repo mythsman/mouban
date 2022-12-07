@@ -15,7 +15,7 @@ func runUser() {
 		if r := recover(); r != nil {
 			log.Println(r, "user agent crashed  => ", util.GetCurrentGoroutineStack())
 		}
-		time.Sleep(time.Second * 5)
+		time.Sleep(time.Second * 1)
 	}()
 	schedule := dao.SearchScheduleByAll(consts.TypeUser.Code, consts.ScheduleStatusToCrawl, consts.ScheduleResultReady)
 	if schedule == nil {

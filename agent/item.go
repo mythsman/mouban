@@ -16,7 +16,7 @@ func runItem(index int) {
 		if r := recover(); r != nil {
 			log.Println(r, "item agent ", index, " crashed  => ", util.GetCurrentGoroutineStack())
 		}
-		time.Sleep(time.Second * 5)
+		time.Sleep(time.Second * 1)
 	}()
 
 	types := []consts.Type{consts.TypeBook, consts.TypeMovie, consts.TypeGame}
