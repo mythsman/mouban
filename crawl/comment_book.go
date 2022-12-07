@@ -119,7 +119,7 @@ func scrollBook(doubanUid uint64, url string, action consts.Action) (*[]model.Co
 		comment := model.Comment{
 			DoubanUid: doubanUid,
 			DoubanId:  doubanId,
-			Type:      consts.TypeBook,
+			Type:      consts.TypeBook.Code,
 			Rate:      ratingNumber,
 			Label:     tags,
 			Comment:   shortComment,

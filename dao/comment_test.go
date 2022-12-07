@@ -11,7 +11,7 @@ func TestUpsertComment(t *testing.T) {
 	comment := &model.Comment{
 		DoubanUid: 11,
 		DoubanId:  22,
-		Type:      consts.TypeMovie,
+		Type:      consts.TypeMovie.Code,
 		Rate:      3,
 		Label:     "tags",
 		Comment:   "shortComment",

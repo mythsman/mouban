@@ -120,7 +120,7 @@ func scrollMovie(doubanUid uint64, url string, action consts.Action) (*[]model.C
 		comment := model.Comment{
 			DoubanUid: doubanUid,
 			DoubanId:  doubanId,
-			Type:      consts.TypeMovie,
+			Type:      consts.TypeMovie.Code,
 			Rate:      ratingNumber,
 			Label:     tags,
 			Comment:   shortComment,

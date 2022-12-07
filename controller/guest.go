@@ -20,10 +20,10 @@ func CheckUser(ctx *gin.Context) {
 	}
 	logAccess(ctx, doubanUid)
 
-	schedule := dao.GetSchedule(doubanUid, consts.TypeUser)
+	schedule := dao.GetSchedule(doubanUid, consts.TypeUser.Code)
 
 	if schedule == nil {
-		dao.CreateSchedule(doubanUid, consts.TypeUser, consts.ScheduleStatusToCrawl, consts.ScheduleResultUnready)
+		dao.CreateSchedule(doubanUid, consts.TypeUser.Code, consts.ScheduleStatusToCrawl, consts.ScheduleResultUnready)
 		BizError(ctx, "未录入当前用户，已发起录入，请等待后台数据更新")
 		return
 	}
@@ -48,7 +48,7 @@ func CheckUser(ctx *gin.Context) {
 	if schedule.Status == consts.ScheduleStatusCrawled {
 		timeLimit, _ := time.ParseDuration("-" + viper.GetString("server.limit"))
 		if schedule.UpdatedAt.Before(time.Now().Add(timeLimit)) {
-			dao.CasScheduleStatus(doubanUid, consts.TypeUser, consts.ScheduleStatusToCrawl, consts.ScheduleStatusCrawled)
+			dao.CasScheduleStatus(doubanUid, consts.TypeUser.Code, consts.ScheduleStatusToCrawl, consts.ScheduleStatusCrawled)
 		}
 	}
 
@@ -74,7 +74,7 @@ func ListUserItem(ctx *gin.Context, t uint8) {
 		offset, _ = strconv.Atoi(ctx.Query("offset"))
 	}
 
-	schedule := dao.GetSchedule(doubanUid, consts.TypeUser)
+	schedule := dao.GetSchedule(doubanUid, consts.TypeUser.Code)
 
 	if schedule == nil {
 		BizError(ctx, "当前用户未录入")
@@ -103,7 +103,7 @@ func ListUserItem(ctx *gin.Context, t uint8) {
 	var commentsVO []model.CommentVO
 
 	switch t {
-	case consts.TypeMovie:
+	case consts.TypeMovie.Code:
 		briefs := dao.ListMovieBrief(&ids)
 		briefMap := make(map[uint64]*model.Movie)
 		for i, _ := range *briefs {
@@ -115,7 +115,7 @@ func ListUserItem(ctx *gin.Context, t uint8) {
 			commentsVO = append(commentsVO, *(*comments)[i].Show(movie.Show()))
 		}
 		break
-	case consts.TypeBook:
+	case consts.TypeBook.Code:
 		briefs := dao.ListBookBrief(&ids)
 		briefMap := make(map[uint64]*model.Book)
 		for i, _ := range *briefs {
@@ -127,7 +127,7 @@ func ListUserItem(ctx *gin.Context, t uint8) {
 			commentsVO = append(commentsVO, *(*comments)[i].Show(book.Show()))
 		}
 		break
-	case consts.TypeGame:
+	case consts.TypeGame.Code:
 		briefs := dao.ListGameBrief(&ids)
 		briefMap := make(map[uint64]*model.Game)
 		for i, _ := range *briefs {

@@ -86,7 +86,7 @@ func Movie(doubanId uint64) (*model.Movie, *model.Rating, *[]string, error) {
 
 	rating := Rating(htmlquery.FindOne(doc, "//div[@id='interest_sectl']"))
 	rating.DoubanId = doubanId
-	rating.Type = consts.TypeMovie
+	rating.Type = consts.TypeMovie.Code
 
 	newUsers := util.ParseNewUsers(doc)
 

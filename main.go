@@ -27,28 +27,13 @@ func main() {
 	{
 		queryGroup.GET("/check_user", controller.CheckUser)
 		queryGroup.GET("/user_book", func(ctx *gin.Context) {
-			controller.ListUserItem(ctx, consts.TypeBook)
+			controller.ListUserItem(ctx, consts.TypeBook.Code)
 		})
 		queryGroup.GET("/user_game", func(ctx *gin.Context) {
-			controller.ListUserItem(ctx, consts.TypeGame)
+			controller.ListUserItem(ctx, consts.TypeGame.Code)
 		})
 		queryGroup.GET("/user_movie", func(ctx *gin.Context) {
-			controller.ListUserItem(ctx, consts.TypeMovie)
-		})
-	}
-
-	adminGroup := router.Group("/admin")
-	{
-		adminGroup.GET("/overview", controller.GetOverview)
-		adminGroup.GET("/crawl_user", controller.CrawlUser)
-		adminGroup.GET("/crawl_book", func(ctx *gin.Context) {
-			controller.CrawlItem(ctx, consts.TypeBook)
-		})
-		adminGroup.GET("/crawl_movie", func(ctx *gin.Context) {
-			controller.CrawlItem(ctx, consts.TypeMovie)
-		})
-		adminGroup.GET("/crawl_game", func(ctx *gin.Context) {
-			controller.CrawlItem(ctx, consts.TypeGame)
+			controller.ListUserItem(ctx, consts.TypeMovie.Code)
 		})
 	}
 
