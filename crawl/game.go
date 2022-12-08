@@ -32,7 +32,8 @@ func Game(doubanId uint64) (*model.Game, *model.Rating, *[]string, *[]uint64, er
 	}
 
 	title := htmlquery.InnerText(htmlquery.FindOne(doc, "//div[@id='content']/h1"))
-	thumbnail := htmlquery.SelectAttr(htmlquery.FindOne(doc, "//div[@class='pic']/img"), "src")
+	thumbnailNode := htmlquery.FindOne(doc, "//div[@class='pic']//img")
+	thumbnail := htmlquery.SelectAttr(thumbnailNode, "src")
 	intro := util.TrimParagraph(htmlquery.InnerText(htmlquery.FindOne(doc, "//div[@id='link-report']/p")))
 
 	data := make(map[string]string)
