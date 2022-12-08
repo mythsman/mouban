@@ -30,9 +30,10 @@ func processBook(doubanId uint64) {
 			log.Println(r, " => ", util.GetCurrentGoroutineStack())
 		}
 	}()
-	book, rating, newUser, err := crawl.Book(doubanId)
+	book, rating, newUser, newItems, err := crawl.Book(doubanId)
 
-	processDiscover(newUser)
+	processDiscoverUser(newUser)
+	processDiscoverItem(newItems, consts.TypeBook)
 
 	if err != nil {
 		dao.ChangeScheduleResult(doubanId, consts.TypeBook.Code, consts.ScheduleResultInvalid)
@@ -50,9 +51,10 @@ func processMovie(doubanId uint64) {
 			log.Println(r, " => ", util.GetCurrentGoroutineStack())
 		}
 	}()
-	movie, rating, newUser, err := crawl.Movie(doubanId)
+	movie, rating, newUser, newItems, err := crawl.Movie(doubanId)
 
-	processDiscover(newUser)
+	processDiscoverUser(newUser)
+	processDiscoverItem(newItems, consts.TypeMovie)
 
 	if err != nil {
 		dao.ChangeScheduleResult(doubanId, consts.TypeMovie.Code, consts.ScheduleResultInvalid)
@@ -71,9 +73,10 @@ func processGame(doubanId uint64) {
 		}
 	}()
 
-	game, rating, newUser, err := crawl.Game(doubanId)
+	game, rating, newUser, newItems, err := crawl.Game(doubanId)
 
-	processDiscover(newUser)
+	processDiscoverUser(newUser)
+	processDiscoverItem(newItems, consts.TypeGame)
 
 	if err != nil {
 		dao.ChangeScheduleResult(doubanId, consts.TypeGame.Code, consts.ScheduleResultInvalid)
@@ -85,7 +88,7 @@ func processGame(doubanId uint64) {
 	dao.ChangeScheduleResult(doubanId, consts.TypeGame.Code, consts.ScheduleResultReady)
 }
 
-func processDiscover(newUsers *[]string) {
+func processDiscoverUser(newUsers *[]string) {
 	if newUsers == nil {
 		return
 	}
@@ -113,6 +116,26 @@ func processDiscover(newUsers *[]string) {
 			if id > 0 {
 				dao.CreateSchedule(id, consts.TypeUser.Code, consts.ScheduleStatusCanCrawl, consts.ScheduleResultUnready)
 			}
+		}
+	}()
+}
+
+func processDiscoverItem(newItems *[]uint64, t consts.Type) {
+	if newItems == nil || len(*newItems) == 0 {
+		return
+	}
+	level := viper.GetInt("agent.discover.level")
+	if level == 0 {
+		return
+	}
+	go func() {
+		defer func() {
+			if r := recover(); r != nil {
+				log.Println(r, " => ", util.GetCurrentGoroutineStack())
+			}
+		}()
+		for _, doubanId := range *newItems {
+			dao.CreateSchedule(doubanId, t.Code, consts.ScheduleStatusCanCrawl, consts.ScheduleResultUnready)
 		}
 	}()
 }

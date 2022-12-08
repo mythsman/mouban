@@ -11,7 +11,7 @@ import (
 	"strings"
 )
 
-func Game(doubanId uint64) (*model.Game, *model.Rating, *[]string, error) {
+func Game(doubanId uint64) (*model.Game, *model.Rating, *[]string, *[]uint64, error) {
 	body, _, err := Get(fmt.Sprintf(consts.GameDetailUrl, doubanId), GameLimiter)
 	if err != nil {
 		panic(err)
@@ -28,7 +28,7 @@ func Game(doubanId uint64) (*model.Game, *model.Rating, *[]string, error) {
 	}
 	t := htmlquery.InnerText(tt)
 	if strings.TrimSpace(t) == "页面不存在" || strings.TrimSpace(t) == "条目不存在" {
-		return nil, nil, nil, errors.New(strings.TrimSpace(t))
+		return nil, nil, nil, nil, errors.New(strings.TrimSpace(t))
 	}
 
 	title := htmlquery.InnerText(htmlquery.FindOne(doc, "//div[@id='content']/h1"))
@@ -61,6 +61,7 @@ func Game(doubanId uint64) (*model.Game, *model.Rating, *[]string, error) {
 	rating.Type = consts.TypeGame.Code
 
 	newUsers := util.ParseNewUsers(doc)
+	newItems := util.ParseNewItems(doc, consts.TypeGame)
 
-	return game, rating, newUsers, nil
+	return game, rating, newUsers, newItems, nil
 }

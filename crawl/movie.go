@@ -11,7 +11,7 @@ import (
 	"strings"
 )
 
-func Movie(doubanId uint64) (*model.Movie, *model.Rating, *[]string, error) {
+func Movie(doubanId uint64) (*model.Movie, *model.Rating, *[]string, *[]uint64, error) {
 	body, _, err := Get(fmt.Sprintf(consts.MovieDetailUrl, doubanId), MovieLimiter)
 	if err != nil {
 		panic(err)
@@ -28,7 +28,7 @@ func Movie(doubanId uint64) (*model.Movie, *model.Rating, *[]string, error) {
 	}
 	t := htmlquery.InnerText(tt)
 	if strings.TrimSpace(t) == "页面不存在" || strings.TrimSpace(t) == "条目不存在" {
-		return nil, nil, nil, errors.New(strings.TrimSpace(t))
+		return nil, nil, nil, nil, errors.New(strings.TrimSpace(t))
 	}
 
 	title := htmlquery.SelectAttr(htmlquery.FindOne(doc, "//meta[@property='og:title']"), "content")
@@ -89,6 +89,7 @@ func Movie(doubanId uint64) (*model.Movie, *model.Rating, *[]string, error) {
 	rating.Type = consts.TypeMovie.Code
 
 	newUsers := util.ParseNewUsers(doc)
+	newItems := util.ParseNewItems(doc, consts.TypeGame)
 
-	return movie, rating, newUsers, nil
+	return movie, rating, newUsers, newItems, nil
 }
