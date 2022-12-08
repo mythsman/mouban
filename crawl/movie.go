@@ -89,7 +89,7 @@ func Movie(doubanId uint64) (*model.Movie, *model.Rating, *[]string, *[]uint64, 
 	rating.Type = consts.TypeMovie.Code
 
 	newUsers := util.ParseNewUsers(doc)
-	newItems := util.ParseNewItems(doc, consts.TypeGame)
+	newItems := util.ParseNewItems(doc, consts.TypeMovie)
 
 	return movie, rating, newUsers, newItems, nil
 }
