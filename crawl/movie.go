@@ -32,7 +32,12 @@ func Movie(doubanId uint64) (*model.Movie, *model.Rating, *[]string, *[]uint64, 
 	}
 
 	title := htmlquery.SelectAttr(htmlquery.FindOne(doc, "//meta[@property='og:title']"), "content")
-	thumbnail := htmlquery.SelectAttr(htmlquery.FindOne(doc, "//a[@class='nbg']/img"), "src")
+	thumbnailNode := htmlquery.FindOne(doc, "//a[@class='nbg']/img")
+	if thumbnailNode == nil {
+		thumbnailNode = htmlquery.FindOne(doc, "//a[@class='nbgnbg']/img")
+	}
+
+	thumbnail := htmlquery.SelectAttr(thumbnailNode, "src")
 
 	intro := ""
 	allHiddenIntro := htmlquery.FindOne(doc, "//div[@id='link-report-intra']/span[@class='all hidden']")
