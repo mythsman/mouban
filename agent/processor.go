@@ -102,6 +102,8 @@ func processDiscoverUser(newUsers *[]string) {
 				log.Println(r, " => ", util.GetCurrentGoroutineStack())
 			}
 		}()
+		totalFound := len(*newUsers)
+		newFound := 0
 		for _, idOrDomain := range *newUsers {
 			id, err := strconv.ParseUint(idOrDomain, 10, 64)
 			if err != nil {
@@ -114,9 +116,13 @@ func processDiscoverUser(newUsers *[]string) {
 				}
 			}
 			if id > 0 {
-				dao.CreateSchedule(id, consts.TypeUser.Code, consts.ScheduleStatusCanCrawl, consts.ScheduleResultUnready)
+				added := dao.CreateSchedule(id, consts.TypeUser.Code, consts.ScheduleStatusCanCrawl, consts.ScheduleResultUnready)
+				if added {
+					newFound += 1
+				}
 			}
 		}
+		log.Println("(", newFound, "/", totalFound, ") users discovered")
 	}()
 }
 
@@ -134,9 +140,16 @@ func processDiscoverItem(newItems *[]uint64, t consts.Type) {
 				log.Println(r, " => ", util.GetCurrentGoroutineStack())
 			}
 		}()
+		totalFound := len(*newItems)
+		newFound := 0
 		for _, doubanId := range *newItems {
-			dao.CreateSchedule(doubanId, t.Code, consts.ScheduleStatusCanCrawl, consts.ScheduleResultUnready)
+			added := dao.CreateSchedule(doubanId, t.Code, consts.ScheduleStatusCanCrawl, consts.ScheduleResultUnready)
+			if added {
+				newFound += 1
+			}
 		}
+		log.Println("(", newFound, "/", totalFound, ")", t.Name+"discovered")
+
 	}()
 }
 

@@ -63,7 +63,7 @@ func ChangeScheduleResult(doubanId uint64, t uint8, result uint8) {
 		Update("result", result)
 }
 
-func CreateSchedule(doubanId uint64, t uint8, status uint8, result uint8) {
+func CreateSchedule(doubanId uint64, t uint8, status uint8, result uint8) bool {
 
 	schedule := &model.Schedule{
 		DoubanId: doubanId,
@@ -71,5 +71,6 @@ func CreateSchedule(doubanId uint64, t uint8, status uint8, result uint8) {
 		Status:   status,
 		Result:   result,
 	}
-	common.Db.Create(&schedule)
+	row := common.Db.Create(&schedule).RowsAffected
+	return row > 0
 }
