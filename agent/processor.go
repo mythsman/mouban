@@ -148,7 +148,7 @@ func processDiscoverItem(newItems *[]uint64, t consts.Type) {
 				newFound += 1
 			}
 		}
-		log.Println("(", newFound, "/", totalFound, ")", t.Name+"discovered")
+		log.Println("(", newFound, "/", totalFound, ")", t.Name, "discovered")
 
 	}()
 }
