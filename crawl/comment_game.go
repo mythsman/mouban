@@ -71,7 +71,7 @@ func scrollGame(doubanUid uint64, url string, action consts.Action) (*[]model.Co
 
 	totalNode := htmlquery.FindOne(doc, "//div[@id='db-usr-profile']/div[@class='info']/h1")
 	if totalNode == nil {
-		panic("total is nil for " + url + ", html: {}" + htmlquery.OutputHTML(doc, true))
+		panic("total is nil for " + url + ", html: " + htmlquery.OutputHTML(doc, true))
 	}
 	total := util.ParseNumber(htmlquery.InnerText(totalNode))
 

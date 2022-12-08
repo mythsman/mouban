@@ -30,7 +30,7 @@ func runFlow() {
 			if discoverBook != nil {
 				changed := dao.CasScheduleStatus(discoverBook.DoubanId, discoverBook.Type, consts.ScheduleStatusToCrawl, consts.ScheduleStatusCanCrawl)
 				if changed {
-					log.Println("flow discover book ", discoverBook.DoubanId)
+					log.Println("flow discover book", discoverBook.DoubanId)
 				}
 			}
 		}
@@ -49,7 +49,7 @@ func runFlow() {
 			if discoverMovie != nil {
 				changed := dao.CasScheduleStatus(discoverMovie.DoubanId, discoverMovie.Type, consts.ScheduleStatusToCrawl, consts.ScheduleStatusCanCrawl)
 				if changed {
-					log.Println("flow discover movie ", discoverMovie.DoubanId)
+					log.Println("flow discover movie", discoverMovie.DoubanId)
 				}
 			}
 		}
@@ -68,7 +68,7 @@ func runFlow() {
 			if discoverGame != nil {
 				changed := dao.CasScheduleStatus(discoverGame.DoubanId, discoverGame.Type, consts.ScheduleStatusToCrawl, consts.ScheduleStatusCanCrawl)
 				if changed {
-					log.Println("flow discover game ", discoverGame.DoubanId)
+					log.Println("flow discover game", discoverGame.DoubanId)
 				}
 			}
 		}
@@ -88,7 +88,7 @@ func runFlow() {
 				if discoverUser != nil {
 					changed := dao.CasScheduleStatus(discoverUser.DoubanId, consts.TypeUser.Code, consts.ScheduleStatusToCrawl, consts.ScheduleStatusCanCrawl)
 					if changed {
-						log.Println("flow discover user ", discoverUser.DoubanId)
+						log.Println("flow discover user", discoverUser.DoubanId)
 					}
 				}
 			}

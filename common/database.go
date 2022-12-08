@@ -78,7 +78,7 @@ func getConnection(username string, password string, host string, port string, d
 
 	if err != nil {
 		log.Println("Open database failed", err)
-		panic("Open database failed" + err.Error())
+		panic("Open database failed " + err.Error())
 	}
 	Db = db
 	log.Println("db connect success")

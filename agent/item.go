@@ -53,5 +53,5 @@ func init() {
 		}()
 	}
 
-	log.Println(concurrency, " item agent(s) enabled")
+	log.Println(concurrency, "item agent(s) enabled")
 }
