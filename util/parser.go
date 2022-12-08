@@ -3,6 +3,7 @@ package util
 import (
 	"github.com/antchfx/htmlquery"
 	"golang.org/x/net/html"
+	"mouban/consts"
 	"regexp"
 	"strconv"
 	"strings"
@@ -95,6 +96,37 @@ func ParseNewUsers(doc *html.Node) *[]string {
 		}
 	}
 	return &newUsers
+}
+
+func ParseNewItems(doc *html.Node, t consts.Type) *[]uint64 {
+	var newItems []uint64
+	newItemSet := make(map[uint64]bool)
+
+	var newItemsNodes []*html.Node
+
+	switch t {
+	case consts.TypeBook:
+		newItemsNodes = htmlquery.Find(doc, "//a[contains(@href,'book.douban.com/subject/')]")
+		break
+	case consts.TypeMovie:
+		newItemsNodes = htmlquery.Find(doc, "//a[contains(@href,'movie.douban.com/subject/')]")
+		break
+	case consts.TypeGame:
+		newItemsNodes = htmlquery.Find(doc, "//a[contains(@href,'www.douban.com/game/')]")
+		break
+	}
+
+	for _, node := range newItemsNodes {
+		bookLink := htmlquery.SelectAttr(node, "href")
+		doubanId := ParseNumber(bookLink)
+		if doubanId > 0 {
+			if !newItemSet[doubanId] {
+				newItems = append(newItems, doubanId)
+				newItemSet[doubanId] = true
+			}
+		}
+	}
+	return &newItems
 }
 
 func TrimBookParagraph(node *html.Node) string {

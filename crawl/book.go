@@ -12,7 +12,7 @@ import (
 	"strings"
 )
 
-func Book(doubanId uint64) (*model.Book, *model.Rating, *[]string, error) {
+func Book(doubanId uint64) (*model.Book, *model.Rating, *[]string, *[]uint64, error) {
 	body, _, err := Get(fmt.Sprintf(consts.BookDetailUrl, doubanId), BookLimiter)
 	if err != nil {
 		panic(err)
@@ -30,7 +30,7 @@ func Book(doubanId uint64) (*model.Book, *model.Rating, *[]string, error) {
 	}
 	t := htmlquery.InnerText(tt)
 	if strings.TrimSpace(t) == "页面不存在" || strings.TrimSpace(t) == "条目不存在" {
-		return nil, nil, nil, errors.New(strings.TrimSpace(t))
+		return nil, nil, nil, nil, errors.New(strings.TrimSpace(t))
 	}
 
 	title := htmlquery.SelectAttr(htmlquery.FindOne(doc, "//meta[@property='og:title']"), "content")
@@ -94,6 +94,7 @@ func Book(doubanId uint64) (*model.Book, *model.Rating, *[]string, error) {
 	rating.Type = consts.TypeBook.Code
 
 	newUsers := util.ParseNewUsers(doc)
+	newItems := util.ParseNewItems(doc, consts.TypeBook)
 
-	return book, rating, newUsers, nil
+	return book, rating, newUsers, newItems, nil
 }
