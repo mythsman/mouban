@@ -1,7 +1,7 @@
 package crawl
 
 import (
-	"crypto/md5"
+	"encoding/xml"
 	"errors"
 	"fmt"
 	"github.com/antchfx/htmlquery"
@@ -10,10 +10,11 @@ import (
 	"mouban/model"
 	"mouban/util"
 	"strings"
+	"time"
 )
 
 func UserOverview(doubanUid uint64) (*model.User, error) {
-	hash, err := UserHash(doubanUid)
+	userPublish, err := UserPublish(doubanUid)
 	if err != nil {
 		return nil, err
 	}
@@ -46,28 +47,44 @@ func UserOverview(doubanUid uint64) (*model.User, error) {
 		MovieWish:    movie.MovieWish,
 		MovieDo:      movie.MovieDo,
 		MovieCollect: movie.MovieCollect,
-		RssHash:      hash,
+		PublishAt:    userPublish,
 		RegisterAt:   book.RegisterAt,
 	}
 
 	return user, nil
 }
 
-func UserHash(doubanUid uint64) (string, error) {
+func UserPublish(doubanUid uint64) (time.Time, error) {
 	body, code, err := Get(fmt.Sprintf(consts.UserRssUrl, doubanUid), UserLimiter)
 	if err != nil {
 		panic(err)
 	}
 
 	if code == 404 {
-		return "", errors.New("code is 404")
+		return time.Time{}, errors.New("code is 404")
 	}
 
-	data := []byte(*body)
-	has := md5.Sum(data)
-	md5str := fmt.Sprintf("%x", has)
+	rss := struct {
+		XMLName xml.Name `xml:"rss"`
+		Channel struct {
+			XMLName xml.Name `xml:"channel"`
+			PubDate string   `xml:"pubDate"`
+		} `xml:"channel"`
+	}{}
 
-	return md5str, nil
+	data := []byte(*body)
+
+	err = xml.Unmarshal(data, &rss)
+	if err != nil {
+		return time.Unix(0, 0), errors.New("parse rss failed")
+	}
+
+	dateTime, err := time.ParseInLocation(time.RFC1123, rss.Channel.PubDate, time.Local)
+	if err != nil {
+		return time.Unix(0, 0), errors.New("parse pubDate failed " + rss.Channel.PubDate)
+	}
+
+	return dateTime, nil
 }
 
 func UserId(domain string) uint64 {
@@ -112,7 +129,7 @@ func bookOverview(doubanUid uint64) (*model.User, error) {
 		if strings.Contains(prompt, "此帐号已被永久停用") {
 			return nil, errors.New("account banned")
 		}
-		if strings.Contains(prompt,"该用户已经主动注销帐号"){
+		if strings.Contains(prompt, "该用户已经主动注销帐号") {
 			return nil, errors.New("account canceled")
 		}
 	}
