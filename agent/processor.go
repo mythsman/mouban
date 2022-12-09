@@ -160,9 +160,9 @@ func processUser(doubanUid uint64, forceUpdate bool) {
 		}
 	}()
 
-	hash, _ := crawl.UserHash(doubanUid)
+	userPublish, _ := crawl.UserPublish(doubanUid)
 	rawUser := dao.GetUser(doubanUid)
-	if !forceUpdate && rawUser != nil && rawUser.RssHash == hash {
+	if !forceUpdate && rawUser != nil && rawUser.PublishAt.Equal(userPublish) {
 		log.Println("user", doubanUid, "not changed")
 		return
 	}

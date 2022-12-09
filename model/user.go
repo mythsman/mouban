@@ -19,8 +19,8 @@ type User struct {
 	MovieWish    uint32
 	MovieDo      uint32
 	MovieCollect uint32
-	RssHash      string `gorm:"type:varchar(32);"`
 	RegisterAt   time.Time
+	PublishAt    time.Time
 	CreatedAt    time.Time
 	UpdatedAt    time.Time
 }

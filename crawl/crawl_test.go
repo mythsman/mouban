@@ -40,12 +40,12 @@ func TestBook(t *testing.T) {
 	fmt.Println(util.ToJson(newItems))
 }
 
-func TestUserHash(t *testing.T) {
-	hash, err := UserHash(162448367)
+func TestUserPublish(t *testing.T) {
+	userPublish, err := UserPublish(162448367)
 	if err != nil {
 		return
 	}
-	t.Logf("User hash for is %s", hash)
+	t.Logf("UserPublish is %s", userPublish)
 }
 
 func TestUserOverview(t *testing.T) {
