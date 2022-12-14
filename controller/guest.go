@@ -28,6 +28,12 @@ func CheckUser(ctx *gin.Context) {
 		return
 	}
 
+	if schedule.Status == consts.ScheduleStatusCanCrawl {
+		dao.CasScheduleStatus(doubanUid, consts.TypeUser.Code, consts.ScheduleStatusToCrawl, consts.ScheduleStatusCanCrawl)
+		BizError(ctx, "未录入当前用户，已发起录入，请等待后台数据更新")
+		return
+	}
+
 	if schedule.Result == consts.ScheduleResultUnready {
 		BizError(ctx, "当前用户录入中")
 		return
