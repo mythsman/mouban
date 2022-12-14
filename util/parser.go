@@ -117,8 +117,8 @@ func ParseNewItems(doc *html.Node, t consts.Type) *[]uint64 {
 	}
 
 	for _, node := range newItemsNodes {
-		bookLink := htmlquery.SelectAttr(node, "href")
-		doubanId := ParseNumber(bookLink)
+		itemLink := htmlquery.SelectAttr(node, "href")
+		doubanId := ParseNumber(itemLink)
 		if doubanId > 0 {
 			if !newItemSet[doubanId] {
 				newItems = append(newItems, doubanId)
