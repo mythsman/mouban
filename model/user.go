@@ -10,15 +10,18 @@ type User struct {
 	Domain       string `gorm:"not hull;index;type:varchar(64)"`
 	Name         string `gorm:"not null;type:varchar(512);"`
 	Thumbnail    string `gorm:"type:varchar(512);"`
-	BookWish     uint32
-	BookDo       uint32
-	BookCollect  uint32
-	GameWish     uint32
-	GameDo       uint32
-	GameCollect  uint32
-	MovieWish    uint32
-	MovieDo      uint32
-	MovieCollect uint32
+	BookWish     uint32 `gorm:"not null default 0"`
+	BookDo       uint32 `gorm:"not null default 0"`
+	BookCollect  uint32 `gorm:"not null default 0"`
+	GameWish     uint32 `gorm:"not null default 0"`
+	GameDo       uint32 `gorm:"not null default 0"`
+	GameCollect  uint32 `gorm:"not null default 0"`
+	MovieWish    uint32 `gorm:"not null default 0"`
+	MovieDo      uint32 `gorm:"not null default 0"`
+	MovieCollect uint32 `gorm:"not null default 0"`
+	SongWish     uint32 `gorm:"not null default 0"`
+	SongDo       uint32 `gorm:"not null default 0"`
+	SongCollect  uint32 `gorm:"not null default 0"`
 	RegisterAt   time.Time
 	PublishAt    time.Time
 	CreatedAt    time.Time
@@ -44,6 +47,9 @@ func (user User) Show() *UserVO {
 		MovieWish:    user.MovieWish,
 		MovieDo:      user.MovieDo,
 		MovieCollect: user.MovieCollect,
+		SongWish:     user.MovieWish,
+		SongDo:       user.MovieDo,
+		SongCollect:  user.MovieCollect,
 	}
 }
 
@@ -61,4 +67,7 @@ type UserVO struct {
 	MovieWish    uint32 `json:"movie_wish"`
 	MovieDo      uint32 `json:"movie_do"`
 	MovieCollect uint32 `json:"movie_collect"`
+	SongWish     uint32 `json:"song_wish"`
+	SongDo       uint32 `json:"song_do"`
+	SongCollect  uint32 `json:"song_collect"`
 }
