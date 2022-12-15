@@ -136,7 +136,10 @@ func scrollSong(doubanUid uint64, url string, action consts.Action) (*[]model.Co
 		return &comments, &songs, uint32(total), "", err
 	} else {
 		nextLink := htmlquery.SelectAttr(nextBtn, "href")
-		return &comments, &songs, uint32(total), "https://song.douban.com" + nextLink, err
+		if !strings.Contains(nextLink, "http") {
+			nextLink = "https://music.douban.com" + nextLink
+		}
+		return &comments, &songs, uint32(total), nextLink, err
 	}
 
 }
