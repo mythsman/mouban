@@ -28,4 +28,5 @@ http:
     book: 4
     movie: 4
     game: 4
+    song: 4
     discover: 4
