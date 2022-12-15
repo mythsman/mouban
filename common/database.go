@@ -71,7 +71,7 @@ func getConnection(username string, password string, host string, port string, d
 			Colorful:                  true,
 		},
 	)
-	
+
 	db, err := gorm.Open(mysql.Open(sqlStr), &gorm.Config{
 		Logger: dbLogger,
 	})
@@ -92,6 +92,7 @@ func migrateTables() {
 		&model.Comment{},
 		&model.Game{},
 		&model.Movie{},
+		&model.Song{},
 		&model.Rating{},
 		&model.Schedule{},
 		&model.User{},
