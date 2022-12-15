@@ -11,6 +11,10 @@ const MovieOverviewUrl = "https://movie.douban.com/people/%d/"
 const MovieCommentUrl = "https://movie.douban.com/people/%d/%s"
 const MovieDetailUrl = "https://movie.douban.com/subject/%d/"
 
+const SongOverviewUrl = "https://music.douban.com/people/%d/"
+const SongCommentUrl = "https://music.douban.com/people/%d/%s"
+const SongDetailUrl = "https://music.douban.com/subject/%d/"
+
 const GameOverviewUrl = "https://www.douban.com/people/%d/games/"
 const GameCommentUrl = "https://www.douban.com/people/%d/games?action=%s"
 const GameDetailUrl = "https://www.douban.com/game/%d/"

@@ -74,6 +74,25 @@ func runFlow() {
 		}
 	}
 
+	pendingSong := dao.SearchScheduleByStatus(consts.TypeSong.Code, consts.ScheduleStatusToCrawl)
+	if pendingSong == nil {
+		retrySong := dao.SearchScheduleByAll(consts.TypeSong.Code, consts.ScheduleStatusCrawled, consts.ScheduleResultUnready)
+		if retrySong != nil {
+			changed := dao.CasScheduleStatus(retrySong.DoubanId, retrySong.Type, consts.ScheduleStatusToCrawl, consts.ScheduleStatusCrawled)
+			if changed {
+				log.Println("flow retry song ", retrySong.DoubanId)
+			}
+		} else {
+			discoverSong := dao.SearchScheduleByStatus(consts.TypeSong.Code, consts.ScheduleStatusCanCrawl)
+			if discoverSong != nil {
+				changed := dao.CasScheduleStatus(discoverSong.DoubanId, discoverSong.Type, consts.ScheduleStatusToCrawl, consts.ScheduleStatusCanCrawl)
+				if changed {
+					log.Println("flow discover song", discoverSong.DoubanId)
+				}
+			}
+		}
+	}
+
 	pendingUser := dao.SearchScheduleByStatus(consts.TypeUser.Code, consts.ScheduleStatusToCrawl)
 	if pendingUser == nil {
 		retryUser := dao.SearchScheduleByAll(consts.TypeUser.Code, consts.ScheduleStatusCrawled, consts.ScheduleResultUnready)

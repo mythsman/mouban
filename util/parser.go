@@ -114,6 +114,9 @@ func ParseNewItems(doc *html.Node, t consts.Type) *[]uint64 {
 	case consts.TypeGame:
 		newItemsNodes = htmlquery.Find(doc, "//a[contains(@href,'www.douban.com/game/')]")
 		break
+	case consts.TypeSong:
+		newItemsNodes = htmlquery.Find(doc, "//a[contains(@href,'music.douban.com/subject/')]")
+		break
 	}
 
 	for _, node := range newItemsNodes {
@@ -138,6 +141,9 @@ func TrimBookParagraph(node *html.Node) string {
 
 func TrimParagraph(info string) string {
 	var data strings.Builder
+
+	info = strings.ReplaceAll(info, "<br>", "\n")
+	info = strings.ReplaceAll(info, "<br/>", "\n")
 
 	for _, p := range strings.Split(info, "\n") {
 		t := strings.TrimSpace(p)

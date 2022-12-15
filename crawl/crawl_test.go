@@ -40,6 +40,17 @@ func TestBook(t *testing.T) {
 	fmt.Println(util.ToJson(newItems))
 }
 
+func TestSong(t *testing.T) {
+	song, rating, newUser, newItems, err := Song(2221098)
+	if err != nil {
+		return
+	}
+	fmt.Println(util.ToJson(song))
+	fmt.Println(util.ToJson(rating))
+	fmt.Println(util.ToJson(newUser))
+	fmt.Println(util.ToJson(newItems))
+}
+
 func TestUserPublish(t *testing.T) {
 	userPublish, err := UserPublish(162448367)
 	if err != nil {
@@ -49,7 +60,7 @@ func TestUserPublish(t *testing.T) {
 }
 
 func TestUserOverview(t *testing.T) {
-	overview, err := UserOverview(235599547)
+	overview, err := UserOverview(43001468)
 	if err != nil {
 		return
 

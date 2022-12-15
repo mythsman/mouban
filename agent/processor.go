@@ -21,6 +21,9 @@ func processItem(t uint8, doubanId uint64) {
 	case consts.TypeGame.Code:
 		processGame(doubanId)
 		break
+	case consts.TypeSong.Code:
+		processSong(doubanId)
+		break
 	}
 }
 
@@ -86,6 +89,28 @@ func processGame(doubanId uint64) {
 	dao.UpsertRating(rating)
 
 	dao.ChangeScheduleResult(doubanId, consts.TypeGame.Code, consts.ScheduleResultReady)
+}
+
+func processSong(doubanId uint64) {
+	defer func() {
+		if r := recover(); r != nil {
+			log.Println(r, " => ", util.GetCurrentGoroutineStack())
+		}
+	}()
+
+	song, rating, newUser, newItems, err := crawl.Song(doubanId)
+
+	processDiscoverUser(newUser)
+	processDiscoverItem(newItems, consts.TypeSong)
+
+	if err != nil {
+		dao.ChangeScheduleResult(doubanId, consts.TypeSong.Code, consts.ScheduleResultInvalid)
+		panic(err)
+	}
+	dao.UpsertSong(song)
+	dao.UpsertRating(rating)
+
+	dao.ChangeScheduleResult(doubanId, consts.TypeSong.Code, consts.ScheduleResultReady)
 }
 
 func processDiscoverUser(newUsers *[]string) {
@@ -225,6 +250,26 @@ func processUser(doubanUid uint64, forceUpdate bool) {
 				added := dao.CreateMovieNx(&(*movie)[i])
 				if added {
 					dao.CreateSchedule((*movie)[i].DoubanId, consts.TypeMovie.Code, consts.ScheduleStatusToCrawl, consts.ScheduleResultUnready)
+				}
+			}
+		}()
+
+	}
+
+	//song
+	if user.SongDo > 0 || user.SongWish > 0 || user.SongCollect > 0 {
+
+		_, comment, song, err := crawl.CommentSong(doubanUid)
+		if err != nil {
+			panic(err)
+		}
+
+		go func() {
+			for i, _ := range *song {
+				dao.UpsertComment(&(*comment)[i])
+				added := dao.CreateSongNx(&(*song)[i])
+				if added {
+					dao.CreateSchedule((*song)[i].DoubanId, consts.TypeSong.Code, consts.ScheduleStatusToCrawl, consts.ScheduleResultUnready)
 				}
 			}
 		}()

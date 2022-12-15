@@ -28,11 +28,19 @@ func UserOverview(doubanUid uint64) (*model.User, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	game, err := gameOverview(doubanUid)
 	if err != nil {
 		return nil, err
 
 	}
+
+	song, err := songOverview(doubanUid)
+	if err != nil {
+		return nil, err
+
+	}
+
 	user := &model.User{
 		DoubanUid:    book.DoubanUid,
 		Domain:       book.Domain,
@@ -47,6 +55,9 @@ func UserOverview(doubanUid uint64) (*model.User, error) {
 		MovieWish:    movie.MovieWish,
 		MovieDo:      movie.MovieDo,
 		MovieCollect: movie.MovieCollect,
+		SongWish:     song.SongWish,
+		SongDo:       song.SongDo,
+		SongCollect:  song.SongCollect,
 		PublishAt:    userPublish,
 		RegisterAt:   book.RegisterAt,
 	}
@@ -220,6 +231,51 @@ func movieOverview(doubanUid uint64) (*model.User, error) {
 		MovieDo:      uint32(doNum),
 		MovieWish:    uint32(wishNum),
 		MovieCollect: uint32(collectNum),
+	}
+	return user, err
+
+}
+
+
+func songOverview(doubanUid uint64) (*model.User, error) {
+	body, _, err := Get(fmt.Sprintf(consts.SongOverviewUrl, doubanUid), UserLimiter)
+	if err != nil {
+		panic(err)
+	}
+
+	doc, err := htmlquery.Parse(strings.NewReader(*body))
+	if err != nil {
+		panic(err)
+	}
+	domain := htmlquery.SelectAttr(htmlquery.FindOne(doc, "//div[@id='db-usr-profile']//div[@class='pic']/a"), "href")
+	domain = util.ParseDomain(doubanUid, domain)
+
+	list := htmlquery.Find(doc, "//div[@id='db-music-mine']//h2")
+	do := ""
+	wish := ""
+	collect := ""
+	for _, h := range list {
+		txt := htmlquery.InnerText(h)
+		if strings.Contains(txt, "听过") {
+			collect = txt
+		}
+		if strings.Contains(txt, "想听") {
+			wish = txt
+		}
+		if strings.Contains(txt, "在听") {
+			do = txt
+		}
+	}
+
+	doNum := util.ParseNumber(do)
+	wishNum := util.ParseNumber(wish)
+	collectNum := util.ParseNumber(collect)
+
+	user := &model.User{
+		Domain:       domain,
+		SongDo:      uint32(doNum),
+		SongWish:    uint32(wishNum),
+		SongCollect: uint32(collectNum),
 	}
 	return user, err
 

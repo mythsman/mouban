@@ -19,7 +19,7 @@ func runItem(index int) {
 		time.Sleep(time.Second * 1)
 	}()
 
-	types := []consts.Type{consts.TypeBook, consts.TypeMovie, consts.TypeGame}
+	types := []consts.Type{consts.TypeBook, consts.TypeMovie, consts.TypeGame, consts.TypeSong}
 	rand.Shuffle(len(types), func(i, j int) { types[i], types[j] = types[j], types[i] })
 
 	for _, t := range types {

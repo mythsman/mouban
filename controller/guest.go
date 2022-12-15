@@ -145,6 +145,18 @@ func ListUserItem(ctx *gin.Context, t uint8) {
 			commentsVO = append(commentsVO, *(*comments)[i].Show(game.Show()))
 		}
 		break
+	case consts.TypeSong.Code:
+		briefs := dao.ListSongBrief(&ids)
+		briefMap := make(map[uint64]*model.Song)
+		for i, _ := range *briefs {
+			briefMap[(*briefs)[i].DoubanId] = &(*briefs)[i]
+		}
+
+		for i, _ := range *comments {
+			song := briefMap[(*comments)[i].DoubanId]
+			commentsVO = append(commentsVO, *(*comments)[i].Show(song.Show()))
+		}
+		break
 	}
 
 	if commentsVO == nil {

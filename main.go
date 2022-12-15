@@ -40,6 +40,9 @@ func main() {
 		queryGroup.GET("/user_movie", func(ctx *gin.Context) {
 			controller.ListUserItem(ctx, consts.TypeMovie.Code)
 		})
+		queryGroup.GET("/user_song", func(ctx *gin.Context) {
+			controller.ListUserItem(ctx, consts.TypeSong.Code)
+		})
 	}
 
 	panic(router.Run(":" + viper.GetString("server.port")))

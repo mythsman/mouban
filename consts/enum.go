@@ -22,6 +22,7 @@ var TypeUser = Type{0, "user"}
 var TypeBook = Type{1, "book"}
 var TypeMovie = Type{2, "movie"}
 var TypeGame = Type{3, "game"}
+var TypeSong = Type{4, "song"}
 
 const ScheduleStatusToCrawl = 0
 const ScheduleStatusCrawling = 1
