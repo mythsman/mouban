@@ -236,7 +236,6 @@ func movieOverview(doubanUid uint64) (*model.User, error) {
 
 }
 
-
 func songOverview(doubanUid uint64) (*model.User, error) {
 	body, _, err := Get(fmt.Sprintf(consts.SongOverviewUrl, doubanUid), UserLimiter)
 	if err != nil {
@@ -272,7 +271,7 @@ func songOverview(doubanUid uint64) (*model.User, error) {
 	collectNum := util.ParseNumber(collect)
 
 	user := &model.User{
-		Domain:       domain,
+		Domain:      domain,
 		SongDo:      uint32(doNum),
 		SongWish:    uint32(wishNum),
 		SongCollect: uint32(collectNum),
