@@ -1,6 +1,7 @@
 package util
 
 import (
+	"mouban/consts"
 	"reflect"
 	"testing"
 	"time"
@@ -107,6 +108,34 @@ func TestTrimParagraph(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := TrimParagraph(tt.args.info); got != tt.want {
 				t.Errorf("TrimParagraph() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestParseItem(t *testing.T) {
+	type args struct {
+		info string
+	}
+	type result struct {
+		id uint64
+		t  consts.Type
+	}
+	tests := []struct {
+		name string
+		args args
+		want result
+	}{
+		{"1", args{info: "sitemap10.xml:    <loc>https://book.douban.com/subject/1503201/</loc>"}, result{id: 1503201, t: consts.TypeBook}},
+		{"2", args{info: "sitemap10.xml:    <loc>https://book.douban.com/subject/1503201"}, result{id: 1503201, t: consts.TypeBook}},
+		{"3", args{info: "sitemap10.xml:    <loc>https://music.douban.com/subject/1503937/</loc>"}, result{id: 1503937, t: consts.TypeSong}},
+		{"4", args{info: "sitemap10.xml:    <loc>https://movie.douban.com/subject/1506676/</loc>"}, result{id: 1506676, t: consts.TypeMovie}},
+		{"5", args{info: "sitemap10.xml:    <loc>https://m3ovie.douban.com/subject/1506676/</loc>"}, result{id: 0, t: consts.TypeUser}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if id, ty := ParseItem(tt.args.info); id != tt.want.id || ty != tt.want.t {
+				t.Errorf("ParseItem() = %v, want %v", id, tt.want.id)
 			}
 		})
 	}
