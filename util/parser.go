@@ -15,6 +15,10 @@ var dateParser = regexp.MustCompile(`.*(\d{4}-\d{2}(-\d{2})?).*`)
 var numberParser = regexp.MustCompile(`\D*(\d+).*`)
 var floatParser = regexp.MustCompile(`([0-9]*\.?[0-9]+)`)
 var domainParser = regexp.MustCompile(`.*people/(.*)/`)
+var bookItemParser = regexp.MustCompile("https://book.douban.com/subject/[0-9]*")
+var movieItemParser = regexp.MustCompile("https://movie.douban.com/subject/[0-9]*")
+var songItemParser = regexp.MustCompile("https://music.douban.com/subject/[0-9]*")
+var gameItemParser = regexp.MustCompile("https://www.douban.com/game/[0-9]*")
 
 func ParseDoubanUid(thumbnail string) uint64 {
 	result := doubanUidParser.FindStringSubmatch(thumbnail)
@@ -198,4 +202,28 @@ func TrimLine(text string) string {
 	}
 
 	return strings.TrimSpace(data.String())
+}
+
+func ParseItem(line string) (uint64, consts.Type) {
+	matches := bookItemParser.FindStringSubmatch(line)
+	if matches != nil {
+		return ParseNumber(matches[0]), consts.TypeBook
+	}
+
+	matches = movieItemParser.FindStringSubmatch(line)
+	if matches != nil {
+		return ParseNumber(matches[0]), consts.TypeMovie
+	}
+
+	matches = songItemParser.FindStringSubmatch(line)
+	if matches != nil {
+		return ParseNumber(matches[0]), consts.TypeSong
+	}
+
+	matches = gameItemParser.FindStringSubmatch(line)
+	if matches != nil {
+		return ParseNumber(matches[0]), consts.TypeGame
+	}
+	
+	return 0, consts.TypeUser
 }

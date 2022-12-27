@@ -28,6 +28,11 @@ func main() {
 		ctx.String(http.StatusOK, "")
 	})
 
+	adminGroup := router.Group("/admin")
+	{
+		adminGroup.GET("/load_data", controller.LoadData)
+	}
+
 	queryGroup := router.Group("/guest")
 	{
 		queryGroup.GET("/check_user", controller.CheckUser)
