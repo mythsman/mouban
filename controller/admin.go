@@ -2,7 +2,9 @@ package controller
 
 import (
 	"bufio"
+	"context"
 	"github.com/gin-gonic/gin"
+	"golang.org/x/sync/semaphore"
 	"log"
 	"mouban/consts"
 	"mouban/dao"
@@ -34,9 +36,19 @@ func loadFile(path string) {
 	defer f.Close()
 
 	scanner := bufio.NewScanner(f)
-
+	sem := semaphore.NewWeighted(10)
 	for scanner.Scan() {
-		processLine(scanner.Text())
+		err := sem.Acquire(context.Background(), 1)
+		if err != nil {
+			log.Println("acquire semaphore failed", err)
+			return
+		}
+		go func() {
+			defer func() {
+				sem.Release(1)
+			}()
+			processLine(scanner.Text())
+		}()
 	}
 
 	if err := scanner.Err(); err != nil {
