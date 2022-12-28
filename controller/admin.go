@@ -53,7 +53,11 @@ func processLine(line string) {
 	if schedule == nil {
 		added := dao.CreateSchedule(doubanId, t.Code, consts.ScheduleStatusCanCrawl, consts.ScheduleResultUnready)
 		if added {
-			log.Println("new", t.Name, "scanned :", doubanId)
+			log.Println("new", t.Name, "added :", doubanId)
+		} else {
+			log.Println("new", t.Name, "duplicated :", doubanId)
 		}
+	} else {
+		log.Println("old", t.Name, "ignored :", doubanId)
 	}
 }
