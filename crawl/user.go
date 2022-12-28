@@ -79,6 +79,7 @@ func UserPublish(doubanUid uint64) (time.Time, error) {
 		XMLName xml.Name `xml:"rss"`
 		Channel struct {
 			XMLName xml.Name `xml:"channel"`
+			Title   string   `xml:"title"`
 			PubDate string   `xml:"pubDate"`
 		} `xml:"channel"`
 	}{}
@@ -88,6 +89,10 @@ func UserPublish(doubanUid uint64) (time.Time, error) {
 	err = xml.Unmarshal(data, &rss)
 	if err != nil {
 		return time.Unix(0, 0), errors.New("parse rss failed")
+	}
+
+	if rss.Channel.PubDate == "" && rss.Channel.Title != "" {
+		return time.Unix(0, 0), nil
 	}
 
 	dateTime, err := time.ParseInLocation(time.RFC1123, rss.Channel.PubDate, time.Local)

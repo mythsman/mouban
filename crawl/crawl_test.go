@@ -52,8 +52,9 @@ func TestSong(t *testing.T) {
 }
 
 func TestUserPublish(t *testing.T) {
-	userPublish, err := UserPublish(162448367)
+	userPublish, err := UserPublish(227565842)
 	if err != nil {
+		t.Logf("UserPublish failed %s", err)
 		return
 	}
 	t.Logf("UserPublish is %s", userPublish)
