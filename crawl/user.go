@@ -9,6 +9,7 @@ import (
 	"mouban/consts"
 	"mouban/model"
 	"mouban/util"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -75,6 +76,10 @@ func UserPublish(doubanUid uint64) (time.Time, error) {
 		return time.Time{}, errors.New("code is 404")
 	}
 
+	if code == 403 {
+		panic("code is 403 for user rss " + strconv.FormatUint(doubanUid, 10))
+	}
+
 	rss := struct {
 		XMLName xml.Name `xml:"rss"`
 		Channel struct {
@@ -88,7 +93,8 @@ func UserPublish(doubanUid uint64) (time.Time, error) {
 
 	err = xml.Unmarshal(data, &rss)
 	if err != nil {
-		return time.Unix(0, 0), errors.New("parse rss failed")
+		log.Println("rss parse failed for", doubanUid, body)
+		return time.Unix(0, 0), nil
 	}
 
 	if rss.Channel.PubDate == "" && rss.Channel.Title != "" {
@@ -97,7 +103,8 @@ func UserPublish(doubanUid uint64) (time.Time, error) {
 
 	dateTime, err := time.ParseInLocation(time.RFC1123, rss.Channel.PubDate, time.Local)
 	if err != nil {
-		return time.Unix(0, 0), errors.New("parse pubDate failed " + rss.Channel.PubDate)
+		log.Println("parse pubDate failed for", doubanUid, body)
+		return time.Unix(0, 0), nil
 	}
 
 	return dateTime, nil
