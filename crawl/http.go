@@ -2,6 +2,7 @@ package crawl
 
 import (
 	"crypto/tls"
+	"errors"
 	"github.com/MercuryEngineering/CookieMonster"
 	"github.com/hashicorp/go-retryablehttp"
 	"github.com/spf13/viper"
@@ -100,7 +101,7 @@ func Get(url string, limiter *rate.Limiter) (*string, int, error) {
 		return nil, 0, err
 	}
 
-	log.Println("code is" , strconv.Itoa(resp.StatusCode) , "for" , url)
+	log.Println("code is", strconv.Itoa(resp.StatusCode), "for", url)
 
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
@@ -108,5 +109,10 @@ func Get(url string, limiter *rate.Limiter) (*string, int, error) {
 		return nil, 0, err
 	}
 	bodyStr := string(body)
+
+	if resp.StatusCode == 403 && strings.Contains(bodyStr, "error code: 004") {
+		return nil, 0, errors.New("IP is probably banned (error code: 004)")
+	}
+
 	return &bodyStr, resp.StatusCode, err
 }
