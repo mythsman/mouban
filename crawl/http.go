@@ -42,6 +42,9 @@ func init() {
 	retryClient.HTTPClient = &http.Client{
 		Jar: jar,
 		CheckRedirect: func(req *http.Request, via []*http.Request) error {
+			if len(via) >= 10 {
+				return errors.New("too many redirects for " + req.URL.String())
+			}
 			if len(via) > 0 && req.Header.Get("cookie") == "" {
 				req.Header.Set("Cookie", via[len(via)-1].Header.Get("Cookie"))
 			}

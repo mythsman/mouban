@@ -14,6 +14,9 @@ import (
 func Movie(doubanId uint64) (*model.Movie, *model.Rating, *[]string, *[]uint64, error) {
 	body, _, err := Get(fmt.Sprintf(consts.MovieDetailUrl, doubanId), MovieLimiter)
 	if err != nil {
+		if strings.Contains(err.Error(), "too many redirects") {
+			return nil, nil, nil, nil, err
+		}
 		panic(err)
 	}
 

@@ -41,8 +41,10 @@ func TestBook(t *testing.T) {
 }
 
 func TestSong(t *testing.T) {
+	//1748967 too many redirects
 	song, rating, newUser, newItems, err := Song(2221098)
 	if err != nil {
+		fmt.Println(err)
 		return
 	}
 	fmt.Println(util.ToJson(song))
