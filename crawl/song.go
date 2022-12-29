@@ -14,6 +14,9 @@ import (
 func Song(doubanId uint64) (*model.Song, *model.Rating, *[]string, *[]uint64, error) {
 	body, _, err := Get(fmt.Sprintf(consts.SongDetailUrl, doubanId), SongLimiter)
 	if err != nil {
+		if strings.Contains(err.Error(), "too many redirects") {
+			return nil, nil, nil, nil, err
+		}
 		panic(err)
 	}
 
