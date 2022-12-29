@@ -36,7 +36,7 @@ func loadFile(path string) {
 	defer f.Close()
 
 	scanner := bufio.NewScanner(f)
-	sem := semaphore.NewWeighted(10)
+	sem := semaphore.NewWeighted(100)
 	for scanner.Scan() {
 		err := sem.Acquire(context.Background(), 1)
 		if err != nil {
