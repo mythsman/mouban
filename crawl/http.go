@@ -39,10 +39,18 @@ func init() {
 	retryClient.Logger = nil
 	retryClient.RetryWaitMin = time.Duration(1) * time.Second
 	retryClient.RetryWaitMax = time.Duration(60) * time.Second
+	retryClient.CheckRetry = func(ctx context.Context, resp *http.Response, err error) (bool, error) {
+		shouldRetry, e := retryablehttp.DefaultRetryPolicy(ctx, resp, err)
+		if shouldRetry && strings.Contains(err.Error(), "too many redirects") {
+			return false, e
+		}
+		return shouldRetry, e
+	}
 	retryClient.HTTPClient = &http.Client{
 		Jar: jar,
 		CheckRedirect: func(req *http.Request, via []*http.Request) error {
-			if len(via) >= 10 {
+			if len(via) >= 5 {
+				log.Println("too many redirects found for", req.URL.String())
 				return errors.New("too many redirects for " + req.URL.String())
 			}
 			if len(via) > 0 && req.Header.Get("cookie") == "" {
