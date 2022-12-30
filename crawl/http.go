@@ -82,7 +82,7 @@ func init() {
 			UserLimiter.SetLimit(rate.Every(getNormDuration(viper.GetInt("http.interval.user"), 20)))
 			ItemLimiter.SetLimit(rate.Every(getNormDuration(viper.GetInt("http.interval.item"), 20)))
 			DiscoverLimiter.SetLimit(rate.Every(getNormDuration(viper.GetInt("http.interval.discover"), 20)))
-			log.Println("rate limiter updated.")
+			log.Println("rate limiter updated")
 		}
 	}()
 }
