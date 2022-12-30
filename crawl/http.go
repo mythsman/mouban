@@ -77,12 +77,12 @@ func init() {
 	DiscoverLimiter = rate.NewLimiter(rate.Every(time.Duration(viper.GetInt("http.interval.discover"))*time.Second), 1)
 
 	go func() {
-		// change limiter in -20% ~ +20% per 90s
-		for range time.NewTicker(time.Second * 90).C {
-			UserLimiter.SetLimit(rate.Every(time.Duration(norm(viper.GetInt("http.interval.user"), 20)) * time.Second))
-			ItemLimiter.SetLimit(rate.Every(time.Duration(norm(viper.GetInt("http.interval.item"), 20)) * time.Second))
-			DiscoverLimiter.SetLimit(rate.Every(time.Duration(norm(viper.GetInt("http.interval.discover"), 20)) * time.Second))
-			log.Println("ratelimiter updated.")
+		// change limiter in -20% ~ +20% per 30s
+		for range time.NewTicker(time.Second * 30).C {
+			UserLimiter.SetLimit(rate.Every(getNormDuration(viper.GetInt("http.interval.user"), 20)))
+			ItemLimiter.SetLimit(rate.Every(getNormDuration(viper.GetInt("http.interval.item"), 20)))
+			DiscoverLimiter.SetLimit(rate.Every(getNormDuration(viper.GetInt("http.interval.discover"), 20)))
+			log.Println("rate limiter updated.")
 		}
 	}()
 }
@@ -134,8 +134,9 @@ func Get(url string, limiter *rate.Limiter) (*string, int, error) {
 	return &bodyStr, resp.StatusCode, err
 }
 
-func norm(value int, percent int) int {
+func getNormDuration(sec int, percent int) time.Duration {
+	duration := time.Duration(sec) * time.Second
+	randMilli := int(duration.Milliseconds())
 	randV := rand.Intn(percent*2) - percent
-	log.Println(randV)
-	return value*randV/100 + value
+	return time.Duration(randMilli*randV/100+randMilli) * time.Millisecond
 }
