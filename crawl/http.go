@@ -30,6 +30,8 @@ var ItemLimiter *rate.Limiter
 var DiscoverLimiter *rate.Limiter
 
 func init() {
+	rand.Seed(time.Now().UnixNano())
+
 	jar, _ := cookiejar.New(nil)
 	retryClient = retryablehttp.NewClient()
 	retryClient.RetryMax = viper.GetInt("http.retry_max")
@@ -73,6 +75,15 @@ func init() {
 	UserLimiter = rate.NewLimiter(rate.Every(time.Duration(viper.GetInt("http.interval.user"))*time.Second), 1)
 	ItemLimiter = rate.NewLimiter(rate.Every(time.Duration(viper.GetInt("http.interval.item"))*time.Second), 1)
 	DiscoverLimiter = rate.NewLimiter(rate.Every(time.Duration(viper.GetInt("http.interval.discover"))*time.Second), 1)
+
+	go func() {
+		// change limiter in -20% ~ +20% per 90s
+		for range time.NewTicker(time.Second * 90).C {
+			UserLimiter.SetLimit(rate.Every(time.Duration(norm(viper.GetInt("http.interval.user"), 20)) * time.Second))
+			ItemLimiter.SetLimit(rate.Every(time.Duration(norm(viper.GetInt("http.interval.item"), 20)) * time.Second))
+			DiscoverLimiter.SetLimit(rate.Every(time.Duration(norm(viper.GetInt("http.interval.discover"), 20)) * time.Second))
+		}
+	}()
 }
 
 func Get(url string, limiter *rate.Limiter) (*string, int, error) {
@@ -120,4 +131,10 @@ func Get(url string, limiter *rate.Limiter) (*string, int, error) {
 	}
 
 	return &bodyStr, resp.StatusCode, err
+}
+
+func norm(value int, percent int) int {
+	randV := rand.Intn(percent*2) - percent
+	log.Println(randV)
+	return value*randV/100 + value
 }
