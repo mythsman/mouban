@@ -63,7 +63,7 @@ func processLine(line string) {
 	}
 	schedule := dao.GetSchedule(doubanId, t.Code)
 	if schedule == nil {
-		added := dao.CreateSchedule(doubanId, t.Code, consts.ScheduleStatusCanCrawl, consts.ScheduleResultUnready)
+		added := dao.CreateScheduleNx(doubanId, t.Code, consts.ScheduleStatusCanCrawl, consts.ScheduleResultUnready)
 		if added {
 			log.Println("new", t.Name, "added :", doubanId)
 		} else {

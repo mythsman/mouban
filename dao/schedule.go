@@ -53,14 +53,18 @@ func ChangeScheduleResult(doubanId uint64, t uint8, result uint8) {
 		Update("result", result)
 }
 
-func CreateSchedule(doubanId uint64, t uint8, status uint8, result uint8) bool {
-
-	schedule := &model.Schedule{
-		DoubanId: doubanId,
-		Type:     t,
-		Status:   status,
-		Result:   result,
+func CreateScheduleNx(doubanId uint64, t uint8, status uint8, result uint8) bool {
+	existingSchedule := GetSchedule(doubanId, t)
+	if existingSchedule == nil {
+		schedule := &model.Schedule{
+			DoubanId: doubanId,
+			Type:     t,
+			Status:   status,
+			Result:   result,
+		}
+		row := common.Db.Create(&schedule).RowsAffected
+		return row > 0
+	} else {
+		return false
 	}
-	row := common.Db.Create(&schedule).RowsAffected
-	return row > 0
 }
