@@ -8,7 +8,7 @@ import (
 )
 
 func TestUpsertSchedule(t *testing.T) {
-	CreateSchedule(1234, consts.TypeMovie.Code, consts.ScheduleStatusToCrawl, consts.ScheduleResultInvalid)
+	CreateScheduleNx(1234, consts.TypeMovie.Code, consts.ScheduleStatusToCrawl, consts.ScheduleResultInvalid)
 }
 
 func TestGetSchedule(t *testing.T) {

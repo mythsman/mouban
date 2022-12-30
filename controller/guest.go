@@ -23,7 +23,7 @@ func CheckUser(ctx *gin.Context) {
 	schedule := dao.GetSchedule(doubanUid, consts.TypeUser.Code)
 
 	if schedule == nil {
-		dao.CreateSchedule(doubanUid, consts.TypeUser.Code, consts.ScheduleStatusToCrawl, consts.ScheduleResultUnready)
+		dao.CreateScheduleNx(doubanUid, consts.TypeUser.Code, consts.ScheduleStatusToCrawl, consts.ScheduleResultUnready)
 		BizError(ctx, "未录入当前用户，已发起录入，请等待后台数据更新")
 		return
 	}

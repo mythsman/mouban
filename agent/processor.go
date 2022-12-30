@@ -141,7 +141,7 @@ func processDiscoverUser(newUsers *[]string) {
 				}
 			}
 			if id > 0 {
-				added := dao.CreateSchedule(id, consts.TypeUser.Code, consts.ScheduleStatusCanCrawl, consts.ScheduleResultUnready)
+				added := dao.CreateScheduleNx(id, consts.TypeUser.Code, consts.ScheduleStatusCanCrawl, consts.ScheduleResultUnready)
 				if added {
 					newFound += 1
 				}
@@ -168,7 +168,7 @@ func processDiscoverItem(newItems *[]uint64, t consts.Type) {
 		totalFound := len(*newItems)
 		newFound := 0
 		for _, doubanId := range *newItems {
-			added := dao.CreateSchedule(doubanId, t.Code, consts.ScheduleStatusCanCrawl, consts.ScheduleResultUnready)
+			added := dao.CreateScheduleNx(doubanId, t.Code, consts.ScheduleStatusCanCrawl, consts.ScheduleResultUnready)
 			if added {
 				newFound += 1
 			}
@@ -210,7 +210,7 @@ func processUser(doubanUid uint64, forceUpdate bool) {
 				dao.UpsertComment(&(*comment)[i])
 				added := dao.CreateGameNx(&(*game)[i])
 				if added {
-					dao.CreateSchedule((*game)[i].DoubanId, consts.TypeGame.Code, consts.ScheduleStatusToCrawl, consts.ScheduleResultUnready)
+					dao.CreateScheduleNx((*game)[i].DoubanId, consts.TypeGame.Code, consts.ScheduleStatusToCrawl, consts.ScheduleResultUnready)
 				}
 			}
 		}()
@@ -229,7 +229,7 @@ func processUser(doubanUid uint64, forceUpdate bool) {
 				added := dao.CreateBookNx(&(*book)[i])
 				dao.UpsertComment(&(*comment)[i])
 				if added {
-					dao.CreateSchedule((*book)[i].DoubanId, consts.TypeBook.Code, consts.ScheduleStatusToCrawl, consts.ScheduleResultUnready)
+					dao.CreateScheduleNx((*book)[i].DoubanId, consts.TypeBook.Code, consts.ScheduleStatusToCrawl, consts.ScheduleResultUnready)
 				}
 			}
 		}()
@@ -249,7 +249,7 @@ func processUser(doubanUid uint64, forceUpdate bool) {
 				dao.UpsertComment(&(*comment)[i])
 				added := dao.CreateMovieNx(&(*movie)[i])
 				if added {
-					dao.CreateSchedule((*movie)[i].DoubanId, consts.TypeMovie.Code, consts.ScheduleStatusToCrawl, consts.ScheduleResultUnready)
+					dao.CreateScheduleNx((*movie)[i].DoubanId, consts.TypeMovie.Code, consts.ScheduleStatusToCrawl, consts.ScheduleResultUnready)
 				}
 			}
 		}()
@@ -269,7 +269,7 @@ func processUser(doubanUid uint64, forceUpdate bool) {
 				dao.UpsertComment(&(*comment)[i])
 				added := dao.CreateSongNx(&(*song)[i])
 				if added {
-					dao.CreateSchedule((*song)[i].DoubanId, consts.TypeSong.Code, consts.ScheduleStatusToCrawl, consts.ScheduleResultUnready)
+					dao.CreateScheduleNx((*song)[i].DoubanId, consts.TypeSong.Code, consts.ScheduleStatusToCrawl, consts.ScheduleResultUnready)
 				}
 			}
 		}()
