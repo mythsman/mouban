@@ -26,10 +26,7 @@ var userAgent = []string{
 
 var retryClient *retryablehttp.Client
 var UserLimiter *rate.Limiter
-var BookLimiter *rate.Limiter
-var MovieLimiter *rate.Limiter
-var GameLimiter *rate.Limiter
-var SongLimiter *rate.Limiter
+var ItemLimiter *rate.Limiter
 var DiscoverLimiter *rate.Limiter
 
 func init() {
@@ -74,10 +71,7 @@ func init() {
 			},
 		}}
 	UserLimiter = rate.NewLimiter(rate.Every(time.Duration(viper.GetInt("http.interval.user"))*time.Second), 1)
-	BookLimiter = rate.NewLimiter(rate.Every(time.Duration(viper.GetInt("http.interval.book"))*time.Second), 1)
-	MovieLimiter = rate.NewLimiter(rate.Every(time.Duration(viper.GetInt("http.interval.movie"))*time.Second), 1)
-	GameLimiter = rate.NewLimiter(rate.Every(time.Duration(viper.GetInt("http.interval.game"))*time.Second), 1)
-	SongLimiter = rate.NewLimiter(rate.Every(time.Duration(viper.GetInt("http.interval.song"))*time.Second), 1)
+	ItemLimiter = rate.NewLimiter(rate.Every(time.Duration(viper.GetInt("http.interval.item"))*time.Second), 1)
 	DiscoverLimiter = rate.NewLimiter(rate.Every(time.Duration(viper.GetInt("http.interval.discover"))*time.Second), 1)
 }
 
