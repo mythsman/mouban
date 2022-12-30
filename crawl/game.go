@@ -12,7 +12,7 @@ import (
 )
 
 func Game(doubanId uint64) (*model.Game, *model.Rating, *[]string, *[]uint64, error) {
-	body, _, err := Get(fmt.Sprintf(consts.GameDetailUrl, doubanId), GameLimiter)
+	body, _, err := Get(fmt.Sprintf(consts.GameDetailUrl, doubanId), ItemLimiter)
 	if err != nil {
 		if strings.Contains(err.Error(), "too many redirects") {
 			return nil, nil, nil, nil, err

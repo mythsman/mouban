@@ -13,7 +13,7 @@ import (
 )
 
 func Book(doubanId uint64) (*model.Book, *model.Rating, *[]string, *[]uint64, error) {
-	body, _, err := Get(fmt.Sprintf(consts.BookDetailUrl, doubanId), BookLimiter)
+	body, _, err := Get(fmt.Sprintf(consts.BookDetailUrl, doubanId), ItemLimiter)
 	if err != nil {
 		if strings.Contains(err.Error(), "too many redirects") {
 			return nil, nil, nil, nil, err
