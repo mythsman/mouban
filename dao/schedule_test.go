@@ -11,6 +11,11 @@ func TestUpsertSchedule(t *testing.T) {
 	CreateScheduleNx(1234, consts.TypeMovie.Code, consts.ScheduleStatusToCrawl, consts.ScheduleResultInvalid)
 }
 
+func TestCasOrphanSchedule(t *testing.T) {
+	cnt := CasOrphanSchedule(0)
+	fmt.Println(cnt)
+}
+
 func TestGetSchedule(t *testing.T) {
 	schedule := GetSchedule(1234, consts.TypeMovie.Code)
 	fmt.Println(util.ToJson(schedule))

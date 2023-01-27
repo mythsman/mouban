@@ -2,7 +2,9 @@ package dao
 
 import (
 	"mouban/common"
+	"mouban/consts"
 	"mouban/model"
+	"time"
 )
 
 func GetSchedule(doubanId uint64, t uint8) *model.Schedule {
@@ -38,6 +40,12 @@ func SearchScheduleByAll(t uint8, status uint8, result uint8) *model.Schedule {
 		return nil
 	}
 	return schedule
+}
+
+func CasOrphanSchedule(expire time.Duration) int64 {
+	return common.Db.Model(&model.Schedule{}).
+		Where("status = ? AND updated_at < ?", consts.ScheduleStatusCrawling, time.Now().Add(-expire)).
+		Update("status", consts.ScheduleStatusToCrawl).RowsAffected
 }
 
 func CasScheduleStatus(doubanId uint64, t uint8, status uint8, rawStatus uint8) bool {
