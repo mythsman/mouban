@@ -3,7 +3,6 @@ package crawl
 import (
 	"crypto/tls"
 	"errors"
-	"github.com/MercuryEngineering/CookieMonster"
 	"github.com/hashicorp/go-retryablehttp"
 	"github.com/spf13/viper"
 	"golang.org/x/net/context"
@@ -11,29 +10,59 @@ import (
 	"io/ioutil"
 	"log"
 	"math/rand"
+	_ "mouban/common"
 	"net/http"
 	"net/http/cookiejar"
+	"net/url"
 	"strconv"
 	"strings"
 	"time"
 )
 
-var userAgent = []string{
-	"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36",
-	"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36",
-	"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36 Edge/106.0.1370.52",
-}[rand.Intn(3)]
-
-var retryClient *retryablehttp.Client
+var clients []*retryablehttp.Client
 var UserLimiter *rate.Limiter
 var ItemLimiter *rate.Limiter
 var DiscoverLimiter *rate.Limiter
 
 func init() {
 	rand.Seed(time.Now().UnixNano())
+	UserLimiter = rate.NewLimiter(rate.Every(time.Duration(viper.GetInt("http.interval.user"))*time.Second), 1)
+	ItemLimiter = rate.NewLimiter(rate.Every(time.Duration(viper.GetInt("http.interval.item"))*time.Second), 1)
+	DiscoverLimiter = rate.NewLimiter(rate.Every(time.Duration(viper.GetInt("http.interval.discover"))*time.Second), 1)
 
+	authString := viper.GetString("http.auth")
+	authList := strings.Split(authString, ";")
+	for _, authKey := range authList {
+		if authKey == "" {
+			continue
+		}
+		entry := strings.Split(authKey, ",")
+		if len(entry) == 1 {
+			client := initClient(entry[0], nil)
+			clients = append(clients, client)
+		} else if len(entry) == 2 {
+			proxy, _ := url.ParseRequestURI(entry[1])
+			client := initClient(entry[0], proxy)
+			clients = append(clients, client)
+		}
+	}
+	log.Println(len(clients), "user auth initialized")
+}
+
+func initClient(dbcl2 string, proxy *url.URL) *retryablehttp.Client {
 	jar, _ := cookiejar.New(nil)
-	retryClient = retryablehttp.NewClient()
+	var cookies []*http.Cookie
+	cookie := &http.Cookie{
+		Name:   "dbcl2",
+		Value:  dbcl2,
+		Path:   "/",
+		Domain: ".douban.com",
+	}
+	cookies = append(cookies, cookie)
+	u, _ := url.Parse("https://douban.com")
+	jar.SetCookies(u, cookies)
+
+	var retryClient = retryablehttp.NewClient()
 	retryClient.RetryMax = viper.GetInt("http.retry_max")
 	retryClient.Logger = nil
 	retryClient.RetryWaitMin = time.Duration(1) * time.Second
@@ -60,6 +89,7 @@ func init() {
 		Timeout: time.Duration(viper.GetInt("http.timeout")) * time.Second,
 		Transport: &http.Transport{
 			TLSHandshakeTimeout: time.Duration(viper.GetInt("http.timeout")) * time.Second,
+			Proxy:               http.ProxyURL(proxy),
 			TLSClientConfig: &tls.Config{
 				MinVersion: tls.VersionTLS12,
 				CipherSuites: []uint16{
@@ -72,19 +102,7 @@ func init() {
 				},
 			},
 		}}
-	UserLimiter = rate.NewLimiter(rate.Every(time.Duration(viper.GetInt("http.interval.user"))*time.Second), 1)
-	ItemLimiter = rate.NewLimiter(rate.Every(time.Duration(viper.GetInt("http.interval.item"))*time.Second), 1)
-	DiscoverLimiter = rate.NewLimiter(rate.Every(time.Duration(viper.GetInt("http.interval.discover"))*time.Second), 1)
-
-	go func() {
-		// change limiter in -20% ~ +20% per 30s
-		for range time.NewTicker(time.Second * 30).C {
-			UserLimiter.SetLimit(rate.Every(getNormDuration(viper.GetInt("http.interval.user"), 20)))
-			ItemLimiter.SetLimit(rate.Every(getNormDuration(viper.GetInt("http.interval.item"), 20)))
-			DiscoverLimiter.SetLimit(rate.Every(getNormDuration(viper.GetInt("http.interval.discover"), 20)))
-			log.Println("rate limiter updated")
-		}
-	}()
+	return retryClient
 }
 
 func Get(url string, limiter *rate.Limiter) (*string, int, error) {
@@ -94,31 +112,18 @@ func Get(url string, limiter *rate.Limiter) (*string, int, error) {
 	}
 
 	req, err := retryablehttp.NewRequest("GET", url, nil)
-	req.Header.Set("User-Agent", userAgent)
+	req.Header.Set("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36")
 	req.Header.Set("Referer", "https://www.douban.com/")
 
-	cookies, err := cookiemonster.ParseFile("./cookie.txt")
-	if err != nil {
-		cookies, err = cookiemonster.ParseFile("../cookie.txt")
-		if err != nil {
-			panic(err)
-		}
-	}
-	for _, c := range cookies {
-		c.Value = strings.Trim(c.Value, "\"")
-		req.AddCookie(c)
-	}
-
-	if err != nil {
-		return nil, 0, err
-	}
+	clientIdx := rand.Intn(len(clients))
+	retryClient := clients[clientIdx]
 
 	resp, err := retryClient.Do(req)
 	if err != nil {
 		return nil, 0, err
 	}
 
-	log.Println("code is", strconv.Itoa(resp.StatusCode), "for", url)
+	log.Println("code is", strconv.Itoa(resp.StatusCode), "at", clientIdx, "for", url)
 
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
@@ -132,11 +137,4 @@ func Get(url string, limiter *rate.Limiter) (*string, int, error) {
 	}
 
 	return &bodyStr, resp.StatusCode, err
-}
-
-func getNormDuration(sec int, percent int) time.Duration {
-	duration := time.Duration(sec) * time.Second
-	randMilli := int(duration.Milliseconds())
-	randV := rand.Intn(percent*2) - percent
-	return time.Duration(randMilli*randV/100+randMilli) * time.Millisecond
 }

@@ -7,7 +7,6 @@ RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
 
 COPY main /srv
 COPY application.yml.sample /srv/application.yml
-COPY cookie.txt.sample /srv/cookie.txt
 
 EXPOSE 8080
 

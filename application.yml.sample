@@ -27,3 +27,4 @@ http:
     user: 4
     item: 4
     discover: 4
+  auth: 42342343,https://user:password@host:port;

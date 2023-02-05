@@ -1,7 +1,6 @@
 .git/
 .idea/
 application.yml
-cookie.txt
 
 # Binaries for programs and plugins
 *.exe
