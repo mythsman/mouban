@@ -8,10 +8,9 @@ import (
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
-	"log"
+	"mouban/log"
 	"mouban/model"
 	"net/url"
-	"os"
 	"time"
 )
 
@@ -41,7 +40,7 @@ func tryCreateDB(username string, password string, host string, port string, dat
 	defer func(db *sql.DB) {
 		err := db.Close()
 		if err != nil {
-			log.Println("database close failed")
+			log.Info("database close failed")
 		}
 	}(db)
 
@@ -63,7 +62,7 @@ func getConnection(username string, password string, host string, port string, d
 		url.QueryEscape(loc))
 
 	dbLogger := logger.New(
-		log.New(os.Stderr, "\r\n", log.LstdFlags),
+		log.Instance(),
 		logger.Config{
 			SlowThreshold:             500 * time.Second,
 			LogLevel:                  logger.Warn,
@@ -77,11 +76,11 @@ func getConnection(username string, password string, host string, port string, d
 	})
 
 	if err != nil {
-		log.Println("Open database failed", err)
+		log.Info("Open database failed", err)
 		panic("Open database failed " + err.Error())
 	}
 	Db = db
-	log.Println("db connect success")
+	log.Info("db connect success")
 }
 
 func migrateTables() {

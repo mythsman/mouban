@@ -2,9 +2,9 @@ package agent
 
 import (
 	"github.com/spf13/viper"
-	"log"
 	"mouban/consts"
 	"mouban/dao"
+	"mouban/log"
 	"mouban/util"
 	"time"
 )
@@ -12,7 +12,7 @@ import (
 func runFlow() {
 	defer func() {
 		if r := recover(); r != nil {
-			log.Println(r, "flow agent crashed  => ", util.GetCurrentGoroutineStack())
+			log.Info(r, "flow agent crashed  => ", util.GetCurrentGoroutineStack())
 		}
 		time.Sleep(time.Second * 1)
 	}()
@@ -23,14 +23,14 @@ func runFlow() {
 		if retryBook != nil {
 			changed := dao.CasScheduleStatus(retryBook.DoubanId, retryBook.Type, consts.ScheduleStatusToCrawl, consts.ScheduleStatusCrawled)
 			if changed {
-				log.Println("flow retry book ", retryBook.DoubanId)
+				log.Info("flow retry book ", retryBook.DoubanId)
 			}
 		} else {
 			discoverBook := dao.SearchScheduleByStatus(consts.TypeBook.Code, consts.ScheduleStatusCanCrawl)
 			if discoverBook != nil {
 				changed := dao.CasScheduleStatus(discoverBook.DoubanId, discoverBook.Type, consts.ScheduleStatusToCrawl, consts.ScheduleStatusCanCrawl)
 				if changed {
-					log.Println("flow discover book", discoverBook.DoubanId)
+					log.Info("flow discover book", discoverBook.DoubanId)
 				}
 			}
 		}
@@ -42,14 +42,14 @@ func runFlow() {
 		if retryMovie != nil {
 			changed := dao.CasScheduleStatus(retryMovie.DoubanId, retryMovie.Type, consts.ScheduleStatusToCrawl, consts.ScheduleStatusCrawled)
 			if changed {
-				log.Println("flow retry movie ", retryMovie.DoubanId)
+				log.Info("flow retry movie ", retryMovie.DoubanId)
 			}
 		} else {
 			discoverMovie := dao.SearchScheduleByStatus(consts.TypeMovie.Code, consts.ScheduleStatusCanCrawl)
 			if discoverMovie != nil {
 				changed := dao.CasScheduleStatus(discoverMovie.DoubanId, discoverMovie.Type, consts.ScheduleStatusToCrawl, consts.ScheduleStatusCanCrawl)
 				if changed {
-					log.Println("flow discover movie", discoverMovie.DoubanId)
+					log.Info("flow discover movie", discoverMovie.DoubanId)
 				}
 			}
 		}
@@ -61,14 +61,14 @@ func runFlow() {
 		if retryGame != nil {
 			changed := dao.CasScheduleStatus(retryGame.DoubanId, retryGame.Type, consts.ScheduleStatusToCrawl, consts.ScheduleStatusCrawled)
 			if changed {
-				log.Println("flow retry game ", retryGame.DoubanId)
+				log.Info("flow retry game ", retryGame.DoubanId)
 			}
 		} else {
 			discoverGame := dao.SearchScheduleByStatus(consts.TypeGame.Code, consts.ScheduleStatusCanCrawl)
 			if discoverGame != nil {
 				changed := dao.CasScheduleStatus(discoverGame.DoubanId, discoverGame.Type, consts.ScheduleStatusToCrawl, consts.ScheduleStatusCanCrawl)
 				if changed {
-					log.Println("flow discover game", discoverGame.DoubanId)
+					log.Info("flow discover game", discoverGame.DoubanId)
 				}
 			}
 		}
@@ -80,14 +80,14 @@ func runFlow() {
 		if retrySong != nil {
 			changed := dao.CasScheduleStatus(retrySong.DoubanId, retrySong.Type, consts.ScheduleStatusToCrawl, consts.ScheduleStatusCrawled)
 			if changed {
-				log.Println("flow retry song ", retrySong.DoubanId)
+				log.Info("flow retry song ", retrySong.DoubanId)
 			}
 		} else {
 			discoverSong := dao.SearchScheduleByStatus(consts.TypeSong.Code, consts.ScheduleStatusCanCrawl)
 			if discoverSong != nil {
 				changed := dao.CasScheduleStatus(discoverSong.DoubanId, discoverSong.Type, consts.ScheduleStatusToCrawl, consts.ScheduleStatusCanCrawl)
 				if changed {
-					log.Println("flow discover song", discoverSong.DoubanId)
+					log.Info("flow discover song", discoverSong.DoubanId)
 				}
 			}
 		}
@@ -99,7 +99,7 @@ func runFlow() {
 		if retryUser != nil {
 			changed := dao.CasScheduleStatus(retryUser.DoubanId, retryUser.Type, consts.ScheduleStatusToCrawl, consts.ScheduleStatusCrawled)
 			if changed {
-				log.Println("flow retry user ", retryUser.DoubanId)
+				log.Info("flow retry user ", retryUser.DoubanId)
 			}
 		} else {
 			if viper.GetBool("agent.flow.discover") {
@@ -107,7 +107,7 @@ func runFlow() {
 				if discoverUser != nil {
 					changed := dao.CasScheduleStatus(discoverUser.DoubanId, consts.TypeUser.Code, consts.ScheduleStatusToCrawl, consts.ScheduleStatusCanCrawl)
 					if changed {
-						log.Println("flow discover user", discoverUser.DoubanId)
+						log.Info("flow discover user", discoverUser.DoubanId)
 					}
 				}
 			}
@@ -117,7 +117,7 @@ func runFlow() {
 }
 func init() {
 	if !viper.GetBool("agent.enable") {
-		log.Println("flow agent disabled")
+		log.Info("flow agent disabled")
 		return
 	}
 	go func() {
@@ -126,5 +126,5 @@ func init() {
 		}
 	}()
 
-	log.Println("flow agent enabled")
+	log.Info("flow agent enabled")
 }

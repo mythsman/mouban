@@ -5,8 +5,8 @@ import (
 	"errors"
 	"fmt"
 	"github.com/antchfx/htmlquery"
-	"log"
 	"mouban/consts"
+	"mouban/log"
 	"mouban/model"
 	"mouban/util"
 	"strconv"
@@ -93,7 +93,7 @@ func UserPublish(doubanUid uint64) (time.Time, error) {
 
 	err = xml.Unmarshal(data, &rss)
 	if err != nil {
-		log.Println("rss parse failed for", doubanUid, body)
+		log.Info("rss parse failed for", doubanUid, body)
 		return time.Unix(0, 0), nil
 	}
 
@@ -103,7 +103,7 @@ func UserPublish(doubanUid uint64) (time.Time, error) {
 
 	dateTime, err := time.ParseInLocation(time.RFC1123, rss.Channel.PubDate, time.Local)
 	if err != nil {
-		log.Println("parse pubDate failed for", doubanUid, body)
+		log.Info("parse pubDate failed for", doubanUid, body)
 		return time.Unix(0, 0), nil
 	}
 
@@ -113,7 +113,7 @@ func UserPublish(doubanUid uint64) (time.Time, error) {
 func UserId(domain string) uint64 {
 	defer func() {
 		if r := recover(); r != nil {
-			log.Println(r, " => ", util.GetCurrentGoroutineStack())
+			log.Info(r, " => ", util.GetCurrentGoroutineStack())
 		}
 	}()
 

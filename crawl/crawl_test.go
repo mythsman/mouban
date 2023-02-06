@@ -1,7 +1,7 @@
 package crawl
 
 import (
-	"fmt"
+	"mouban/log"
 	"mouban/util"
 	"testing"
 )
@@ -11,10 +11,10 @@ func TestMovie(t *testing.T) {
 	if err != nil {
 		return
 	}
-	fmt.Println(util.ToJson(movie))
-	fmt.Println(util.ToJson(rating))
-	fmt.Println(util.ToJson(newUsers))
-	fmt.Println(util.ToJson(newItems))
+	log.Info(util.ToJson(movie))
+	log.Info(util.ToJson(rating))
+	log.Info(util.ToJson(newUsers))
+	log.Info(util.ToJson(newItems))
 
 }
 
@@ -23,10 +23,10 @@ func TestGame(t *testing.T) {
 	if err != nil {
 		return
 	}
-	fmt.Println(util.ToJson(game))
-	fmt.Println(util.ToJson(rating))
-	fmt.Println(util.ToJson(newUsers))
-	fmt.Println(util.ToJson(newItems))
+	log.Info(util.ToJson(game))
+	log.Info(util.ToJson(rating))
+	log.Info(util.ToJson(newUsers))
+	log.Info(util.ToJson(newItems))
 }
 
 func TestBook(t *testing.T) {
@@ -34,23 +34,23 @@ func TestBook(t *testing.T) {
 	if err != nil {
 		return
 	}
-	fmt.Println(util.ToJson(book))
-	fmt.Println(util.ToJson(rating))
-	fmt.Println(util.ToJson(newUser))
-	fmt.Println(util.ToJson(newItems))
+	log.Info(util.ToJson(book))
+	log.Info(util.ToJson(rating))
+	log.Info(util.ToJson(newUser))
+	log.Info(util.ToJson(newItems))
 }
 
 func TestSong(t *testing.T) {
 	//1748967 too many redirects
 	song, rating, newUser, newItems, err := Song(1748967)
 	if err != nil {
-		fmt.Println(err)
+		log.Info(err)
 		return
 	}
-	fmt.Println(util.ToJson(song))
-	fmt.Println(util.ToJson(rating))
-	fmt.Println(util.ToJson(newUser))
-	fmt.Println(util.ToJson(newItems))
+	log.Info(util.ToJson(song))
+	log.Info(util.ToJson(rating))
+	log.Info(util.ToJson(newUser))
+	log.Info(util.ToJson(newItems))
 }
 
 func TestUserPublish(t *testing.T) {
@@ -68,11 +68,10 @@ func TestUserOverview(t *testing.T) {
 		return
 
 	}
-	fmt.Println(util.ToJson(overview))
+	log.Info(util.ToJson(overview))
 }
 
 func TestUserId(t *testing.T) {
 	id := UserId("162448367")
-
-	t.Logf("UserId is %d", id)
+	log.Info("UserId is", id)
 }

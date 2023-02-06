@@ -1,7 +1,7 @@
 package crawl
 
 import (
-	"fmt"
+	"github.com/sirupsen/logrus"
 	"mouban/consts"
 	"mouban/util"
 	"testing"
@@ -9,7 +9,7 @@ import (
 
 func Test_scrollSong(t *testing.T) {
 	comments, songs, total := scrollAllSong(43001468, consts.ActionCollect)
-	fmt.Println(util.ToJson(*comments))
-	fmt.Println(util.ToJson(*songs))
-	fmt.Println(total)
+	log.Info(util.ToJson(*comments))
+	log.Info(util.ToJson(*songs))
+	log.Info(total)
 }

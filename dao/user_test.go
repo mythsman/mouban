@@ -1,7 +1,7 @@
 package dao
 
 import (
-	"fmt"
+	"mouban/log"
 	"mouban/model"
 	"mouban/util"
 	"testing"
@@ -24,5 +24,5 @@ func TestUpsertUser(t *testing.T) {
 
 func TestGetUser(t *testing.T) {
 	user := GetUser(1323)
-	fmt.Println(util.ToJson(user))
+	log.Info(util.ToJson(user))
 }
