@@ -10,14 +10,14 @@ type Book struct {
 	Title       string `gorm:"not null;type:varchar(512)"`
 	Subtitle    string `gorm:"type:varchar(512)"`
 	Orititle    string `gorm:"type:varchar(512)"`
-	Author      string `gorm:"type:varchar(512)"`
+	Author      string `gorm:"type:varchar(1024)"`
 	Translator  string `gorm:"type:varchar(512)"`
 	Press       string `gorm:"type:varchar(512)"`
 	Producer    string `gorm:"type:varchar(512)"`
 	Serial      string `gorm:"type:varchar(512)"`
 	PublishDate string `gorm:"type:varchar(64)"`
 	ISBN        string `gorm:"type:varchar(64)"`
-	Framing     string `gorm:"type:varchar(64)"`
+	Framing     string `gorm:"type:varchar(512)"`
 	Page        uint32
 	Price       uint32
 	BookIntro   string `gorm:"type:mediumtext"`
