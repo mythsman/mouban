@@ -1,8 +1,8 @@
 package crawl
 
 import (
-	"github.com/sirupsen/logrus"
 	"mouban/consts"
+	"mouban/log"
 	"mouban/util"
 	"testing"
 )
