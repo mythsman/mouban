@@ -21,10 +21,10 @@ datasource:
   charset: utf8mb4
   loc: Asia/Shanghai
 http:
-  timeout: 10
+  timeout: 10000
   retry_max: 20
   interval:
-    user: 4
-    item: 4
-    discover: 4
+    user: 4000
+    item: 4000
+    discover: 4000
   auth: 42342343,https://user:password@host:port;

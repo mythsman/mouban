@@ -9,13 +9,13 @@ import (
 	"golang.org/x/time/rate"
 	"io/ioutil"
 	"log"
-	"math/rand"
 	_ "mouban/common"
 	"net/http"
 	"net/http/cookiejar"
 	"net/url"
 	"strconv"
 	"strings"
+	"sync/atomic"
 	"time"
 )
 
@@ -23,12 +23,12 @@ var clients []*retryablehttp.Client
 var UserLimiter *rate.Limiter
 var ItemLimiter *rate.Limiter
 var DiscoverLimiter *rate.Limiter
+var clientIndex = uint32(0)
 
 func init() {
-	rand.Seed(time.Now().UnixNano())
-	UserLimiter = rate.NewLimiter(rate.Every(time.Duration(viper.GetInt("http.interval.user"))*time.Second), 1)
-	ItemLimiter = rate.NewLimiter(rate.Every(time.Duration(viper.GetInt("http.interval.item"))*time.Second), 1)
-	DiscoverLimiter = rate.NewLimiter(rate.Every(time.Duration(viper.GetInt("http.interval.discover"))*time.Second), 1)
+	UserLimiter = rate.NewLimiter(rate.Every(time.Duration(viper.GetInt("http.interval.user"))*time.Millisecond), 1)
+	ItemLimiter = rate.NewLimiter(rate.Every(time.Duration(viper.GetInt("http.interval.item"))*time.Millisecond), 1)
+	DiscoverLimiter = rate.NewLimiter(rate.Every(time.Duration(viper.GetInt("http.interval.discover"))*time.Millisecond), 1)
 
 	authString := viper.GetString("http.auth")
 	authList := strings.Split(authString, ";")
@@ -86,9 +86,9 @@ func initClient(dbcl2 string, proxy *url.URL) *retryablehttp.Client {
 			}
 			return nil
 		},
-		Timeout: time.Duration(viper.GetInt("http.timeout")) * time.Second,
+		Timeout: time.Duration(viper.GetInt("http.timeout")) * time.Millisecond,
 		Transport: &http.Transport{
-			TLSHandshakeTimeout: time.Duration(viper.GetInt("http.timeout")) * time.Second,
+			TLSHandshakeTimeout: time.Duration(viper.GetInt("http.timeout")) * time.Millisecond,
 			Proxy:               http.ProxyURL(proxy),
 			TLSClientConfig: &tls.Config{
 				MinVersion: tls.VersionTLS12,
@@ -115,7 +115,7 @@ func Get(url string, limiter *rate.Limiter) (*string, int, error) {
 	req.Header.Set("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36")
 	req.Header.Set("Referer", "https://www.douban.com/")
 
-	clientIdx := rand.Intn(len(clients))
+	clientIdx := int(atomic.AddUint32(&clientIndex, 1)-1) % len(clients)
 	retryClient := clients[clientIdx]
 
 	resp, err := retryClient.Do(req)
@@ -123,7 +123,7 @@ func Get(url string, limiter *rate.Limiter) (*string, int, error) {
 		return nil, 0, err
 	}
 
-	log.Println("code is", strconv.Itoa(resp.StatusCode), "at", clientIdx, "for", url)
+	log.Println("code is", strconv.Itoa(resp.StatusCode), "at", 1+clientIdx, "for", url)
 
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
