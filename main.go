@@ -3,20 +3,18 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
-	"log"
 	"math/rand"
 	_ "mouban/agent"
 	"mouban/consts"
 	"mouban/controller"
+	"mouban/log"
 	"mouban/util"
 	"net/http"
-	"os"
 	"strings"
 	"time"
 )
 
 func main() {
-	log.SetOutput(os.Stdout)
 	rand.Seed(time.Now().UnixNano())
 
 	router := gin.Default()
@@ -60,7 +58,7 @@ func Recover(ctx *gin.Context) {
 				"success": false,
 				"msg":     "服务内部错误，请联系开发者处理",
 			})
-			log.Println(r, " => ", util.GetCurrentGoroutineStack())
+			log.Info(r, " => ", util.GetCurrentGoroutineStack())
 		}
 	}()
 	ctx.Next()

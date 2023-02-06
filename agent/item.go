@@ -2,10 +2,10 @@ package agent
 
 import (
 	"github.com/spf13/viper"
-	"log"
 	"math/rand"
 	"mouban/consts"
 	"mouban/dao"
+	"mouban/log"
 	"mouban/util"
 	"strconv"
 	"time"
@@ -14,7 +14,7 @@ import (
 func runItem(index int) {
 	defer func() {
 		if r := recover(); r != nil {
-			log.Println(r, "item agent", index, "crashed  => ", util.GetCurrentGoroutineStack())
+			log.Info(r, "item agent", index, "crashed  => ", util.GetCurrentGoroutineStack())
 		}
 		time.Sleep(time.Second * 1)
 	}()
@@ -27,10 +27,10 @@ func runItem(index int) {
 		if schedule != nil {
 			changed := dao.CasScheduleStatus(schedule.DoubanId, schedule.Type, consts.ScheduleStatusCrawling, consts.ScheduleStatusToCrawl)
 			if changed {
-				log.Println("item", index, "start", t.Name, strconv.FormatUint(schedule.DoubanId, 10))
+				log.Info("item", index, "start", t.Name, strconv.FormatUint(schedule.DoubanId, 10))
 				processItem(t.Code, schedule.DoubanId)
 				dao.CasScheduleStatus(schedule.DoubanId, schedule.Type, consts.ScheduleStatusCrawled, consts.ScheduleStatusCrawling)
-				log.Println("item", index, "end", t.Name, strconv.FormatUint(schedule.DoubanId, 10))
+				log.Info("item", index, "end", t.Name, strconv.FormatUint(schedule.DoubanId, 10))
 			}
 			break
 		}
@@ -40,7 +40,7 @@ func runItem(index int) {
 
 func init() {
 	if !viper.GetBool("agent.enable") {
-		log.Println("item agent disabled")
+		log.Info("item agent disabled")
 		return
 	}
 	concurrency := viper.GetInt("agent.item.concurrency")
@@ -53,5 +53,5 @@ func init() {
 		}()
 	}
 
-	log.Println(concurrency, "item agent(s) enabled")
+	log.Info(concurrency, "item agent(s) enabled")
 }

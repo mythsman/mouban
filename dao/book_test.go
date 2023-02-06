@@ -32,10 +32,10 @@ func TestUpsertBook(t *testing.T) {
 
 func TestGetBookDetail(t *testing.T) {
 	detail := GetBookDetail(11)
-	fmt.Println(util.ToJson(detail))
+	t.Logf(util.ToJson(detail))
 }
 
 func TestListBookBrief(t *testing.T) {
 	briefs := ListBookBrief(&[]uint64{11, 11})
-	fmt.Println(util.ToJson(briefs))
+	log.Info(util.ToJson(briefs))
 }

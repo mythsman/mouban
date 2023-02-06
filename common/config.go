@@ -2,8 +2,9 @@ package common
 
 import (
 	"github.com/spf13/viper"
-	"log"
+	"mouban/log"
 	"os"
+	"path/filepath"
 	"strings"
 )
 
@@ -12,9 +13,10 @@ func initFromYaml() {
 	viper.SetConfigName("application")
 	viper.SetConfigType("yml")
 	viper.AddConfigPath(workDir)
+	viper.AddConfigPath(filepath.Join(workDir, "../"))
 	err := viper.ReadInConfig()
 	if err != nil {
-		log.Println("viper init error")
+		log.Info("viper init error")
 		panic(err)
 	}
 }
@@ -32,5 +34,5 @@ func initFromEnv() {
 func init() {
 	initFromYaml()
 	initFromEnv()
-	log.Println("config init success")
+	log.Info("config init success")
 }
