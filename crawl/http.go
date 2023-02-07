@@ -50,18 +50,6 @@ func init() {
 }
 
 func initClient(dbcl2 string, proxy *url.URL) *retryablehttp.Client {
-	jar, _ := cookiejar.New(nil)
-	var cookies []*http.Cookie
-	cookie := &http.Cookie{
-		Name:   "dbcl2",
-		Value:  dbcl2,
-		Path:   "/",
-		Domain: ".douban.com",
-	}
-	cookies = append(cookies, cookie)
-	u, _ := url.Parse("https://douban.com")
-	jar.SetCookies(u, cookies)
-
 	var retryClient = retryablehttp.NewClient()
 	retryClient.RetryMax = viper.GetInt("http.retry_max")
 	retryClient.Logger = nil
@@ -74,8 +62,9 @@ func initClient(dbcl2 string, proxy *url.URL) *retryablehttp.Client {
 		}
 		return shouldRetry, e
 	}
+
 	retryClient.HTTPClient = &http.Client{
-		Jar: jar,
+		Jar: initCookieJar(dbcl2),
 		CheckRedirect: func(req *http.Request, via []*http.Request) error {
 			if len(via) >= 5 {
 				logrus.Infoln("too many redirects found for", req.URL.String())
@@ -102,7 +91,29 @@ func initClient(dbcl2 string, proxy *url.URL) *retryablehttp.Client {
 				},
 			},
 		}}
+
+	go func() {
+		for range time.NewTicker(time.Hour * 1).C {
+			retryClient.HTTPClient.Jar = initCookieJar(dbcl2)
+			logrus.Infoln("client cookie jar refreshed")
+		}
+	}()
 	return retryClient
+}
+
+func initCookieJar(dbcl2 string) http.CookieJar {
+	jar, _ := cookiejar.New(nil)
+	var cookies []*http.Cookie
+	cookie := &http.Cookie{
+		Name:   "dbcl2",
+		Value:  dbcl2,
+		Path:   "/",
+		Domain: ".douban.com",
+	}
+	cookies = append(cookies, cookie)
+	u, _ := url.Parse("https://douban.com")
+	jar.SetCookies(u, cookies)
+	return jar
 }
 
 func Get(url string, limiter *rate.Limiter) (*string, int, error) {
