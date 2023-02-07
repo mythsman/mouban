@@ -1,6 +1,9 @@
 package log
 
-import "github.com/sirupsen/logrus"
+import (
+	"github.com/sirupsen/logrus"
+	"os"
+)
 
 var logger *logrus.Logger
 
@@ -18,7 +21,10 @@ func Instance() *logrus.Logger {
 
 func init() {
 	logger = logrus.New()
+	logger.Out = os.Stdout
+	logger.SetLevel(logrus.InfoLevel)
 	logger.SetFormatter(&logrus.TextFormatter{
-		DisableQuote: true,
+		DisableQuote:    true,
+		TimestampFormat: "2006-01-02 15:04:05",
 	})
 }
