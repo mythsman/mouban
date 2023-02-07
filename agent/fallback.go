@@ -11,7 +11,7 @@ import (
 func runFallback() {
 	defer func() {
 		if r := recover(); r != nil {
-			logrus.Infoln(r, "fallback agent crashed  => ", util.GetCurrentGoroutineStack())
+			logrus.Errorln(r, "fallback agent crashed  => ", util.GetCurrentGoroutineStack())
 		}
 		time.Sleep(time.Hour * 1)
 	}()

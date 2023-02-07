@@ -13,7 +13,7 @@ import (
 func runUser() {
 	defer func() {
 		if r := recover(); r != nil {
-			logrus.Infoln(r, "user agent crashed  => ", util.GetCurrentGoroutineStack())
+			logrus.Errorln(r, "user agent crashed  => ", util.GetCurrentGoroutineStack())
 		}
 		time.Sleep(time.Second * 1)
 	}()

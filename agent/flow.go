@@ -12,7 +12,7 @@ import (
 func runFlow() {
 	defer func() {
 		if r := recover(); r != nil {
-			logrus.Infoln(r, "flow agent crashed  => ", util.GetCurrentGoroutineStack())
+			logrus.Errorln(r, "flow agent crashed  => ", util.GetCurrentGoroutineStack())
 		}
 		time.Sleep(time.Second * 1)
 	}()

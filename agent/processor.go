@@ -30,7 +30,7 @@ func processItem(t uint8, doubanId uint64) {
 func processBook(doubanId uint64) {
 	defer func() {
 		if r := recover(); r != nil {
-			logrus.Infoln(r, " => ", util.GetCurrentGoroutineStack())
+			logrus.Errorln(r, " => ", util.GetCurrentGoroutineStack())
 		}
 	}()
 	book, rating, newUser, newItems, err := crawl.Book(doubanId)
@@ -51,7 +51,7 @@ func processBook(doubanId uint64) {
 func processMovie(doubanId uint64) {
 	defer func() {
 		if r := recover(); r != nil {
-			logrus.Infoln(r, " => ", util.GetCurrentGoroutineStack())
+			logrus.Errorln(r, " => ", util.GetCurrentGoroutineStack())
 		}
 	}()
 	movie, rating, newUser, newItems, err := crawl.Movie(doubanId)
@@ -72,7 +72,7 @@ func processMovie(doubanId uint64) {
 func processGame(doubanId uint64) {
 	defer func() {
 		if r := recover(); r != nil {
-			logrus.Infoln(r, " => ", util.GetCurrentGoroutineStack())
+			logrus.Errorln(r, " => ", util.GetCurrentGoroutineStack())
 		}
 	}()
 
@@ -94,7 +94,7 @@ func processGame(doubanId uint64) {
 func processSong(doubanId uint64) {
 	defer func() {
 		if r := recover(); r != nil {
-			logrus.Infoln(r, " => ", util.GetCurrentGoroutineStack())
+			logrus.Errorln(r, " => ", util.GetCurrentGoroutineStack())
 		}
 	}()
 
@@ -124,7 +124,7 @@ func processDiscoverUser(newUsers *[]string) {
 	go func() {
 		defer func() {
 			if r := recover(); r != nil {
-				logrus.Infoln(r, " => ", util.GetCurrentGoroutineStack())
+				logrus.Errorln(r, " => ", util.GetCurrentGoroutineStack())
 			}
 		}()
 		totalFound := len(*newUsers)
@@ -162,7 +162,7 @@ func processDiscoverItem(newItems *[]uint64, t consts.Type) {
 	go func() {
 		defer func() {
 			if r := recover(); r != nil {
-				logrus.Infoln(r, " => ", util.GetCurrentGoroutineStack())
+				logrus.Errorln(r, " => ", util.GetCurrentGoroutineStack())
 			}
 		}()
 		totalFound := len(*newItems)
@@ -181,7 +181,7 @@ func processDiscoverItem(newItems *[]uint64, t consts.Type) {
 func processUser(doubanUid uint64, forceUpdate bool) {
 	defer func() {
 		if r := recover(); r != nil {
-			logrus.Infoln(r, " => ", util.GetCurrentGoroutineStack())
+			logrus.Errorln(r, " => ", util.GetCurrentGoroutineStack())
 		}
 	}()
 
