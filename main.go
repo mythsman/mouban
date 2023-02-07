@@ -60,7 +60,7 @@ func handle(ctx *gin.Context) {
 				"success": false,
 				"msg":     "服务内部错误，请联系开发者处理",
 			})
-			logrus.Infoln(r, " => ", util.GetCurrentGoroutineStack())
+			logrus.Errorln(r, " => ", util.GetCurrentGoroutineStack())
 		}
 	}()
 	ctx.Next()
