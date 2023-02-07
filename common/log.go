@@ -48,7 +48,7 @@ func (h *InfluxHooker) Fire(e *logrus.Entry) error {
 	}
 
 	// Create point using fluent style
-	p := influxdb2.NewPointWithMeasurement("mouban").
+	p := influxdb2.NewPointWithMeasurement("log").
 		AddTag("level", e.Level.String()).
 		AddField("msg", e.Message).
 		SetTime(time.Now())
