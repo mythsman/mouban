@@ -19,8 +19,9 @@ func main() {
 
 	router := gin.Default()
 
-	router.Use(Recover)
-	router.Use(Cors)
+	router.Use(handle)
+	router.Use(cors)
+	router.Use(logger)
 
 	router.GET("/", func(ctx *gin.Context) {
 		ctx.String(http.StatusOK, "")
@@ -51,7 +52,7 @@ func main() {
 	panic(router.Run(":" + viper.GetString("server.port")))
 }
 
-func Recover(ctx *gin.Context) {
+func handle(ctx *gin.Context) {
 	defer func() {
 		if r := recover(); r != nil {
 			ctx.JSON(http.StatusInternalServerError, gin.H{
@@ -64,7 +65,7 @@ func Recover(ctx *gin.Context) {
 	ctx.Next()
 }
 
-func Cors(c *gin.Context) {
+func cors(c *gin.Context) {
 	cors := viper.GetString("server.cors")
 	method := c.Request.Method
 	origin := c.Request.Header.Get("Origin")
@@ -78,4 +79,31 @@ func Cors(c *gin.Context) {
 	}
 
 	c.Next()
+}
+
+func logger(c *gin.Context) {
+
+	// 开始时间
+	startTime := time.Now()
+
+	// 处理请求
+	c.Next()
+
+	// 结束时间
+	endTime := time.Now()
+
+	// 执行时间
+	latencyTime := endTime.Sub(startTime)
+
+	// 请求路由
+	reqUri := c.Request.RequestURI
+
+	// 状态码
+	statusCode := c.Writer.Status()
+
+	// 请求IP
+	clientIP := c.ClientIP()
+
+	// 日志格式
+	log.Info("uri", reqUri, "status_code", statusCode, "cost", latencyTime, "client_ip", clientIP)
 }
