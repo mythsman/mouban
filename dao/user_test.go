@@ -24,5 +24,5 @@ func TestUpsertUser(t *testing.T) {
 
 func TestGetUser(t *testing.T) {
 	user := GetUser(1323)
-	logrus.Info(util.ToJson(user))
+	logrus.Infoln(util.ToJson(user))
 }

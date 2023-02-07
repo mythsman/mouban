@@ -46,7 +46,7 @@ func init() {
 			clients = append(clients, client)
 		}
 	}
-	logrus.Info(len(clients), "user auth initialized")
+	logrus.Infoln(len(clients), "user auth initialized")
 }
 
 func initClient(dbcl2 string, proxy *url.URL) *retryablehttp.Client {
@@ -78,7 +78,7 @@ func initClient(dbcl2 string, proxy *url.URL) *retryablehttp.Client {
 		Jar: jar,
 		CheckRedirect: func(req *http.Request, via []*http.Request) error {
 			if len(via) >= 5 {
-				logrus.Info("too many redirects found for", req.URL.String())
+				logrus.Infoln("too many redirects found for", req.URL.String())
 				return errors.New("too many redirects for " + req.URL.String())
 			}
 			if len(via) > 0 && req.Header.Get("cookie") == "" {
@@ -123,7 +123,7 @@ func Get(url string, limiter *rate.Limiter) (*string, int, error) {
 		return nil, 0, err
 	}
 
-	logrus.Info("code is", strconv.Itoa(resp.StatusCode), "at", 1+clientIdx, "for", url)
+	logrus.Infoln("code is", strconv.Itoa(resp.StatusCode), "at", 1+clientIdx, "for", url)
 
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)

@@ -26,10 +26,10 @@ func TestUpsertRating(t *testing.T) {
 
 func TestGetRating(t *testing.T) {
 	rating := GetRating(123, consts.TypeMovie.Code)
-	logrus.Info(util.ToJson(rating))
+	logrus.Infoln(util.ToJson(rating))
 }
 
 func TestListRating(t *testing.T) {
 	ratings := ListRating(&[]uint64{123, 123}, consts.TypeMovie.Code)
-	logrus.Info(util.ToJson(ratings))
+	logrus.Infoln(util.ToJson(ratings))
 }

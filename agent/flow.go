@@ -12,7 +12,7 @@ import (
 func runFlow() {
 	defer func() {
 		if r := recover(); r != nil {
-			logrus.Info(r, "flow agent crashed  => ", util.GetCurrentGoroutineStack())
+			logrus.Infoln(r, "flow agent crashed  => ", util.GetCurrentGoroutineStack())
 		}
 		time.Sleep(time.Second * 1)
 	}()
@@ -23,14 +23,14 @@ func runFlow() {
 		if retryBook != nil {
 			changed := dao.CasScheduleStatus(retryBook.DoubanId, retryBook.Type, consts.ScheduleStatusToCrawl, consts.ScheduleStatusCrawled)
 			if changed {
-				logrus.Info("flow retry book ", retryBook.DoubanId)
+				logrus.Infoln("flow retry book ", retryBook.DoubanId)
 			}
 		} else {
 			discoverBook := dao.SearchScheduleByStatus(consts.TypeBook.Code, consts.ScheduleStatusCanCrawl)
 			if discoverBook != nil {
 				changed := dao.CasScheduleStatus(discoverBook.DoubanId, discoverBook.Type, consts.ScheduleStatusToCrawl, consts.ScheduleStatusCanCrawl)
 				if changed {
-					logrus.Info("flow discover book", discoverBook.DoubanId)
+					logrus.Infoln("flow discover book", discoverBook.DoubanId)
 				}
 			}
 		}
@@ -42,14 +42,14 @@ func runFlow() {
 		if retryMovie != nil {
 			changed := dao.CasScheduleStatus(retryMovie.DoubanId, retryMovie.Type, consts.ScheduleStatusToCrawl, consts.ScheduleStatusCrawled)
 			if changed {
-				logrus.Info("flow retry movie ", retryMovie.DoubanId)
+				logrus.Infoln("flow retry movie ", retryMovie.DoubanId)
 			}
 		} else {
 			discoverMovie := dao.SearchScheduleByStatus(consts.TypeMovie.Code, consts.ScheduleStatusCanCrawl)
 			if discoverMovie != nil {
 				changed := dao.CasScheduleStatus(discoverMovie.DoubanId, discoverMovie.Type, consts.ScheduleStatusToCrawl, consts.ScheduleStatusCanCrawl)
 				if changed {
-					logrus.Info("flow discover movie", discoverMovie.DoubanId)
+					logrus.Infoln("flow discover movie", discoverMovie.DoubanId)
 				}
 			}
 		}
@@ -61,14 +61,14 @@ func runFlow() {
 		if retryGame != nil {
 			changed := dao.CasScheduleStatus(retryGame.DoubanId, retryGame.Type, consts.ScheduleStatusToCrawl, consts.ScheduleStatusCrawled)
 			if changed {
-				logrus.Info("flow retry game ", retryGame.DoubanId)
+				logrus.Infoln("flow retry game ", retryGame.DoubanId)
 			}
 		} else {
 			discoverGame := dao.SearchScheduleByStatus(consts.TypeGame.Code, consts.ScheduleStatusCanCrawl)
 			if discoverGame != nil {
 				changed := dao.CasScheduleStatus(discoverGame.DoubanId, discoverGame.Type, consts.ScheduleStatusToCrawl, consts.ScheduleStatusCanCrawl)
 				if changed {
-					logrus.Info("flow discover game", discoverGame.DoubanId)
+					logrus.Infoln("flow discover game", discoverGame.DoubanId)
 				}
 			}
 		}
@@ -80,14 +80,14 @@ func runFlow() {
 		if retrySong != nil {
 			changed := dao.CasScheduleStatus(retrySong.DoubanId, retrySong.Type, consts.ScheduleStatusToCrawl, consts.ScheduleStatusCrawled)
 			if changed {
-				logrus.Info("flow retry song ", retrySong.DoubanId)
+				logrus.Infoln("flow retry song ", retrySong.DoubanId)
 			}
 		} else {
 			discoverSong := dao.SearchScheduleByStatus(consts.TypeSong.Code, consts.ScheduleStatusCanCrawl)
 			if discoverSong != nil {
 				changed := dao.CasScheduleStatus(discoverSong.DoubanId, discoverSong.Type, consts.ScheduleStatusToCrawl, consts.ScheduleStatusCanCrawl)
 				if changed {
-					logrus.Info("flow discover song", discoverSong.DoubanId)
+					logrus.Infoln("flow discover song", discoverSong.DoubanId)
 				}
 			}
 		}
@@ -99,7 +99,7 @@ func runFlow() {
 		if retryUser != nil {
 			changed := dao.CasScheduleStatus(retryUser.DoubanId, retryUser.Type, consts.ScheduleStatusToCrawl, consts.ScheduleStatusCrawled)
 			if changed {
-				logrus.Info("flow retry user ", retryUser.DoubanId)
+				logrus.Infoln("flow retry user ", retryUser.DoubanId)
 			}
 		} else {
 			if viper.GetBool("agent.flow.discover") {
@@ -107,7 +107,7 @@ func runFlow() {
 				if discoverUser != nil {
 					changed := dao.CasScheduleStatus(discoverUser.DoubanId, consts.TypeUser.Code, consts.ScheduleStatusToCrawl, consts.ScheduleStatusCanCrawl)
 					if changed {
-						logrus.Info("flow discover user", discoverUser.DoubanId)
+						logrus.Infoln("flow discover user", discoverUser.DoubanId)
 					}
 				}
 			}
@@ -117,7 +117,7 @@ func runFlow() {
 }
 func init() {
 	if !viper.GetBool("agent.enable") {
-		logrus.Info("flow agent disabled")
+		logrus.Infoln("flow agent disabled")
 		return
 	}
 	go func() {
@@ -126,5 +126,5 @@ func init() {
 		}
 	}()
 
-	logrus.Info("flow agent enabled")
+	logrus.Infoln("flow agent enabled")
 }

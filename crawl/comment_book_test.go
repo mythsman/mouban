@@ -12,10 +12,10 @@ func Test_scrollBook(t *testing.T) {
 	if err != nil {
 		return
 	}
-	logrus.Info(util.ToJson(*comments))
-	logrus.Info(util.ToJson(*books))
-	logrus.Info(total)
-	logrus.Info(next)
+	logrus.Infoln(util.ToJson(*comments))
+	logrus.Infoln(util.ToJson(*books))
+	logrus.Infoln(total)
+	logrus.Infoln(next)
 }
 
 func Test_CommentBook(t *testing.T) {
@@ -23,8 +23,8 @@ func Test_CommentBook(t *testing.T) {
 	if err != nil {
 		return
 	}
-	logrus.Info(util.ToJson(*user))
-	logrus.Info(util.ToJson(*comments))
-	logrus.Info(util.ToJson(*books))
+	logrus.Infoln(util.ToJson(*user))
+	logrus.Infoln(util.ToJson(*comments))
+	logrus.Infoln(util.ToJson(*books))
 
 }

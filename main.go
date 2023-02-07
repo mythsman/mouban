@@ -6,6 +6,7 @@ import (
 	"github.com/spf13/viper"
 	"math/rand"
 	_ "mouban/agent"
+	_ "mouban/common"
 	"mouban/consts"
 	"mouban/controller"
 	"mouban/util"
@@ -59,7 +60,7 @@ func handle(ctx *gin.Context) {
 				"success": false,
 				"msg":     "服务内部错误，请联系开发者处理",
 			})
-			logrus.Info(r, " => ", util.GetCurrentGoroutineStack())
+			logrus.Infoln(r, " => ", util.GetCurrentGoroutineStack())
 		}
 	}()
 	ctx.Next()
@@ -105,5 +106,5 @@ func logger(c *gin.Context) {
 	clientIP := c.ClientIP()
 
 	// 日志格式
-	logrus.Info("uri", reqUri, "status_code", statusCode, "cost", latencyTime, "client_ip", clientIP)
+	logrus.Infoln("uri", reqUri, "status_code", statusCode, "cost", latencyTime, "client_ip", clientIP)
 }

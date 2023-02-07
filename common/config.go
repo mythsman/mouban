@@ -16,7 +16,7 @@ func initFromYaml() {
 	viper.AddConfigPath(filepath.Join(workDir, "../"))
 	err := viper.ReadInConfig()
 	if err != nil {
-		logrus.Info("viper init error")
+		logrus.Infoln("viper init error")
 		panic(err)
 	}
 }
