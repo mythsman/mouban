@@ -20,6 +20,11 @@ datasource:
   password: 123456
   charset: utf8mb4
   loc: Asia/Shanghai
+influxdb:
+  url: http://localhost:8086
+  token: 11111
+  org: home
+  bucket: log
 http:
   timeout: 10000
   retry_max: 20

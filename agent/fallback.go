@@ -1,9 +1,9 @@
 package agent
 
 import (
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"mouban/dao"
-	"mouban/log"
 	"mouban/util"
 	"time"
 )
@@ -11,17 +11,17 @@ import (
 func runFallback() {
 	defer func() {
 		if r := recover(); r != nil {
-			log.Info(r, "fallback agent crashed  => ", util.GetCurrentGoroutineStack())
+			logrus.Info(r, "fallback agent crashed  => ", util.GetCurrentGoroutineStack())
 		}
 		time.Sleep(time.Hour * 1)
 	}()
 	cnt := dao.CasOrphanSchedule(time.Hour * 6)
-	log.Info(cnt, "orphan schedule reset")
+	logrus.Info(cnt, "orphan schedule reset")
 }
 
 func init() {
 	if !viper.GetBool("agent.enable") {
-		log.Info("fallback agent disabled")
+		logrus.Info("fallback agent disabled")
 		return
 	}
 
@@ -31,5 +31,5 @@ func init() {
 		}
 	}()
 
-	log.Info("fallback agent enabled")
+	logrus.Info("fallback agent enabled")
 }

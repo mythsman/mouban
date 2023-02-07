@@ -2,12 +2,12 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"math/rand"
 	_ "mouban/agent"
 	"mouban/consts"
 	"mouban/controller"
-	"mouban/log"
 	"mouban/util"
 	"net/http"
 	"strings"
@@ -59,7 +59,7 @@ func handle(ctx *gin.Context) {
 				"success": false,
 				"msg":     "服务内部错误，请联系开发者处理",
 			})
-			log.Info(r, " => ", util.GetCurrentGoroutineStack())
+			logrus.Info(r, " => ", util.GetCurrentGoroutineStack())
 		}
 	}()
 	ctx.Next()
@@ -105,5 +105,5 @@ func logger(c *gin.Context) {
 	clientIP := c.ClientIP()
 
 	// 日志格式
-	log.Info("uri", reqUri, "status_code", statusCode, "cost", latencyTime, "client_ip", clientIP)
+	logrus.Info("uri", reqUri, "status_code", statusCode, "cost", latencyTime, "client_ip", clientIP)
 }

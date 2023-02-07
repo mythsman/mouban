@@ -1,7 +1,7 @@
 package dao
 
 import (
-	"fmt"
+	"github.com/sirupsen/logrus"
 	"mouban/model"
 	"mouban/util"
 	"testing"
@@ -37,5 +37,5 @@ func TestGetBookDetail(t *testing.T) {
 
 func TestListBookBrief(t *testing.T) {
 	briefs := ListBookBrief(&[]uint64{11, 11})
-	log.Info(util.ToJson(briefs))
+	logrus.Info(util.ToJson(briefs))
 }

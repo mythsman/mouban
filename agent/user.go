@@ -1,10 +1,10 @@
 package agent
 
 import (
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"mouban/consts"
 	"mouban/dao"
-	"mouban/log"
 	"mouban/util"
 	"strconv"
 	"time"
@@ -13,7 +13,7 @@ import (
 func runUser() {
 	defer func() {
 		if r := recover(); r != nil {
-			log.Info(r, "user agent crashed  => ", util.GetCurrentGoroutineStack())
+			logrus.Info(r, "user agent crashed  => ", util.GetCurrentGoroutineStack())
 		}
 		time.Sleep(time.Second * 1)
 	}()
@@ -24,17 +24,17 @@ func runUser() {
 	if schedule != nil {
 		changed := dao.CasScheduleStatus(schedule.DoubanId, schedule.Type, consts.ScheduleStatusCrawling, consts.ScheduleStatusToCrawl)
 		if changed {
-			log.Info("start process user" + strconv.FormatUint(schedule.DoubanId, 10))
+			logrus.Info("start process user" + strconv.FormatUint(schedule.DoubanId, 10))
 			processUser(schedule.DoubanId, schedule.Result == consts.ScheduleResultUnready)
 			dao.CasScheduleStatus(schedule.DoubanId, schedule.Type, consts.ScheduleStatusCrawled, consts.ScheduleStatusCrawling)
-			log.Info("end process user" + strconv.FormatUint(schedule.DoubanId, 10))
+			logrus.Info("end process user" + strconv.FormatUint(schedule.DoubanId, 10))
 		}
 	}
 }
 
 func init() {
 	if !viper.GetBool("agent.enable") {
-		log.Info("user agent disabled")
+		logrus.Info("user agent disabled")
 		return
 	}
 
@@ -44,5 +44,5 @@ func init() {
 		}
 	}()
 
-	log.Info("user agent enabled")
+	logrus.Info("user agent enabled")
 }

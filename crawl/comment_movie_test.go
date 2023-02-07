@@ -1,8 +1,8 @@
 package crawl
 
 import (
+	"github.com/sirupsen/logrus"
 	"mouban/consts"
-	"mouban/log"
 	"mouban/util"
 	"testing"
 )
@@ -12,9 +12,9 @@ func Test_scrollMovie(t *testing.T) {
 	if err != nil {
 		return
 	}
-	log.Info(util.ToJson(*comments))
-	log.Info(util.ToJson(*movies))
+	logrus.Info(util.ToJson(*comments))
+	logrus.Info(util.ToJson(*movies))
 
-	log.Info(total)
-	log.Info(next)
+	logrus.Info(total)
+	logrus.Info(next)
 }
