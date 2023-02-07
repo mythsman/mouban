@@ -1,8 +1,8 @@
 package common
 
 import (
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
-	"mouban/log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -16,7 +16,7 @@ func initFromYaml() {
 	viper.AddConfigPath(filepath.Join(workDir, "../"))
 	err := viper.ReadInConfig()
 	if err != nil {
-		log.Info("viper init error")
+		logrus.Info("viper init error")
 		panic(err)
 	}
 }
@@ -31,8 +31,7 @@ func initFromEnv() {
 	}
 }
 
-func init() {
+func InitConfig() {
 	initFromYaml()
 	initFromEnv()
-	log.Info("config init success")
 }

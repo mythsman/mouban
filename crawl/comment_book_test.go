@@ -1,8 +1,8 @@
 package crawl
 
 import (
+	"github.com/sirupsen/logrus"
 	"mouban/consts"
-	"mouban/log"
 	"mouban/util"
 	"testing"
 )
@@ -12,10 +12,10 @@ func Test_scrollBook(t *testing.T) {
 	if err != nil {
 		return
 	}
-	log.Info(util.ToJson(*comments))
-	log.Info(util.ToJson(*books))
-	log.Info(total)
-	log.Info(next)
+	logrus.Info(util.ToJson(*comments))
+	logrus.Info(util.ToJson(*books))
+	logrus.Info(total)
+	logrus.Info(next)
 }
 
 func Test_CommentBook(t *testing.T) {
@@ -23,8 +23,8 @@ func Test_CommentBook(t *testing.T) {
 	if err != nil {
 		return
 	}
-	log.Info(util.ToJson(*user))
-	log.Info(util.ToJson(*comments))
-	log.Info(util.ToJson(*books))
+	logrus.Info(util.ToJson(*user))
+	logrus.Info(util.ToJson(*comments))
+	logrus.Info(util.ToJson(*books))
 
 }

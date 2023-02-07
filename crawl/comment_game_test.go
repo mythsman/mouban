@@ -1,8 +1,8 @@
 package crawl
 
 import (
+	"github.com/sirupsen/logrus"
 	"mouban/consts"
-	"mouban/log"
 	"mouban/util"
 	"testing"
 )
@@ -12,8 +12,8 @@ func Test_scrollGame(t *testing.T) {
 	if err != nil {
 		return
 	}
-	log.Info(util.ToJson(*comments))
-	log.Info(util.ToJson(*games))
-	log.Info(total)
-	log.Info(next)
+	logrus.Info(util.ToJson(*comments))
+	logrus.Info(util.ToJson(*games))
+	logrus.Info(total)
+	logrus.Info(next)
 }

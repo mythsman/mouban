@@ -4,11 +4,11 @@ import (
 	"database/sql"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
-	"mouban/log"
 	"mouban/model"
 	"net/url"
 	"time"
@@ -16,7 +16,7 @@ import (
 
 var Db *gorm.DB
 
-func init() {
+func InitDatabase() {
 	host := viper.GetString("datasource.host")
 	port := viper.GetString("datasource.port")
 	database := viper.GetString("datasource.database")
@@ -40,7 +40,7 @@ func tryCreateDB(username string, password string, host string, port string, dat
 	defer func(db *sql.DB) {
 		err := db.Close()
 		if err != nil {
-			log.Info("database close failed")
+			logrus.Info("database close failed")
 		}
 	}(db)
 
@@ -62,7 +62,7 @@ func getConnection(username string, password string, host string, port string, d
 		url.QueryEscape(loc))
 
 	dbLogger := logger.New(
-		log.Instance(),
+		logrus.StandardLogger(),
 		logger.Config{
 			SlowThreshold:             500 * time.Second,
 			LogLevel:                  logger.Warn,
@@ -76,11 +76,11 @@ func getConnection(username string, password string, host string, port string, d
 	})
 
 	if err != nil {
-		log.Info("Open database failed", err)
+		logrus.Info("Open database failed", err)
 		panic("Open database failed " + err.Error())
 	}
 	Db = db
-	log.Info("db connect success")
+	logrus.Info("mysql connect success")
 }
 
 func migrateTables() {

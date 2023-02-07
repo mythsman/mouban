@@ -4,10 +4,10 @@ import (
 	"bufio"
 	"context"
 	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 	"golang.org/x/sync/semaphore"
 	"mouban/consts"
 	"mouban/dao"
-	"mouban/log"
 	"mouban/util"
 	"net/http"
 	"os"
@@ -16,7 +16,7 @@ import (
 func LoadData(ctx *gin.Context) {
 	path := ctx.Query("path")
 
-	log.Info("start loading ", path)
+	logrus.Info("start loading ", path)
 
 	ctx.JSON(http.StatusOK, gin.H{
 		"success": true,
@@ -29,7 +29,7 @@ func loadFile(path string) {
 	f, err := os.Open(path)
 
 	if err != nil {
-		log.Fatal(err)
+		logrus.Fatal(err)
 		return
 	}
 
@@ -40,7 +40,7 @@ func loadFile(path string) {
 	for scanner.Scan() {
 		err := sem.Acquire(context.Background(), 1)
 		if err != nil {
-			log.Info("acquire semaphore failed", err)
+			logrus.Info("acquire semaphore failed", err)
 			return
 		}
 		go func() {
@@ -52,7 +52,7 @@ func loadFile(path string) {
 	}
 
 	if err := scanner.Err(); err != nil {
-		log.Fatal(err)
+		logrus.Fatal(err)
 	}
 }
 
@@ -65,11 +65,11 @@ func processLine(line string) {
 	if schedule == nil {
 		added := dao.CreateScheduleNx(doubanId, t.Code, consts.ScheduleStatusCanCrawl, consts.ScheduleResultUnready)
 		if added {
-			log.Info("new", t.Name, "added :", doubanId)
+			logrus.Info("new", t.Name, "added :", doubanId)
 		} else {
-			log.Info("new", t.Name, "duplicated :", doubanId)
+			logrus.Info("new", t.Name, "duplicated :", doubanId)
 		}
 	} else {
-		log.Info("old", t.Name, "ignored :", doubanId)
+		logrus.Info("old", t.Name, "ignored :", doubanId)
 	}
 }

@@ -1,8 +1,8 @@
 package dao
 
 import (
+	"github.com/sirupsen/logrus"
 	"mouban/consts"
-	"mouban/log"
 	"mouban/model"
 	"mouban/util"
 	"testing"
@@ -26,10 +26,10 @@ func TestUpsertRating(t *testing.T) {
 
 func TestGetRating(t *testing.T) {
 	rating := GetRating(123, consts.TypeMovie.Code)
-	log.Info(util.ToJson(rating))
+	logrus.Info(util.ToJson(rating))
 }
 
 func TestListRating(t *testing.T) {
 	ratings := ListRating(&[]uint64{123, 123}, consts.TypeMovie.Code)
-	log.Info(util.ToJson(ratings))
+	logrus.Info(util.ToJson(ratings))
 }

@@ -1,7 +1,7 @@
 package dao
 
 import (
-	"fmt"
+	"github.com/sirupsen/logrus"
 	"mouban/consts"
 	"mouban/util"
 	"testing"
@@ -13,17 +13,17 @@ func TestUpsertSchedule(t *testing.T) {
 
 func TestCasOrphanSchedule(t *testing.T) {
 	cnt := CasOrphanSchedule(0)
-	log.Info(cnt)
+	logrus.Info(cnt)
 }
 
 func TestGetSchedule(t *testing.T) {
 	schedule := GetSchedule(1234, consts.TypeMovie.Code)
-	log.Info(util.ToJson(schedule))
+	logrus.Info(util.ToJson(schedule))
 }
 
 func TestSearchSchedule(t *testing.T) {
 	schedule := SearchScheduleByStatus(consts.TypeBook.Code, consts.ScheduleStatusToCrawl)
-	log.Info(util.ToJson(schedule))
+	logrus.Info(util.ToJson(schedule))
 }
 
 func TestChangeScheduleResult(t *testing.T) {

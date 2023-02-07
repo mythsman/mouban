@@ -1,7 +1,7 @@
 package dao
 
 import (
-	"mouban/log"
+	"github.com/sirupsen/logrus"
 	"mouban/model"
 	"mouban/util"
 	"testing"
@@ -24,5 +24,5 @@ func TestUpsertUser(t *testing.T) {
 
 func TestGetUser(t *testing.T) {
 	user := GetUser(1323)
-	log.Info(util.ToJson(user))
+	logrus.Info(util.ToJson(user))
 }

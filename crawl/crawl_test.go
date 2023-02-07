@@ -1,7 +1,7 @@
 package crawl
 
 import (
-	"mouban/log"
+	"github.com/sirupsen/logrus"
 	"mouban/util"
 	"testing"
 )
@@ -11,10 +11,10 @@ func TestMovie(t *testing.T) {
 	if err != nil {
 		return
 	}
-	log.Info(util.ToJson(movie))
-	log.Info(util.ToJson(rating))
-	log.Info(util.ToJson(newUsers))
-	log.Info(util.ToJson(newItems))
+	logrus.Info(util.ToJson(movie))
+	logrus.Info(util.ToJson(rating))
+	logrus.Info(util.ToJson(newUsers))
+	logrus.Info(util.ToJson(newItems))
 
 }
 
@@ -23,10 +23,10 @@ func TestGame(t *testing.T) {
 	if err != nil {
 		return
 	}
-	log.Info(util.ToJson(game))
-	log.Info(util.ToJson(rating))
-	log.Info(util.ToJson(newUsers))
-	log.Info(util.ToJson(newItems))
+	logrus.Info(util.ToJson(game))
+	logrus.Info(util.ToJson(rating))
+	logrus.Info(util.ToJson(newUsers))
+	logrus.Info(util.ToJson(newItems))
 }
 
 func TestBook(t *testing.T) {
@@ -34,23 +34,23 @@ func TestBook(t *testing.T) {
 	if err != nil {
 		return
 	}
-	log.Info(util.ToJson(book))
-	log.Info(util.ToJson(rating))
-	log.Info(util.ToJson(newUser))
-	log.Info(util.ToJson(newItems))
+	logrus.Info(util.ToJson(book))
+	logrus.Info(util.ToJson(rating))
+	logrus.Info(util.ToJson(newUser))
+	logrus.Info(util.ToJson(newItems))
 }
 
 func TestSong(t *testing.T) {
 	//1748967 too many redirects
 	song, rating, newUser, newItems, err := Song(1748967)
 	if err != nil {
-		log.Info(err)
+		logrus.Info(err)
 		return
 	}
-	log.Info(util.ToJson(song))
-	log.Info(util.ToJson(rating))
-	log.Info(util.ToJson(newUser))
-	log.Info(util.ToJson(newItems))
+	logrus.Info(util.ToJson(song))
+	logrus.Info(util.ToJson(rating))
+	logrus.Info(util.ToJson(newUser))
+	logrus.Info(util.ToJson(newItems))
 }
 
 func TestUserPublish(t *testing.T) {
@@ -68,10 +68,10 @@ func TestUserOverview(t *testing.T) {
 		return
 
 	}
-	log.Info(util.ToJson(overview))
+	logrus.Info(util.ToJson(overview))
 }
 
 func TestUserId(t *testing.T) {
 	id := UserId("162448367")
-	log.Info("UserId is", id)
+	logrus.Info("UserId is", id)
 }
