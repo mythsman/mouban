@@ -7,9 +7,9 @@ import (
 type Book struct {
 	ID          uint64
 	DoubanId    uint64 `gorm:"not null;uniqueIndex"`
-	Title       string `gorm:"not null;type:varchar(512)"`
-	Subtitle    string `gorm:"type:varchar(512)"`
-	Orititle    string `gorm:"type:varchar(512)"`
+	Title       string `gorm:"not null;type:varchar(1024)"`
+	Subtitle    string `gorm:"type:varchar(1024)"`
+	Orititle    string `gorm:"type:varchar(1024)"`
 	Author      string `gorm:"type:varchar(1024)"`
 	Translator  string `gorm:"type:varchar(512)"`
 	Press       string `gorm:"type:varchar(512)"`
