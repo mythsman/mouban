@@ -13,17 +13,17 @@ func TestUpsertSchedule(t *testing.T) {
 
 func TestCasOrphanSchedule(t *testing.T) {
 	cnt := CasOrphanSchedule(0)
-	logrus.Info(cnt)
+	logrus.Infoln(cnt)
 }
 
 func TestGetSchedule(t *testing.T) {
 	schedule := GetSchedule(1234, consts.TypeMovie.Code)
-	logrus.Info(util.ToJson(schedule))
+	logrus.Infoln(util.ToJson(schedule))
 }
 
 func TestSearchSchedule(t *testing.T) {
 	schedule := SearchScheduleByStatus(consts.TypeBook.Code, consts.ScheduleStatusToCrawl)
-	logrus.Info(util.ToJson(schedule))
+	logrus.Infoln(util.ToJson(schedule))
 }
 
 func TestChangeScheduleResult(t *testing.T) {

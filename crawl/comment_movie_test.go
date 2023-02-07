@@ -12,9 +12,9 @@ func Test_scrollMovie(t *testing.T) {
 	if err != nil {
 		return
 	}
-	logrus.Info(util.ToJson(*comments))
-	logrus.Info(util.ToJson(*movies))
+	logrus.Infoln(util.ToJson(*comments))
+	logrus.Infoln(util.ToJson(*movies))
 
-	logrus.Info(total)
-	logrus.Info(next)
+	logrus.Infoln(total)
+	logrus.Infoln(next)
 }

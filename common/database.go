@@ -40,7 +40,7 @@ func tryCreateDB(username string, password string, host string, port string, dat
 	defer func(db *sql.DB) {
 		err := db.Close()
 		if err != nil {
-			logrus.Info("database close failed")
+			logrus.Infoln("database close failed")
 		}
 	}(db)
 
@@ -76,11 +76,11 @@ func getConnection(username string, password string, host string, port string, d
 	})
 
 	if err != nil {
-		logrus.Info("Open database failed", err)
+		logrus.Infoln("Open database failed", err)
 		panic("Open database failed " + err.Error())
 	}
 	Db = db
-	logrus.Info("mysql connect success")
+	logrus.Infoln("mysql connect success")
 }
 
 func migrateTables() {

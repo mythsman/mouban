@@ -30,7 +30,7 @@ func processItem(t uint8, doubanId uint64) {
 func processBook(doubanId uint64) {
 	defer func() {
 		if r := recover(); r != nil {
-			logrus.Info(r, " => ", util.GetCurrentGoroutineStack())
+			logrus.Infoln(r, " => ", util.GetCurrentGoroutineStack())
 		}
 	}()
 	book, rating, newUser, newItems, err := crawl.Book(doubanId)
@@ -51,7 +51,7 @@ func processBook(doubanId uint64) {
 func processMovie(doubanId uint64) {
 	defer func() {
 		if r := recover(); r != nil {
-			logrus.Info(r, " => ", util.GetCurrentGoroutineStack())
+			logrus.Infoln(r, " => ", util.GetCurrentGoroutineStack())
 		}
 	}()
 	movie, rating, newUser, newItems, err := crawl.Movie(doubanId)
@@ -72,7 +72,7 @@ func processMovie(doubanId uint64) {
 func processGame(doubanId uint64) {
 	defer func() {
 		if r := recover(); r != nil {
-			logrus.Info(r, " => ", util.GetCurrentGoroutineStack())
+			logrus.Infoln(r, " => ", util.GetCurrentGoroutineStack())
 		}
 	}()
 
@@ -94,7 +94,7 @@ func processGame(doubanId uint64) {
 func processSong(doubanId uint64) {
 	defer func() {
 		if r := recover(); r != nil {
-			logrus.Info(r, " => ", util.GetCurrentGoroutineStack())
+			logrus.Infoln(r, " => ", util.GetCurrentGoroutineStack())
 		}
 	}()
 
@@ -124,7 +124,7 @@ func processDiscoverUser(newUsers *[]string) {
 	go func() {
 		defer func() {
 			if r := recover(); r != nil {
-				logrus.Info(r, " => ", util.GetCurrentGoroutineStack())
+				logrus.Infoln(r, " => ", util.GetCurrentGoroutineStack())
 			}
 		}()
 		totalFound := len(*newUsers)
@@ -147,7 +147,7 @@ func processDiscoverUser(newUsers *[]string) {
 				}
 			}
 		}
-		logrus.Info("(", newFound, "/", totalFound, ") users discovered")
+		logrus.Infoln("(", newFound, "/", totalFound, ") users discovered")
 	}()
 }
 
@@ -162,7 +162,7 @@ func processDiscoverItem(newItems *[]uint64, t consts.Type) {
 	go func() {
 		defer func() {
 			if r := recover(); r != nil {
-				logrus.Info(r, " => ", util.GetCurrentGoroutineStack())
+				logrus.Infoln(r, " => ", util.GetCurrentGoroutineStack())
 			}
 		}()
 		totalFound := len(*newItems)
@@ -173,7 +173,7 @@ func processDiscoverItem(newItems *[]uint64, t consts.Type) {
 				newFound += 1
 			}
 		}
-		logrus.Info("(", newFound, "/", totalFound, ")", t.Name, "discovered")
+		logrus.Infoln("(", newFound, "/", totalFound, ")", t.Name, "discovered")
 
 	}()
 }
@@ -181,14 +181,14 @@ func processDiscoverItem(newItems *[]uint64, t consts.Type) {
 func processUser(doubanUid uint64, forceUpdate bool) {
 	defer func() {
 		if r := recover(); r != nil {
-			logrus.Info(r, " => ", util.GetCurrentGoroutineStack())
+			logrus.Infoln(r, " => ", util.GetCurrentGoroutineStack())
 		}
 	}()
 
 	userPublish, _ := crawl.UserPublish(doubanUid)
 	rawUser := dao.GetUser(doubanUid)
 	if !forceUpdate && rawUser != nil && rawUser.PublishAt.Equal(userPublish) {
-		logrus.Info("user", doubanUid, "not changed")
+		logrus.Infoln("user", doubanUid, "not changed")
 		return
 	}
 	//user

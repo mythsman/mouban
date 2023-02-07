@@ -12,8 +12,8 @@ func Test_scrollGame(t *testing.T) {
 	if err != nil {
 		return
 	}
-	logrus.Info(util.ToJson(*comments))
-	logrus.Info(util.ToJson(*games))
-	logrus.Info(total)
-	logrus.Info(next)
+	logrus.Infoln(util.ToJson(*comments))
+	logrus.Infoln(util.ToJson(*games))
+	logrus.Infoln(total)
+	logrus.Infoln(next)
 }

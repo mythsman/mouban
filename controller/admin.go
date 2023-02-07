@@ -16,7 +16,7 @@ import (
 func LoadData(ctx *gin.Context) {
 	path := ctx.Query("path")
 
-	logrus.Info("start loading ", path)
+	logrus.Infoln("start loading ", path)
 
 	ctx.JSON(http.StatusOK, gin.H{
 		"success": true,
@@ -29,7 +29,7 @@ func loadFile(path string) {
 	f, err := os.Open(path)
 
 	if err != nil {
-		logrus.Fatal(err)
+		logrus.Fatalln(err)
 		return
 	}
 
@@ -40,7 +40,7 @@ func loadFile(path string) {
 	for scanner.Scan() {
 		err := sem.Acquire(context.Background(), 1)
 		if err != nil {
-			logrus.Info("acquire semaphore failed", err)
+			logrus.Infoln("acquire semaphore failed", err)
 			return
 		}
 		go func() {
@@ -52,7 +52,7 @@ func loadFile(path string) {
 	}
 
 	if err := scanner.Err(); err != nil {
-		logrus.Fatal(err)
+		logrus.Fatalln(err)
 	}
 }
 
@@ -65,11 +65,11 @@ func processLine(line string) {
 	if schedule == nil {
 		added := dao.CreateScheduleNx(doubanId, t.Code, consts.ScheduleStatusCanCrawl, consts.ScheduleResultUnready)
 		if added {
-			logrus.Info("new", t.Name, "added :", doubanId)
+			logrus.Infoln("new", t.Name, "added :", doubanId)
 		} else {
-			logrus.Info("new", t.Name, "duplicated :", doubanId)
+			logrus.Infoln("new", t.Name, "duplicated :", doubanId)
 		}
 	} else {
-		logrus.Info("old", t.Name, "ignored :", doubanId)
+		logrus.Infoln("old", t.Name, "ignored :", doubanId)
 	}
 }

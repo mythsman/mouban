@@ -37,5 +37,5 @@ func TestGetBookDetail(t *testing.T) {
 
 func TestListBookBrief(t *testing.T) {
 	briefs := ListBookBrief(&[]uint64{11, 11})
-	logrus.Info(util.ToJson(briefs))
+	logrus.Infoln(util.ToJson(briefs))
 }

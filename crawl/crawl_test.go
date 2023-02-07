@@ -11,10 +11,10 @@ func TestMovie(t *testing.T) {
 	if err != nil {
 		return
 	}
-	logrus.Info(util.ToJson(movie))
-	logrus.Info(util.ToJson(rating))
-	logrus.Info(util.ToJson(newUsers))
-	logrus.Info(util.ToJson(newItems))
+	logrus.Infoln(util.ToJson(movie))
+	logrus.Infoln(util.ToJson(rating))
+	logrus.Infoln(util.ToJson(newUsers))
+	logrus.Infoln(util.ToJson(newItems))
 
 }
 
@@ -23,10 +23,10 @@ func TestGame(t *testing.T) {
 	if err != nil {
 		return
 	}
-	logrus.Info(util.ToJson(game))
-	logrus.Info(util.ToJson(rating))
-	logrus.Info(util.ToJson(newUsers))
-	logrus.Info(util.ToJson(newItems))
+	logrus.Infoln(util.ToJson(game))
+	logrus.Infoln(util.ToJson(rating))
+	logrus.Infoln(util.ToJson(newUsers))
+	logrus.Infoln(util.ToJson(newItems))
 }
 
 func TestBook(t *testing.T) {
@@ -34,23 +34,23 @@ func TestBook(t *testing.T) {
 	if err != nil {
 		return
 	}
-	logrus.Info(util.ToJson(book))
-	logrus.Info(util.ToJson(rating))
-	logrus.Info(util.ToJson(newUser))
-	logrus.Info(util.ToJson(newItems))
+	logrus.Infoln(util.ToJson(book))
+	logrus.Infoln(util.ToJson(rating))
+	logrus.Infoln(util.ToJson(newUser))
+	logrus.Infoln(util.ToJson(newItems))
 }
 
 func TestSong(t *testing.T) {
 	//1748967 too many redirects
 	song, rating, newUser, newItems, err := Song(1748967)
 	if err != nil {
-		logrus.Info(err)
+		logrus.Infoln(err)
 		return
 	}
-	logrus.Info(util.ToJson(song))
-	logrus.Info(util.ToJson(rating))
-	logrus.Info(util.ToJson(newUser))
-	logrus.Info(util.ToJson(newItems))
+	logrus.Infoln(util.ToJson(song))
+	logrus.Infoln(util.ToJson(rating))
+	logrus.Infoln(util.ToJson(newUser))
+	logrus.Infoln(util.ToJson(newItems))
 }
 
 func TestUserPublish(t *testing.T) {
@@ -68,10 +68,10 @@ func TestUserOverview(t *testing.T) {
 		return
 
 	}
-	logrus.Info(util.ToJson(overview))
+	logrus.Infoln(util.ToJson(overview))
 }
 
 func TestUserId(t *testing.T) {
 	id := UserId("162448367")
-	logrus.Info("UserId is", id)
+	logrus.Infoln("UserId is", id)
 }

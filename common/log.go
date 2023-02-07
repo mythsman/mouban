@@ -34,7 +34,7 @@ func InitLogger() {
 
 	writeApi = client.WriteAPI(viper.GetString("influxdb.org"), viper.GetString("influxdb.bucket"))
 
-	logrus.Info("influxdb init success")
+	logrus.Infoln("influxdb init success")
 }
 
 type InfluxHooker struct {

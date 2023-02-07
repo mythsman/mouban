@@ -9,7 +9,7 @@ import (
 
 func Test_scrollSong(t *testing.T) {
 	comments, songs, total := scrollAllSong(43001468, consts.ActionCollect)
-	logrus.Info(util.ToJson(*comments))
-	logrus.Info(util.ToJson(*songs))
-	logrus.Info(total)
+	logrus.Infoln(util.ToJson(*comments))
+	logrus.Infoln(util.ToJson(*songs))
+	logrus.Infoln(total)
 }

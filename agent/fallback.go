@@ -11,17 +11,17 @@ import (
 func runFallback() {
 	defer func() {
 		if r := recover(); r != nil {
-			logrus.Info(r, "fallback agent crashed  => ", util.GetCurrentGoroutineStack())
+			logrus.Infoln(r, "fallback agent crashed  => ", util.GetCurrentGoroutineStack())
 		}
 		time.Sleep(time.Hour * 1)
 	}()
 	cnt := dao.CasOrphanSchedule(time.Hour * 6)
-	logrus.Info(cnt, "orphan schedule reset")
+	logrus.Infoln(cnt, "orphan schedule reset")
 }
 
 func init() {
 	if !viper.GetBool("agent.enable") {
-		logrus.Info("fallback agent disabled")
+		logrus.Infoln("fallback agent disabled")
 		return
 	}
 
@@ -31,5 +31,5 @@ func init() {
 		}
 	}()
 
-	logrus.Info("fallback agent enabled")
+	logrus.Infoln("fallback agent enabled")
 }
