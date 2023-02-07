@@ -9,11 +9,7 @@ import (
 	"time"
 )
 
-func init() {
-	InitConfig()
-	InitLogger()
-	InitDatabase()
-}
+
 
 func InitLogger() {
 	logrus.SetOutput(os.Stdout)
