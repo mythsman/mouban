@@ -18,7 +18,7 @@ import (
 func main() {
 	rand.Seed(time.Now().UnixNano())
 
-	router := gin.Default()
+	router := gin.New()
 
 	router.Use(handle)
 	router.Use(cors)
