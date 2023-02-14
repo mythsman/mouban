@@ -45,7 +45,7 @@ func SearchScheduleByAll(t uint8, status uint8, result uint8) *model.Schedule {
 // CasOrphanSchedule idx_status
 func CasOrphanSchedule(t uint8, expire time.Duration) int64 {
 	return common.Db.Model(&model.Schedule{}).
-		Where("type = ? status = ? AND updated_at < ?", t, consts.ScheduleStatusCrawling, time.Now().Add(-expire)).
+		Where("type = ? AND status = ? AND updated_at < ?", t, consts.ScheduleStatusCrawling, time.Now().Add(-expire)).
 		Update("status", consts.ScheduleStatusToCrawl).RowsAffected
 }
 
