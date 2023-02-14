@@ -12,7 +12,7 @@ func TestUpsertSchedule(t *testing.T) {
 }
 
 func TestCasOrphanSchedule(t *testing.T) {
-	cnt := CasOrphanSchedule(0)
+	cnt := CasOrphanSchedule(consts.TypeBook.Code, 0)
 	logrus.Infoln(cnt)
 }
 

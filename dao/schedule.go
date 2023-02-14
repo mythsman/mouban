@@ -42,12 +42,14 @@ func SearchScheduleByAll(t uint8, status uint8, result uint8) *model.Schedule {
 	return schedule
 }
 
-func CasOrphanSchedule(expire time.Duration) int64 {
+// CasOrphanSchedule idx_status
+func CasOrphanSchedule(t uint8, expire time.Duration) int64 {
 	return common.Db.Model(&model.Schedule{}).
 		Where("status = ? AND updated_at < ?", consts.ScheduleStatusCrawling, time.Now().Add(-expire)).
 		Update("status", consts.ScheduleStatusToCrawl).RowsAffected
 }
 
+// CasScheduleStatus uk_schedule
 func CasScheduleStatus(doubanId uint64, t uint8, status uint8, rawStatus uint8) bool {
 	row := common.Db.Model(&model.Schedule{}).
 		Where("douban_id = ? AND type = ? AND status = ?", doubanId, t, rawStatus).
@@ -55,6 +57,7 @@ func CasScheduleStatus(doubanId uint64, t uint8, status uint8, rawStatus uint8) 
 	return row > 0
 }
 
+// ChangeScheduleResult uk_schedule
 func ChangeScheduleResult(doubanId uint64, t uint8, result uint8) {
 	common.Db.Model(&model.Schedule{}).
 		Where("douban_id = ? AND type = ?", doubanId, t).
