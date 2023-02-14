@@ -3,6 +3,7 @@ package agent
 import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
+	"mouban/consts"
 	"mouban/dao"
 	"mouban/util"
 	"time"
@@ -15,8 +16,22 @@ func runFallback() {
 		}
 		time.Sleep(time.Hour * 1)
 	}()
-	cnt := dao.CasOrphanSchedule(time.Hour * 6)
-	logrus.Infoln(cnt, "orphan schedule reset")
+	
+	cnt := dao.CasOrphanSchedule(consts.TypeUser.Code, time.Hour*6)
+	logrus.Infoln(cnt, "orphan users reset")
+
+	cnt = dao.CasOrphanSchedule(consts.TypeBook.Code, time.Hour*6)
+	logrus.Infoln(cnt, "orphan books reset")
+
+	cnt = dao.CasOrphanSchedule(consts.TypeMovie.Code, time.Hour*6)
+	logrus.Infoln(cnt, "orphan movies reset")
+
+	cnt = dao.CasOrphanSchedule(consts.TypeGame.Code, time.Hour*6)
+	logrus.Infoln(cnt, "orphan games reset")
+
+	cnt = dao.CasOrphanSchedule(consts.TypeSong.Code, time.Hour*6)
+	logrus.Infoln(cnt, "orphan songs reset")
+
 }
 
 func init() {
