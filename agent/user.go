@@ -24,10 +24,10 @@ func runUser() {
 	if schedule != nil {
 		changed := dao.CasScheduleStatus(schedule.DoubanId, schedule.Type, consts.ScheduleStatusCrawling, consts.ScheduleStatusToCrawl)
 		if changed {
-			logrus.Infoln("start process user" + strconv.FormatUint(schedule.DoubanId, 10))
+			logrus.Infoln("start process user", strconv.FormatUint(schedule.DoubanId, 10))
 			processUser(schedule.DoubanId, schedule.Result == consts.ScheduleResultUnready)
 			dao.CasScheduleStatus(schedule.DoubanId, schedule.Type, consts.ScheduleStatusCrawled, consts.ScheduleStatusCrawling)
-			logrus.Infoln("end process user" + strconv.FormatUint(schedule.DoubanId, 10))
+			logrus.Infoln("end process user", strconv.FormatUint(schedule.DoubanId, 10))
 		}
 	}
 }
