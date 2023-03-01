@@ -15,7 +15,7 @@ type Rating struct {
 	Star3     float32
 	Star2     float32
 	Star1     float32
-	Status    uint8
+	Status    *uint8
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }

@@ -19,7 +19,7 @@ func TestUpsertRating(t *testing.T) {
 		Star3:    3.4,
 		Star2:    2.4,
 		Star1:    1.4,
-		Status:   consts.RatingNormal,
+		Status:   &consts.RatingNormal.Code,
 	}
 	UpsertRating(rating)
 }

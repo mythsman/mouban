@@ -6,13 +6,14 @@ import (
 )
 
 func UpsertMovie(movie *model.Movie) {
-	if common.Db.Where("douban_id = ? ", movie.DoubanId).Updates(movie).RowsAffected == 0 {
-		common.Db.Create(movie)
-	}
+	data := &model.Movie{}
+	common.Db.Where("douban_id = ? ", movie.DoubanId).Assign(movie).FirstOrCreate(data)
 }
 
 func CreateMovieNx(movie *model.Movie) bool {
-	return common.Db.Create(movie).RowsAffected > 0
+	data := &model.Movie{}
+	result := common.Db.Where("douban_id = ? ", movie.DoubanId).Attrs(movie).FirstOrCreate(data)
+	return result.RowsAffected > 0
 }
 
 func GetMovieDetail(doubanId uint64) *model.Movie {

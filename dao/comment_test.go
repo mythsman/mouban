@@ -15,7 +15,7 @@ func TestUpsertComment(t *testing.T) {
 		Rate:      3,
 		Label:     "tags",
 		Comment:   "shortComment",
-		Action:    consts.ActionWish.Code,
+		Action:    &consts.ActionWish.Code,
 		MarkDate:  time.Now(),
 	}
 	UpsertComment(comment)

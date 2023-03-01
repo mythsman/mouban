@@ -23,23 +23,23 @@ func CheckUser(ctx *gin.Context) {
 	schedule := dao.GetSchedule(doubanUid, consts.TypeUser.Code)
 
 	if schedule == nil {
-		dao.CreateScheduleNx(doubanUid, consts.TypeUser.Code, consts.ScheduleStatusToCrawl, consts.ScheduleResultUnready)
+		dao.CreateScheduleNx(doubanUid, consts.TypeUser.Code, consts.ScheduleToCrawl.Code, consts.ScheduleUnready.Code)
 		BizError(ctx, "未录入当前用户，已发起录入，请等待后台数据更新")
 		return
 	}
 
-	if schedule.Status == consts.ScheduleStatusCanCrawl {
-		dao.CasScheduleStatus(doubanUid, consts.TypeUser.Code, consts.ScheduleStatusToCrawl, consts.ScheduleStatusCanCrawl)
+	if *schedule.Status == consts.ScheduleCanCrawl.Code {
+		dao.CasScheduleStatus(doubanUid, consts.TypeUser.Code, consts.ScheduleToCrawl.Code, consts.ScheduleCanCrawl.Code)
 		BizError(ctx, "未录入当前用户，已发起录入，请等待后台数据更新")
 		return
 	}
 
-	if schedule.Result == consts.ScheduleResultUnready {
+	if *schedule.Result == consts.ScheduleUnready.Code {
 		BizError(ctx, "当前用户录入中")
 		return
 	}
 
-	if schedule.Result == consts.ScheduleResultInvalid {
+	if *schedule.Result == consts.ScheduleInvalid.Code {
 		BizError(ctx, "当前用户不存在")
 		return
 	}
@@ -51,10 +51,10 @@ func CheckUser(ctx *gin.Context) {
 		"result":  user.Show(),
 	})
 
-	if schedule.Status == consts.ScheduleStatusCrawled {
+	if *schedule.Status == consts.ScheduleCrawled.Code {
 		timeLimit, _ := time.ParseDuration("-" + viper.GetString("server.limit"))
 		if schedule.UpdatedAt.Before(time.Now().Add(timeLimit)) {
-			dao.CasScheduleStatus(doubanUid, consts.TypeUser.Code, consts.ScheduleStatusToCrawl, consts.ScheduleStatusCrawled)
+			dao.CasScheduleStatus(doubanUid, consts.TypeUser.Code, consts.ScheduleToCrawl.Code, consts.ScheduleCrawled.Code)
 		}
 	}
 
@@ -87,12 +87,12 @@ func ListUserItem(ctx *gin.Context, t uint8) {
 		return
 	}
 
-	if schedule.Result == consts.ScheduleResultUnready {
+	if *schedule.Result == consts.ScheduleUnready.Code {
 		BizError(ctx, "当前用户录入中")
 		return
 	}
 
-	if schedule.Result == consts.ScheduleResultInvalid {
+	if *schedule.Result == consts.ScheduleInvalid.Code {
 		BizError(ctx, "当前用户不存在")
 		return
 	}

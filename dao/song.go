@@ -6,13 +6,14 @@ import (
 )
 
 func UpsertSong(song *model.Song) {
-	if common.Db.Where("douban_id = ? ", song.DoubanId).Updates(song).RowsAffected == 0 {
-		common.Db.Create(song)
-	}
+	data := &model.Song{}
+	common.Db.Where("douban_id = ? ", song.DoubanId).Assign(song).FirstOrCreate(data)
 }
 
 func CreateSongNx(song *model.Song) bool {
-	return common.Db.Create(song).RowsAffected > 0
+	data := &model.Song{}
+	result := common.Db.Where("douban_id = ? ", song.DoubanId).Attrs(song).FirstOrCreate(data)
+	return result.RowsAffected > 0
 }
 
 func GetSongDetail(doubanId uint64) *model.Song {

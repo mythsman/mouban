@@ -1,8 +1,13 @@
 package consts
 
-const RatingNormal = 0
-const RatingNotEnough = 1
-const RatingNotAllowed = 2
+type RatingStatus struct {
+	Code uint8
+	Name string
+}
+
+var RatingNormal = RatingStatus{0, "normal"}
+var RatingNotEnough = RatingStatus{1, "not enough"}
+var RatingNotAllowed = RatingStatus{2, "not allowed"}
 
 type Action struct {
 	Code uint8
@@ -24,11 +29,21 @@ var TypeMovie = Type{2, "movie"}
 var TypeGame = Type{3, "game"}
 var TypeSong = Type{4, "song"}
 
-const ScheduleStatusToCrawl = 0
-const ScheduleStatusCrawling = 1
-const ScheduleStatusCrawled = 2
-const ScheduleStatusCanCrawl = 3
+type ScheduleStatus struct {
+	Code uint8
+	Name string
+}
 
-const ScheduleResultUnready = 0
-const ScheduleResultReady = 1
-const ScheduleResultInvalid = 2
+var ScheduleToCrawl = ScheduleStatus{0, "to crawl"}
+var ScheduleCrawling = ScheduleStatus{1, "crawling"}
+var ScheduleCrawled = ScheduleStatus{2, "crawled"}
+var ScheduleCanCrawl = ScheduleStatus{3, "can crawl"}
+
+type ScheduleResult struct {
+	Code uint8
+	Name string
+}
+
+var ScheduleUnready = ScheduleResult{0, "unready"}
+var ScheduleReady = ScheduleResult{1, "ready"}
+var ScheduleInvalid = ScheduleResult{2, "invalid"}

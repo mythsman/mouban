@@ -13,7 +13,7 @@ import (
 func Rating(interestSelect *html.Node) *model.Rating {
 	if interestSelect == nil {
 		result := &model.Rating{
-			Status: consts.RatingNotAllowed,
+			Status: &consts.RatingNotAllowed.Code,
 		}
 		return result
 	}
@@ -21,7 +21,7 @@ func Rating(interestSelect *html.Node) *model.Rating {
 	ratingRaw := htmlquery.InnerText(htmlquery.FindOne(interestSelect, "//strong[@property='v:average']"))
 	if len(strings.TrimSpace(ratingRaw)) == 0 {
 		result := &model.Rating{
-			Status: consts.RatingNotEnough,
+			Status: &consts.RatingNotEnough.Code,
 		}
 		return result
 	}
@@ -56,7 +56,7 @@ func Rating(interestSelect *html.Node) *model.Rating {
 		Star3:  float32(star3),
 		Star2:  float32(star2),
 		Star1:  float32(star1),
-		Status: consts.RatingNormal,
+		Status: &consts.RatingNormal.Code,
 	}
 	return result
 }

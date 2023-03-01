@@ -6,13 +6,14 @@ import (
 )
 
 func UpsertBook(book *model.Book) {
-	if common.Db.Where("douban_id = ? ", book.DoubanId).Updates(book).RowsAffected == 0 {
-		common.Db.Create(book)
-	}
+	data := &model.Book{}
+	common.Db.Where("douban_id = ? ", book.DoubanId).Assign(book).FirstOrCreate(data)
 }
 
 func CreateBookNx(book *model.Book) bool {
-	return common.Db.Create(book).RowsAffected > 0
+	data := &model.Book{}
+	result := common.Db.Where("douban_id = ? ", book.DoubanId).Attrs(book).FirstOrCreate(data)
+	return result.RowsAffected > 0
 }
 
 func GetBookDetail(doubanId uint64) *model.Book {

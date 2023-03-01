@@ -125,7 +125,7 @@ func scrollMovie(doubanUid uint64, url string, action consts.Action) (*[]model.C
 			Rate:      ratingNumber,
 			Label:     tags,
 			Comment:   shortComment,
-			Action:    action.Code,
+			Action:    &action.Code,
 			MarkDate:  markDate,
 		}
 		comments = append(comments, comment)

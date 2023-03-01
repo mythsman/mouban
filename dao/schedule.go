@@ -45,8 +45,8 @@ func SearchScheduleByAll(t uint8, status uint8, result uint8) *model.Schedule {
 // CasOrphanSchedule idx_status
 func CasOrphanSchedule(t uint8, expire time.Duration) int64 {
 	return common.Db.Model(&model.Schedule{}).
-		Where("type = ? AND status = ? AND updated_at < ?", t, consts.ScheduleStatusCrawling, time.Now().Add(-expire)).
-		Update("status", consts.ScheduleStatusToCrawl).RowsAffected
+		Where("type = ? AND status = ? AND updated_at < ?", t, consts.ScheduleCrawling.Code, time.Now().Add(-expire)).
+		Update("status", consts.ScheduleToCrawl.Code).RowsAffected
 }
 
 // CasScheduleStatus uk_schedule
@@ -65,17 +65,13 @@ func ChangeScheduleResult(doubanId uint64, t uint8, result uint8) {
 }
 
 func CreateScheduleNx(doubanId uint64, t uint8, status uint8, result uint8) bool {
-	existingSchedule := GetSchedule(doubanId, t)
-	if existingSchedule == nil {
-		schedule := &model.Schedule{
-			DoubanId: doubanId,
-			Type:     t,
-			Status:   status,
-			Result:   result,
-		}
-		row := common.Db.Create(&schedule).RowsAffected
-		return row > 0
-	} else {
-		return false
+	data := &model.Schedule{}
+	insert := &model.Schedule{
+		DoubanId: doubanId,
+		Type:     t,
+		Status:   &status,
+		Result:   &result,
 	}
+	row := common.Db.Where("douban_id = ? AND type = ? ", doubanId, t).Attrs(insert).FirstOrCreate(data).RowsAffected
+	return row > 0
 }

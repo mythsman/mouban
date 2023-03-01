@@ -8,7 +8,7 @@ import (
 )
 
 func TestUpsertSchedule(t *testing.T) {
-	CreateScheduleNx(1234, consts.TypeMovie.Code, consts.ScheduleStatusToCrawl, consts.ScheduleResultInvalid)
+	CreateScheduleNx(1234, consts.TypeMovie.Code, consts.ScheduleToCrawl.Code, consts.ScheduleInvalid.Code)
 }
 
 func TestCasOrphanSchedule(t *testing.T) {
@@ -22,10 +22,10 @@ func TestGetSchedule(t *testing.T) {
 }
 
 func TestSearchSchedule(t *testing.T) {
-	schedule := SearchScheduleByStatus(consts.TypeBook.Code, consts.ScheduleStatusToCrawl)
+	schedule := SearchScheduleByStatus(consts.TypeBook.Code, consts.ScheduleToCrawl.Code)
 	logrus.Infoln(util.ToJson(schedule))
 }
 
 func TestChangeScheduleResult(t *testing.T) {
-	ChangeScheduleResult(162448367, consts.TypeUser.Code, consts.ScheduleResultReady)
+	ChangeScheduleResult(162448367, consts.TypeUser.Code, consts.ScheduleReady.Code)
 }
