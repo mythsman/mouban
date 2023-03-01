@@ -1,16 +1,19 @@
 package dao
 
 import (
+	"github.com/sirupsen/logrus"
 	"mouban/common"
 	"mouban/model"
 )
 
 func UpsertSong(song *model.Song) {
+	logrus.Infoln("upsert song", song.DoubanId, song.Title)
 	data := &model.Song{}
 	common.Db.Where("douban_id = ? ", song.DoubanId).Assign(song).FirstOrCreate(data)
 }
 
 func CreateSongNx(song *model.Song) bool {
+	logrus.Infoln("create song", song.DoubanId, song.Title)
 	data := &model.Song{}
 	result := common.Db.Where("douban_id = ? ", song.DoubanId).Attrs(song).FirstOrCreate(data)
 	return result.RowsAffected > 0

@@ -1,11 +1,13 @@
 package dao
 
 import (
+	"github.com/sirupsen/logrus"
 	"mouban/common"
 	"mouban/model"
 )
 
 func UpsertComment(comment *model.Comment) {
+	logrus.Infoln("upsert comment", comment.DoubanId, comment.Type, "for", comment.DoubanUid)
 	data := &model.Comment{}
 	common.Db.Where("douban_id = ? AND douban_uid = ? AND type = ?", comment.DoubanId, comment.DoubanUid, comment.Type).Assign(comment).FirstOrCreate(data)
 }
