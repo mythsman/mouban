@@ -1,11 +1,13 @@
 package dao
 
 import (
+	"github.com/sirupsen/logrus"
 	"mouban/common"
 	"mouban/model"
 )
 
 func UpsertRating(rating *model.Rating) {
+	logrus.Infoln("upsert rating", rating.DoubanId, rating.Type)
 	data := &model.Rating{}
 	common.Db.Where("douban_id = ? AND type = ?", rating.DoubanId, rating.Type).Assign(rating).FirstOrCreate(data)
 }

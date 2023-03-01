@@ -1,16 +1,19 @@
 package dao
 
 import (
+	"github.com/sirupsen/logrus"
 	"mouban/common"
 	"mouban/model"
 )
 
 func UpsertMovie(movie *model.Movie) {
+	logrus.Infoln("upsert movie", movie.DoubanId, movie.Title)
 	data := &model.Movie{}
 	common.Db.Where("douban_id = ? ", movie.DoubanId).Assign(movie).FirstOrCreate(data)
 }
 
 func CreateMovieNx(movie *model.Movie) bool {
+	logrus.Infoln("create movie", movie.DoubanId, movie.Title)
 	data := &model.Movie{}
 	result := common.Db.Where("douban_id = ? ", movie.DoubanId).Attrs(movie).FirstOrCreate(data)
 	return result.RowsAffected > 0

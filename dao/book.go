@@ -1,16 +1,19 @@
 package dao
 
 import (
+	"github.com/sirupsen/logrus"
 	"mouban/common"
 	"mouban/model"
 )
 
 func UpsertBook(book *model.Book) {
+	logrus.Infoln("upsert book", book.DoubanId, book.Title)
 	data := &model.Book{}
 	common.Db.Where("douban_id = ? ", book.DoubanId).Assign(book).FirstOrCreate(data)
 }
 
 func CreateBookNx(book *model.Book) bool {
+	logrus.Infoln("create book", book.DoubanId, book.Title)
 	data := &model.Book{}
 	result := common.Db.Where("douban_id = ? ", book.DoubanId).Attrs(book).FirstOrCreate(data)
 	return result.RowsAffected > 0
