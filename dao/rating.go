@@ -6,9 +6,8 @@ import (
 )
 
 func UpsertRating(rating *model.Rating) {
-	if common.Db.Where("douban_id = ? AND type = ?", rating.DoubanId, rating.Type).Updates(rating).RowsAffected == 0 {
-		common.Db.Create(rating)
-	}
+	data := &model.Rating{}
+	common.Db.Where("douban_id = ? AND type = ?", rating.DoubanId, rating.Type).Assign(rating).FirstOrCreate(data)
 }
 
 func GetRating(doubanId uint64, t uint8) *model.Rating {

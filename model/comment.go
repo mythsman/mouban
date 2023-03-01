@@ -12,7 +12,7 @@ type Comment struct {
 	Rate      uint8
 	Label     string    `gorm:"type:varchar(512)"`
 	Comment   string    `gorm:"type:mediumtext"`
-	Action    uint8     `gorm:"not null;index:idx_search;priority:4"`
+	Action    *uint8     `gorm:"not null;index:idx_search;priority:4"`
 	MarkDate  time.Time `gorm:"not null;index:idx_search;priority:5"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
@@ -28,7 +28,7 @@ func (comment Comment) Show(item interface{}) *CommentVO {
 		Rate:     comment.Rate,
 		Label:    comment.Label,
 		Comment:  comment.Comment,
-		Action:   comment.Action,
+		Action:   *comment.Action,
 		MarkDate: comment.MarkDate.Format("2006-01-02"),
 	}
 }

@@ -118,7 +118,7 @@ func scrollGame(doubanUid uint64, url string, action consts.Action) (*[]model.Co
 			Rate:      ratingNumber,
 			Label:     tags,
 			Comment:   shortComment,
-			Action:    action.Code,
+			Action:    &action.Code,
 			MarkDate:  markDate,
 		}
 		comments = append(comments, comment)

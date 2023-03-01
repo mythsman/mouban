@@ -6,13 +6,14 @@ import (
 )
 
 func UpsertGame(game *model.Game) {
-	if common.Db.Where("douban_id = ? ", game.DoubanId).Updates(game).RowsAffected == 0 {
-		common.Db.Create(game)
-	}
+	data := &model.Game{}
+	common.Db.Where("douban_id = ? ", game.DoubanId).Assign(game).FirstOrCreate(data)
 }
 
 func CreateGameNx(game *model.Game) bool {
-	return common.Db.Create(game).RowsAffected > 0
+	data := &model.Game{}
+	result := common.Db.Where("douban_id = ? ", game.DoubanId).Attrs(game).FirstOrCreate(data)
+	return result.RowsAffected > 0
 }
 
 func GetGameDetail(doubanId uint64) *model.Game {

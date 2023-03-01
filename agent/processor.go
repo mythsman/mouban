@@ -39,13 +39,13 @@ func processBook(doubanId uint64) {
 	processDiscoverItem(newItems, consts.TypeBook)
 
 	if err != nil {
-		dao.ChangeScheduleResult(doubanId, consts.TypeBook.Code, consts.ScheduleResultInvalid)
+		dao.ChangeScheduleResult(doubanId, consts.TypeBook.Code, consts.ScheduleInvalid.Code)
 		panic(err)
 	}
 	dao.UpsertBook(book)
 	dao.UpsertRating(rating)
 
-	dao.ChangeScheduleResult(doubanId, consts.TypeBook.Code, consts.ScheduleResultReady)
+	dao.ChangeScheduleResult(doubanId, consts.TypeBook.Code, consts.ScheduleReady.Code)
 }
 
 func processMovie(doubanId uint64) {
@@ -60,13 +60,13 @@ func processMovie(doubanId uint64) {
 	processDiscoverItem(newItems, consts.TypeMovie)
 
 	if err != nil {
-		dao.ChangeScheduleResult(doubanId, consts.TypeMovie.Code, consts.ScheduleResultInvalid)
+		dao.ChangeScheduleResult(doubanId, consts.TypeMovie.Code, consts.ScheduleInvalid.Code)
 		panic(err)
 	}
 	dao.UpsertMovie(movie)
 	dao.UpsertRating(rating)
 
-	dao.ChangeScheduleResult(doubanId, consts.TypeMovie.Code, consts.ScheduleResultReady)
+	dao.ChangeScheduleResult(doubanId, consts.TypeMovie.Code, consts.ScheduleReady.Code)
 }
 
 func processGame(doubanId uint64) {
@@ -82,13 +82,13 @@ func processGame(doubanId uint64) {
 	processDiscoverItem(newItems, consts.TypeGame)
 
 	if err != nil {
-		dao.ChangeScheduleResult(doubanId, consts.TypeGame.Code, consts.ScheduleResultInvalid)
+		dao.ChangeScheduleResult(doubanId, consts.TypeGame.Code, consts.ScheduleInvalid.Code)
 		panic(err)
 	}
 	dao.UpsertGame(game)
 	dao.UpsertRating(rating)
 
-	dao.ChangeScheduleResult(doubanId, consts.TypeGame.Code, consts.ScheduleResultReady)
+	dao.ChangeScheduleResult(doubanId, consts.TypeGame.Code, consts.ScheduleReady.Code)
 }
 
 func processSong(doubanId uint64) {
@@ -104,13 +104,13 @@ func processSong(doubanId uint64) {
 	processDiscoverItem(newItems, consts.TypeSong)
 
 	if err != nil {
-		dao.ChangeScheduleResult(doubanId, consts.TypeSong.Code, consts.ScheduleResultInvalid)
+		dao.ChangeScheduleResult(doubanId, consts.TypeSong.Code, consts.ScheduleInvalid.Code)
 		panic(err)
 	}
 	dao.UpsertSong(song)
 	dao.UpsertRating(rating)
 
-	dao.ChangeScheduleResult(doubanId, consts.TypeSong.Code, consts.ScheduleResultReady)
+	dao.ChangeScheduleResult(doubanId, consts.TypeSong.Code, consts.ScheduleReady.Code)
 }
 
 func processDiscoverUser(newUsers *[]string) {
@@ -141,7 +141,7 @@ func processDiscoverUser(newUsers *[]string) {
 				}
 			}
 			if id > 0 {
-				added := dao.CreateScheduleNx(id, consts.TypeUser.Code, consts.ScheduleStatusCanCrawl, consts.ScheduleResultUnready)
+				added := dao.CreateScheduleNx(id, consts.TypeUser.Code, consts.ScheduleCanCrawl.Code, consts.ScheduleUnready.Code)
 				if added {
 					newFound += 1
 				}
@@ -168,7 +168,7 @@ func processDiscoverItem(newItems *[]uint64, t consts.Type) {
 		totalFound := len(*newItems)
 		newFound := 0
 		for _, doubanId := range *newItems {
-			added := dao.CreateScheduleNx(doubanId, t.Code, consts.ScheduleStatusCanCrawl, consts.ScheduleResultUnready)
+			added := dao.CreateScheduleNx(doubanId, t.Code, consts.ScheduleCanCrawl.Code, consts.ScheduleUnready.Code)
 			if added {
 				newFound += 1
 			}
@@ -194,7 +194,7 @@ func processUser(doubanUid uint64, forceUpdate bool) {
 	//user
 	user, err := crawl.UserOverview(doubanUid)
 	if err != nil {
-		dao.ChangeScheduleResult(doubanUid, consts.TypeUser.Code, consts.ScheduleResultInvalid)
+		dao.ChangeScheduleResult(doubanUid, consts.TypeUser.Code, consts.ScheduleInvalid.Code)
 		panic(err)
 	}
 	dao.UpsertUser(user)
@@ -210,7 +210,7 @@ func processUser(doubanUid uint64, forceUpdate bool) {
 				dao.UpsertComment(&(*comment)[i])
 				added := dao.CreateGameNx(&(*game)[i])
 				if added {
-					dao.CreateScheduleNx((*game)[i].DoubanId, consts.TypeGame.Code, consts.ScheduleStatusToCrawl, consts.ScheduleResultUnready)
+					dao.CreateScheduleNx((*game)[i].DoubanId, consts.TypeGame.Code, consts.ScheduleToCrawl.Code, consts.ScheduleUnready.Code)
 				}
 			}
 		}()
@@ -229,7 +229,7 @@ func processUser(doubanUid uint64, forceUpdate bool) {
 				added := dao.CreateBookNx(&(*book)[i])
 				dao.UpsertComment(&(*comment)[i])
 				if added {
-					dao.CreateScheduleNx((*book)[i].DoubanId, consts.TypeBook.Code, consts.ScheduleStatusToCrawl, consts.ScheduleResultUnready)
+					dao.CreateScheduleNx((*book)[i].DoubanId, consts.TypeBook.Code, consts.ScheduleToCrawl.Code, consts.ScheduleUnready.Code)
 				}
 			}
 		}()
@@ -249,7 +249,7 @@ func processUser(doubanUid uint64, forceUpdate bool) {
 				dao.UpsertComment(&(*comment)[i])
 				added := dao.CreateMovieNx(&(*movie)[i])
 				if added {
-					dao.CreateScheduleNx((*movie)[i].DoubanId, consts.TypeMovie.Code, consts.ScheduleStatusToCrawl, consts.ScheduleResultUnready)
+					dao.CreateScheduleNx((*movie)[i].DoubanId, consts.TypeMovie.Code, consts.ScheduleToCrawl.Code, consts.ScheduleUnready.Code)
 				}
 			}
 		}()
@@ -269,12 +269,12 @@ func processUser(doubanUid uint64, forceUpdate bool) {
 				dao.UpsertComment(&(*comment)[i])
 				added := dao.CreateSongNx(&(*song)[i])
 				if added {
-					dao.CreateScheduleNx((*song)[i].DoubanId, consts.TypeSong.Code, consts.ScheduleStatusToCrawl, consts.ScheduleResultUnready)
+					dao.CreateScheduleNx((*song)[i].DoubanId, consts.TypeSong.Code, consts.ScheduleToCrawl.Code, consts.ScheduleUnready.Code)
 				}
 			}
 		}()
 
 	}
 
-	dao.ChangeScheduleResult(doubanUid, consts.TypeUser.Code, consts.ScheduleResultReady)
+	dao.ChangeScheduleResult(doubanUid, consts.TypeUser.Code, consts.ScheduleReady.Code)
 }

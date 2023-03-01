@@ -23,13 +23,13 @@ func runItem(index int) {
 	rand.Shuffle(len(types), func(i, j int) { types[i], types[j] = types[j], types[i] })
 
 	for _, t := range types {
-		schedule := dao.SearchScheduleByStatus(t.Code, consts.ScheduleStatusToCrawl)
+		schedule := dao.SearchScheduleByStatus(t.Code, consts.ScheduleToCrawl.Code)
 		if schedule != nil {
-			changed := dao.CasScheduleStatus(schedule.DoubanId, schedule.Type, consts.ScheduleStatusCrawling, consts.ScheduleStatusToCrawl)
+			changed := dao.CasScheduleStatus(schedule.DoubanId, schedule.Type, consts.ScheduleCrawling.Code, consts.ScheduleToCrawl.Code)
 			if changed {
 				logrus.Infoln("item", index, "start", t.Name, strconv.FormatUint(schedule.DoubanId, 10))
 				processItem(t.Code, schedule.DoubanId)
-				dao.CasScheduleStatus(schedule.DoubanId, schedule.Type, consts.ScheduleStatusCrawled, consts.ScheduleStatusCrawling)
+				dao.CasScheduleStatus(schedule.DoubanId, schedule.Type, consts.ScheduleCrawled.Code, consts.ScheduleCrawling.Code)
 				logrus.Infoln("item", index, "end", t.Name, strconv.FormatUint(schedule.DoubanId, 10))
 			}
 			break

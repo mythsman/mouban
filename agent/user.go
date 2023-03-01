@@ -17,16 +17,16 @@ func runUser() {
 		}
 		time.Sleep(time.Second * 1)
 	}()
-	schedule := dao.SearchScheduleByAll(consts.TypeUser.Code, consts.ScheduleStatusToCrawl, consts.ScheduleResultReady)
+	schedule := dao.SearchScheduleByAll(consts.TypeUser.Code, consts.ScheduleToCrawl.Code, consts.ScheduleReady.Code)
 	if schedule == nil {
-		schedule = dao.SearchScheduleByAll(consts.TypeUser.Code, consts.ScheduleStatusToCrawl, consts.ScheduleResultUnready)
+		schedule = dao.SearchScheduleByAll(consts.TypeUser.Code, consts.ScheduleToCrawl.Code, consts.ScheduleUnready.Code)
 	}
 	if schedule != nil {
-		changed := dao.CasScheduleStatus(schedule.DoubanId, schedule.Type, consts.ScheduleStatusCrawling, consts.ScheduleStatusToCrawl)
+		changed := dao.CasScheduleStatus(schedule.DoubanId, schedule.Type, consts.ScheduleCrawling.Code, consts.ScheduleToCrawl.Code)
 		if changed {
 			logrus.Infoln("start process user", strconv.FormatUint(schedule.DoubanId, 10))
-			processUser(schedule.DoubanId, schedule.Result == consts.ScheduleResultUnready)
-			dao.CasScheduleStatus(schedule.DoubanId, schedule.Type, consts.ScheduleStatusCrawled, consts.ScheduleStatusCrawling)
+			processUser(schedule.DoubanId, *schedule.Result == consts.ScheduleUnready.Code)
+			dao.CasScheduleStatus(schedule.DoubanId, schedule.Type, consts.ScheduleCrawled.Code, consts.ScheduleCrawling.Code)
 			logrus.Infoln("end process user", strconv.FormatUint(schedule.DoubanId, 10))
 		}
 	}
