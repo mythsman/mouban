@@ -13,10 +13,12 @@ func UpsertSong(song *model.Song) {
 }
 
 func CreateSongNx(song *model.Song) bool {
-	logrus.Infoln("create song", song.DoubanId, song.Title)
 	data := &model.Song{}
-	result := common.Db.Where("douban_id = ? ", song.DoubanId).Attrs(song).FirstOrCreate(data)
-	return result.RowsAffected > 0
+	inserted := common.Db.Where("douban_id = ? ", song.DoubanId).Attrs(song).FirstOrCreate(data).RowsAffected > 0
+	if inserted {
+		logrus.Infoln("create song", song.DoubanId, song.Title)
+	}
+	return inserted
 }
 
 func GetSongDetail(doubanId uint64) *model.Song {

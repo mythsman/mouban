@@ -13,10 +13,12 @@ func UpsertGame(game *model.Game) {
 }
 
 func CreateGameNx(game *model.Game) bool {
-	logrus.Infoln("create game", game.DoubanId, game.Title)
 	data := &model.Game{}
-	result := common.Db.Where("douban_id = ? ", game.DoubanId).Attrs(game).FirstOrCreate(data)
-	return result.RowsAffected > 0
+	inserted := common.Db.Where("douban_id = ? ", game.DoubanId).Attrs(game).FirstOrCreate(data).RowsAffected > 0
+	if inserted {
+		logrus.Infoln("create game", game.DoubanId, game.Title)
+	}
+	return inserted
 }
 
 func GetGameDetail(doubanId uint64) *model.Game {

@@ -13,10 +13,12 @@ func UpsertBook(book *model.Book) {
 }
 
 func CreateBookNx(book *model.Book) bool {
-	logrus.Infoln("create book", book.DoubanId, book.Title)
 	data := &model.Book{}
-	result := common.Db.Where("douban_id = ? ", book.DoubanId).Attrs(book).FirstOrCreate(data)
-	return result.RowsAffected > 0
+	inserted := common.Db.Where("douban_id = ? ", book.DoubanId).Attrs(book).FirstOrCreate(data).RowsAffected > 0
+	if inserted {
+		logrus.Infoln("create book", book.DoubanId, book.Title)
+	}
+	return inserted
 }
 
 func GetBookDetail(doubanId uint64) *model.Book {

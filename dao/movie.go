@@ -13,10 +13,12 @@ func UpsertMovie(movie *model.Movie) {
 }
 
 func CreateMovieNx(movie *model.Movie) bool {
-	logrus.Infoln("create movie", movie.DoubanId, movie.Title)
 	data := &model.Movie{}
-	result := common.Db.Where("douban_id = ? ", movie.DoubanId).Attrs(movie).FirstOrCreate(data)
-	return result.RowsAffected > 0
+	inserted := common.Db.Where("douban_id = ? ", movie.DoubanId).Attrs(movie).FirstOrCreate(data).RowsAffected > 0
+	if inserted {
+		logrus.Infoln("create movie", movie.DoubanId, movie.Title)
+	}
+	return inserted
 }
 
 func GetMovieDetail(doubanId uint64) *model.Movie {
