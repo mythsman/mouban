@@ -60,6 +60,31 @@ func CheckUser(ctx *gin.Context) {
 
 }
 
+func ResetUser(ctx *gin.Context) {
+	id := ctx.Query("id")
+	doubanUid, err := strconv.ParseUint(id, 10, 64)
+	if err != nil || id == "0" {
+		BizError(ctx, "用户ID输入错误")
+		return
+	}
+
+	logAccess(ctx, doubanUid)
+
+	schedule := dao.GetSchedule(doubanUid, consts.TypeUser.Code)
+	if schedule == nil {
+		BizError(ctx, "未录入当前用户，重置无效")
+		return
+	}
+
+	rows := dao.PurgeComment(doubanUid)
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"result":  strconv.FormatInt(rows, 10) + " 评论已清理",
+	})
+	
+}
+
 func ListUserItem(ctx *gin.Context, t uint8) {
 	id := ctx.Query("id")
 	doubanUid, err := strconv.ParseUint(id, 10, 64)
@@ -188,6 +213,8 @@ func parseAction(action string) uint8 {
 		return consts.ActionCollect.Code
 	case consts.ActionDo.Name:
 		return consts.ActionDo.Code
+	case consts.ActionHide.Name:
+		return consts.ActionHide.Code
 	}
 	return consts.ActionCollect.Code
 }

@@ -36,6 +36,7 @@ func main() {
 	queryGroup := router.Group("/guest")
 	{
 		queryGroup.GET("/check_user", controller.CheckUser)
+		queryGroup.GET("/reset_user", controller.ResetUser)
 		queryGroup.GET("/user_book", func(ctx *gin.Context) {
 			controller.ListUserItem(ctx, consts.TypeBook.Code)
 		})
