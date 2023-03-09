@@ -34,6 +34,7 @@ func (movie Movie) Show() *MovieVO {
 	return &MovieVO{
 		DoubanId:    movie.DoubanId,
 		Title:       movie.Title,
+		Style:       movie.Style,
 		Director:    movie.Director,
 		Writer:      movie.Writer,
 		Actor:       movie.Actor,
@@ -46,6 +47,7 @@ func (movie Movie) Show() *MovieVO {
 type MovieVO struct {
 	DoubanId    uint64 `json:"douban_id"`
 	Title       string `json:"title"`
+	Style       string `json:"style"`
 	Director    string `json:"director"`
 	Writer      string `json:"writer"`
 	Actor       string `json:"actor"`
