@@ -17,6 +17,7 @@ type Action struct {
 var ActionDo = Action{0, "do"}
 var ActionWish = Action{1, "wish"}
 var ActionCollect = Action{2, "collect"}
+var ActionHide = Action{3, "hide"}
 
 type Type struct {
 	Code uint8

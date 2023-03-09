@@ -3,8 +3,15 @@ package dao
 import (
 	"github.com/sirupsen/logrus"
 	"mouban/common"
+	"mouban/consts"
 	"mouban/model"
 )
+
+func PurgeComment(doubanUid uint64) int64 {
+	rows := common.Db.Model(&model.Comment{}).Where("douban_uid = ? ", doubanUid).Update("action", consts.ActionHide.Code).RowsAffected
+	logrus.Infoln("purge", rows, "comment(s) for", doubanUid)
+	return rows
+}
 
 func UpsertComment(comment *model.Comment) {
 	logrus.Infoln("upsert comment", comment.DoubanId, comment.Type, "for", comment.DoubanUid)
