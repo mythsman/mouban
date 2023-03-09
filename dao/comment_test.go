@@ -1,6 +1,7 @@
 package dao
 
 import (
+	"github.com/sirupsen/logrus"
 	"mouban/consts"
 	"mouban/model"
 	"testing"
@@ -10,8 +11,8 @@ import (
 func TestUpsertComment(t *testing.T) {
 	comment := &model.Comment{
 		DoubanUid: 11,
-		DoubanId:  22,
-		Type:      consts.TypeMovie.Code,
+		DoubanId:  23,
+		Type:      consts.TypeBook.Code,
 		Rate:      3,
 		Label:     "tags",
 		Comment:   "shortComment",
@@ -19,4 +20,9 @@ func TestUpsertComment(t *testing.T) {
 		MarkDate:  time.Now(),
 	}
 	UpsertComment(comment)
+}
+
+func TestGetCommentIds(t *testing.T) {
+	data := GetCommentIds(11, consts.TypeMovie.Code)
+	logrus.Infoln("data", *data)
 }
