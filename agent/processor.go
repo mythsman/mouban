@@ -206,7 +206,18 @@ func processUser(doubanUid uint64, forceUpdate bool) {
 			panic(err)
 		}
 		go func() {
-			for i, _ := range *game {
+			newCommentIds := make(map[uint64]bool)
+			for i := range *game {
+				newCommentIds[(*game)[i].DoubanId] = true
+			}
+			oldCommentIds := dao.GetCommentIds(doubanUid, consts.TypeGame.Code)
+			for i := range *oldCommentIds {
+				id := (*oldCommentIds)[i]
+				if !newCommentIds[id] {
+					dao.HideComment(doubanUid, consts.TypeGame.Code, id)
+				}
+			}
+			for i := range *game {
 				dao.UpsertComment(&(*comment)[i])
 				added := dao.CreateGameNx(&(*game)[i])
 				if added {
@@ -225,7 +236,18 @@ func processUser(doubanUid uint64, forceUpdate bool) {
 			panic(err)
 		}
 		go func() {
-			for i, _ := range *book {
+			newCommentIds := make(map[uint64]bool)
+			for i := range *book {
+				newCommentIds[(*book)[i].DoubanId] = true
+			}
+			oldCommentIds := dao.GetCommentIds(doubanUid, consts.TypeBook.Code)
+			for i := range *oldCommentIds {
+				id := (*oldCommentIds)[i]
+				if !newCommentIds[id] {
+					dao.HideComment(doubanUid, consts.TypeBook.Code, id)
+				}
+			}
+			for i := range *book {
 				added := dao.CreateBookNx(&(*book)[i])
 				dao.UpsertComment(&(*comment)[i])
 				if added {
@@ -245,7 +267,18 @@ func processUser(doubanUid uint64, forceUpdate bool) {
 		}
 
 		go func() {
-			for i, _ := range *movie {
+			newCommentIds := make(map[uint64]bool)
+			for i := range *movie {
+				newCommentIds[(*movie)[i].DoubanId] = true
+			}
+			oldCommentIds := dao.GetCommentIds(doubanUid, consts.TypeMovie.Code)
+			for i := range *oldCommentIds {
+				id := (*oldCommentIds)[i]
+				if !newCommentIds[id] {
+					dao.HideComment(doubanUid, consts.TypeMovie.Code, id)
+				}
+			}
+			for i := range *movie {
 				dao.UpsertComment(&(*comment)[i])
 				added := dao.CreateMovieNx(&(*movie)[i])
 				if added {
@@ -265,7 +298,18 @@ func processUser(doubanUid uint64, forceUpdate bool) {
 		}
 
 		go func() {
-			for i, _ := range *song {
+			newCommentIds := make(map[uint64]bool)
+			for i := range *song {
+				newCommentIds[(*song)[i].DoubanId] = true
+			}
+			oldCommentIds := dao.GetCommentIds(doubanUid, consts.TypeSong.Code)
+			for i := range *oldCommentIds {
+				id := (*oldCommentIds)[i]
+				if !newCommentIds[id] {
+					dao.HideComment(doubanUid, consts.TypeSong.Code, id)
+				}
+			}
+			for i := range *song {
 				dao.UpsertComment(&(*comment)[i])
 				added := dao.CreateSongNx(&(*song)[i])
 				if added {

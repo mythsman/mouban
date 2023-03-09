@@ -7,10 +7,17 @@ import (
 	"mouban/model"
 )
 
-func PurgeComment(doubanUid uint64) int64 {
-	rows := common.Db.Model(&model.Comment{}).Where("douban_uid = ? ", doubanUid).Update("action", consts.ActionHide.Code).RowsAffected
-	logrus.Infoln("purge", rows, "comment(s) for", doubanUid)
-	return rows
+func HideComment(doubanUid uint64, t uint8, doubanId uint64) {
+	logrus.Infoln("hide comment for", doubanUid, "type", t, "at", doubanId)
+	common.Db.Model(&model.Comment{}).
+		Where("douban_uid = ? AND type = ? AND douban_id = ?", doubanUid, t, doubanId).
+		Update("action", consts.ActionHide.Code)
+}
+
+func GetCommentIds(doubanUid uint64, t uint8) *[]uint64 {
+	var doubanIds []uint64
+	common.Db.Model(&model.Comment{}).Where("douban_uid = ? AND type = ?", doubanUid, t).Select("douban_id").Find(&doubanIds)
+	return &doubanIds
 }
 
 func UpsertComment(comment *model.Comment) {
