@@ -32,4 +32,4 @@ http:
     user: 4000
     item: 4000
     discover: 4000
-  auth: 42342343,https://user:password@host:port;
+  auth: 42342343:rwedsf32,https://user:password@host:port;
