@@ -31,6 +31,7 @@ func main() {
 	adminGroup := router.Group("/admin")
 	{
 		adminGroup.GET("/load_data", controller.LoadData)
+		adminGroup.GET("/refresh_item", controller.RefreshItem)
 	}
 
 	queryGroup := router.Group("/guest")

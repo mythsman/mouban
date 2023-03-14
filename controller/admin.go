@@ -13,6 +13,36 @@ import (
 	"os"
 )
 
+func RefreshItem(ctx *gin.Context) {
+	typeStr := ctx.Query("type")
+	idStr := ctx.Query("id")
+
+	t := uint8(util.ParseNumber(typeStr))
+	id := util.ParseNumber(idStr)
+	if t == 0 || id == 0 {
+		BizError(ctx, "参数错误")
+		return
+	}
+
+	schedule := dao.GetSchedule(id, t)
+	if schedule == nil {
+		BizError(ctx, "条目未收录，无法更新")
+		return
+	}
+
+	if *schedule.Status == consts.ScheduleCrawling.Code || *schedule.Status == consts.ScheduleToCrawl.Code {
+		BizError(ctx, "当前条目正在更新中")
+		return
+	}
+
+	dao.CasScheduleStatus(schedule.DoubanId, schedule.Type, consts.ScheduleToCrawl.Code, *schedule.Status)
+	logrus.Infoln("refresh item for", t, id)
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"success": true,
+	})
+}
+
 func LoadData(ctx *gin.Context) {
 	path := ctx.Query("path")
 

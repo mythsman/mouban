@@ -54,6 +54,8 @@ bid需要在cookie中查看：
 
 ## 接口
 
+### 常用接口
+
 ```
 # 将 {your_douban_id} 改为你的豆瓣数字ID
 
@@ -92,4 +94,18 @@ http://localhost:8080/guest/user_song?id={your_douban_id}&action=wish
 http://localhost:8080/guest/user_song?id={your_douban_id}&action=do
 
 http://localhost:8080/guest/user_song?id={your_douban_id}&action=collect
+```
+
+### 后台接口
+
+```
+# 加载离线rss数据
+
+http://localhost:8080/admin/load_data?path={path_to_local_rss_file}
+
+# 强制更新条目
+# item_type 取 0-book 1-movie 2-game 3-song
+
+http://localhost:8080/admin/refresh_item?type={item_type}&id={item_douban_id}
+
 ```
