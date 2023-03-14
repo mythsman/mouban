@@ -57,7 +57,11 @@ func Book(doubanId uint64) (*model.Book, *model.Rating, *[]string, *[]uint64, er
 		authorIntro = util.TrimBookParagraph(selected[1])
 	}
 
-	data := util.TrimInfo(htmlquery.OutputHTML(htmlquery.FindOne(doc, "//div[@id='info']"), false))
+	info := htmlquery.FindOne(doc, "//div[@id='info']")
+	if info == nil {
+		panic("info is nil for " + strconv.FormatUint(doubanId, 10) + ", html: " + htmlquery.OutputHTML(doc, true))
+	}
+	data := util.TrimInfo(htmlquery.OutputHTML(info, false))
 
 	isbn := strings.TrimSpace(data["ISBN"])
 	subtitle := strings.TrimSpace(data["副标题"])

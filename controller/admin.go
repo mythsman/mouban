@@ -66,18 +66,19 @@ func loadFile(path string) {
 	defer f.Close()
 
 	scanner := bufio.NewScanner(f)
-	sem := semaphore.NewWeighted(100)
+	sem := semaphore.NewWeighted(20)
 	for scanner.Scan() {
 		err := sem.Acquire(context.Background(), 1)
 		if err != nil {
 			logrus.Infoln("acquire semaphore failed", err)
 			return
 		}
+		line := scanner.Text()
 		go func() {
 			defer func() {
 				sem.Release(1)
 			}()
-			processLine(scanner.Text())
+			processLine(line)
 		}()
 	}
 

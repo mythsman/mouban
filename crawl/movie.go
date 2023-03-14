@@ -53,7 +53,11 @@ func Movie(doubanId uint64) (*model.Movie, *model.Rating, *[]string, *[]uint64, 
 		}
 	}
 
-	data := util.TrimInfo(htmlquery.OutputHTML(htmlquery.FindOne(doc, "//div[@id='info']"), false))
+	info := htmlquery.FindOne(doc, "//div[@id='info']")
+	if info == nil {
+		panic("info is nil for " + strconv.FormatUint(doubanId, 10) + ", html: " + htmlquery.OutputHTML(doc, true))
+	}
+	data := util.TrimInfo(htmlquery.OutputHTML(info, false))
 
 	director := strings.TrimSpace(data["编剧"])
 	actor := strings.TrimSpace(data["主演"])
