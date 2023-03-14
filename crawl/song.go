@@ -59,7 +59,11 @@ func Song(doubanId uint64) (*model.Song, *model.Rating, *[]string, *[]uint64, er
 		trackList = util.TrimParagraph(htmlquery.OutputHTML(trackListNode, false))
 	}
 
-	data := util.TrimInfo(htmlquery.OutputHTML(htmlquery.FindOne(doc, "//div[@id='info']"), false))
+	info := htmlquery.FindOne(doc, "//div[@id='info']")
+	if info == nil {
+		panic("info is nil for " + strconv.FormatUint(doubanId, 10) + ", html: " + htmlquery.OutputHTML(doc, true))
+	}
+	data := util.TrimInfo(htmlquery.OutputHTML(info, false))
 
 	alias := strings.TrimSpace(data["又名"])
 	musician := strings.TrimSpace(data["表演者"])

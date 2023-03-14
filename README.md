@@ -1,5 +1,7 @@
 # mouban
 
+> 截至 2023年3月，已汇总有效数据：图书 2303604 本、游戏 4810 部、电影 232436 部、音乐 809147 首。
+
 本服务作为 [hexo-douban](https://github.com/mythsman/hexo-douban) 项目的后台数据获取服务，用于根据用户的豆瓣ID，获取用户在豆瓣的 书 影 音 游 中的标注信息，方便用户快速提取。
 
 [![dockeri.co](https://dockerico.blankenship.io/image/mythsman/mouban)](https://hub.docker.com/r/mythsman/mouban)
@@ -45,12 +47,11 @@
         - datasource__password=passwd for mysql
 ```
 
-其中最重要的是 http__auth 参数，用于配置登陆态的用户信息和走的http代理，格式为 `<doubanUid>:<bid>,http://<user>:<password>@<proxyIp>:<proxyPort>;`
+其中最重要的是 http__auth 参数，用于配置登陆态的用户信息和走的http代理，格式为 `<dbcl2>,http://<user>:<password>@<proxyIp>:<proxyPort>;`
 ，可以配置多个。
 
-bid需要在cookie中查看：
-
-![bid.png](image/img.png)
+dbcl2需要在cookie中查看：
+![img.png](image/img.png)
 
 ## 接口
 
@@ -98,14 +99,23 @@ http://localhost:8080/guest/user_song?id={your_douban_id}&action=collect
 
 ### 后台接口
 
+#### 加载 sitemap 数据
+
+豆瓣比较符合规范，sitemap文件更新的很及时，可以通过 [sitemap_index](https://www.douban.com/sitemap_index.xml)
+和 [sitemap_updated_index](https://www.douban.com/sitemap_updated_index.xml) 将存量数据离线下载下来，再一次性导入。
+
 ```
-# 加载离线rss数据
+# 加载离线 sitemap 数据，数据需要事先下载。
 
-http://localhost:8080/admin/load_data?path={path_to_local_rss_file}
+http://localhost:8080/admin/load_data?path={path_to_local_sitemap_file}
+```
 
-# 强制更新条目
-# item_type 取 0-book 1-movie 2-game 3-song
+#### 强制更新条目
 
+目前条目下载好后，后续不会进行更新，如有更新需要，目前暂时需要手动强制更新一下。
+
+item_type 取: 0-book 1-movie 2-game 3-song
+
+```
 http://localhost:8080/admin/refresh_item?type={item_type}&id={item_douban_id}
-
 ```
