@@ -1,8 +1,8 @@
 # mouban
 
-> 截至 2023年3月，已汇总有效数据：图书 2303604 本、游戏 4810 部、电影 232436 部、音乐 809147 首。
+> 截至 2023年3月，已汇总有效数据（去除了不存在的条目、被封禁条目后）：图书 2303604 本、电影 232436 部、音乐 809147 首、游戏 4810 部。
 
-本服务作为 [hexo-douban](https://github.com/mythsman/hexo-douban) 项目的后台数据获取服务，用于根据用户的豆瓣ID，获取用户在豆瓣的 书 影 音 游 中的标注信息，方便用户快速提取。
+本服务作为 [hexo-douban](https://github.com/mythsman/hexo-douban) 项目的后台数据获取服务，用于根据用户的豆瓣ID，获取用户在豆瓣的书、影、音、游中的标注信息，方便用户快速提取。
 
 [![dockeri.co](https://dockerico.blankenship.io/image/mythsman/mouban)](https://hub.docker.com/r/mythsman/mouban)
 
@@ -13,9 +13,10 @@
 1. 用户输入个人豆瓣ID。
 2. 访问读书首页获取用户头像、域名等信息。
 3. 访问个人 rss 页面获得用户最新更新时间用于去重。
-4. 访问用户书、影、游的首页获取总数等信息。
-5. 滚动访问用户书、影、游的评论页获取评论信息、条目概览。
+4. 访问用户书、影、音、游的首页获取总数等信息。
+5. 滚动访问用户书、影、音、游的评论页获取评论信息、条目概览。
 6. 访问条目详情页获取详细信息，并自动发现其他推荐的用户和条目。
+7. 每天定时更新书、影、音、游的首页，获取最新条目。
 
 ## 部署
 
@@ -101,14 +102,16 @@ http://localhost:8080/guest/user_song?id={your_douban_id}&action=collect
 
 #### 加载 sitemap 数据
 
-豆瓣比较符合规范，sitemap文件更新的很及时，可以通过 [sitemap_index](https://www.douban.com/sitemap_index.xml)
-和 [sitemap_updated_index](https://www.douban.com/sitemap_updated_index.xml) 将存量数据离线下载下来，再一次性导入。
+豆瓣在他的[robots.txt](https://www.douban.com/robots.txt)中分享了他的 sitemap，并且一直持续更新。因此我们可以通过 [sitemap_index](https://www.douban.com/sitemap_index.xml)
+和 [sitemap_updated_index](https://www.douban.com/sitemap_updated_index.xml) 将存量数据离线下载下来，解压后按类型 grep 条目后直接一次性导入，节省了对存量数据的爬虫搜索逻辑。
 
 ```
-# 加载离线 sitemap 数据，数据需要事先下载。
+# 加载离线 sitemap 数据。数据需要事先下载，并挂载到 docker 进程的指定路径下。
 
 http://localhost:8080/admin/load_data?path={path_to_local_sitemap_file}
 ```
+
+需要注意的是，sitemap 的数据并不全。除了举反例证明外，还有一个明显的例子，就是在 sitemap 中，书籍的条目数从 [五年前](https://www.zhihu.com/question/19583157/answer/140028235) 左右开始就是 3088633 条，但是最近一次更新时，发现 sitemap 中记录的书籍数还是这么多（即使 sitemap 本身也在更新）。因此增量更新始终是必要的。
 
 #### 强制更新条目
 
