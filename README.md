@@ -49,7 +49,7 @@
 ```
 
 其中最重要的是 http__auth 参数，用于配置登陆态的用户信息和走的http代理，格式为 `<dbcl2>,http://<user>:<password>@<proxyIp>:<proxyPort>;`
-，可以配置多个。
+，可以配置多个。需要注意的是，豆瓣对于未登录的账号有概率会投毒（[例子](https://movie.douban.com/subject/4881682/)），所以这里采用登陆态账号来处理。
 
 dbcl2需要在cookie中查看：
 ![img.png](image/img.png)

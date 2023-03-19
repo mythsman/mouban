@@ -29,10 +29,6 @@ func runLatest() {
 	logrus.Infoln(len(*songIds), "latest songs discovered")
 	processDiscoverItem(songIds, consts.TypeSong)
 
-	gameIds := crawl.LatestGame()
-	logrus.Infoln(len(*gameIds), "latest games discovered")
-	processDiscoverItem(gameIds, consts.TypeGame)
-
 }
 
 func init() {

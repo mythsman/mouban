@@ -51,18 +51,3 @@ func LatestMovie() *[]uint64 {
 
 	return util.ParseNewItems(doc, consts.TypeMovie)
 }
-
-func LatestGame() *[]uint64 {
-	body, _, err := Get(consts.GameLatestUrl, DiscoverLimiter)
-	if err != nil {
-		panic(err)
-	}
-
-	doc, err := htmlquery.Parse(strings.NewReader(*body))
-
-	if err != nil {
-		panic(err)
-	}
-
-	return util.ParseNewItems(doc, consts.TypeGame)
-}
