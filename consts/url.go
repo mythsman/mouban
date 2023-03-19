@@ -21,4 +21,6 @@ const SongLatestUrl = "https://music.douban.com/review/latest/"
 const GameOverviewUrl = "https://www.douban.com/people/%d/games/"
 const GameCommentUrl = "https://www.douban.com/people/%d/games?action=%s"
 const GameDetailUrl = "https://www.douban.com/game/%d/"
-const GameLatestUrl = "https://www.douban.com/game/explore?sort=original_release_date"
+
+//https://www.douban.com/j/ilmen/game/search?genres=&platforms=96&q=&sort=original_release_date
+//https://movie.douban.com/j/new_search_subjects

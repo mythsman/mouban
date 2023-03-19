@@ -224,6 +224,6 @@ func ParseItem(line string) (uint64, consts.Type) {
 	if matches != nil {
 		return ParseNumber(matches[0]), consts.TypeGame
 	}
-	
+
 	return 0, consts.TypeUser
 }

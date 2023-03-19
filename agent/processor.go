@@ -147,7 +147,9 @@ func processDiscoverUser(newUsers *[]string) {
 				}
 			}
 		}
-		logrus.Infoln("(", newFound, "/", totalFound, ") users discovered")
+		if newFound > 0 {
+			logrus.Infoln("(", newFound, "/", totalFound, ") users discovered")
+		}
 	}()
 }
 
@@ -173,8 +175,9 @@ func processDiscoverItem(newItems *[]uint64, t consts.Type) {
 				newFound += 1
 			}
 		}
-		logrus.Infoln("(", newFound, "/", totalFound, ")", t.Name, "discovered")
-
+		if newFound > 0 {
+			logrus.Infoln("(", newFound, "/", totalFound, ")", t.Name, "discovered")
+		}
 	}()
 }
 
