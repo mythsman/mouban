@@ -181,7 +181,7 @@ func processDiscoverItem(newItems *[]uint64, t consts.Type) {
 	}()
 }
 
-func processUser(doubanUid uint64, forceUpdate bool) {
+func processUser(doubanUid uint64) {
 	defer func() {
 		if r := recover(); r != nil {
 			logrus.Errorln(r, " => ", util.GetCurrentGoroutineStack())
@@ -190,7 +190,7 @@ func processUser(doubanUid uint64, forceUpdate bool) {
 
 	userPublish, _ := crawl.UserPublish(doubanUid)
 	rawUser := dao.GetUser(doubanUid)
-	if !forceUpdate && rawUser != nil && rawUser.PublishAt.Equal(userPublish) {
+	if rawUser != nil && rawUser.PublishAt.Equal(userPublish) {
 		logrus.Infoln("user", doubanUid, "not changed")
 		return
 	}
@@ -200,7 +200,6 @@ func processUser(doubanUid uint64, forceUpdate bool) {
 		dao.ChangeScheduleResult(doubanUid, consts.TypeUser.Code, consts.ScheduleInvalid.Code)
 		panic(err)
 	}
-	dao.UpsertUser(user)
 
 	//game
 	if user.GameDo > 0 || user.GameWish > 0 || user.GameCollect > 0 {
@@ -323,5 +322,6 @@ func processUser(doubanUid uint64, forceUpdate bool) {
 
 	}
 
+	dao.UpsertUser(user)
 	dao.ChangeScheduleResult(doubanUid, consts.TypeUser.Code, consts.ScheduleReady.Code)
 }
