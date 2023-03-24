@@ -11,26 +11,26 @@ import (
 	"time"
 )
 
-func CommentBook(doubanUid uint64, fullSync bool) (*[]model.Comment, *[]model.Book, error) {
+func CommentBook(doubanUid uint64, forceSyncAfter time.Time) (*[]model.Comment, *[]model.Book, error) {
 	var allComments []model.Comment
 	var allBooks []model.Book
 
-	comments, books := scrollAllBook(doubanUid, consts.ActionDo, fullSync)
+	comments, books := scrollAllBook(doubanUid, consts.ActionDo, forceSyncAfter)
 	allComments = append(allComments, *comments...)
 	allBooks = append(allBooks, *books...)
 
-	comments, books = scrollAllBook(doubanUid, consts.ActionWish, fullSync)
+	comments, books = scrollAllBook(doubanUid, consts.ActionWish, forceSyncAfter)
 	allComments = append(allComments, *comments...)
 	allBooks = append(allBooks, *books...)
 
-	comments, books = scrollAllBook(doubanUid, consts.ActionCollect, fullSync)
+	comments, books = scrollAllBook(doubanUid, consts.ActionCollect, forceSyncAfter)
 	allComments = append(allComments, *comments...)
 	allBooks = append(allBooks, *books...)
 
 	return &allComments, &allBooks, nil
 }
 
-func scrollAllBook(doubanUid uint64, action consts.Action, fullSync bool) (*[]model.Comment, *[]model.Book) {
+func scrollAllBook(doubanUid uint64, action consts.Action, forceSyncAfter time.Time) (*[]model.Comment, *[]model.Book) {
 	total := uint32(0)
 	var allComments []model.Comment
 	var allBooks []model.Book
@@ -46,8 +46,8 @@ func scrollAllBook(doubanUid uint64, action consts.Action, fullSync bool) (*[]mo
 		allComments = append(allComments, *comments...)
 		allBooks = append(allBooks, *books...)
 
-		if !fullSync && len(*comments) > 0 {
-			if (*comments)[len(*comments)-1].MarkDate.Before(time.Now()) {
+		if forceSyncAfter.Unix() > 0 && len(*comments) > 0 {
+			if (*comments)[len(*comments)-1].MarkDate.Before(forceSyncAfter) {
 				break
 			}
 		}

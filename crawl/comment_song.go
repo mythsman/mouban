@@ -11,26 +11,26 @@ import (
 	"time"
 )
 
-func CommentSong(doubanUid uint64, fullSync bool) (*[]model.Comment, *[]model.Song, error) {
+func CommentSong(doubanUid uint64, forceSyncAfter time.Time) (*[]model.Comment, *[]model.Song, error) {
 	var allComments []model.Comment
 	var allSongs []model.Song
 
-	comments, songs := scrollAllSong(doubanUid, consts.ActionDo, fullSync)
+	comments, songs := scrollAllSong(doubanUid, consts.ActionDo, forceSyncAfter)
 	allComments = append(allComments, *comments...)
 	allSongs = append(allSongs, *songs...)
 
-	comments, songs = scrollAllSong(doubanUid, consts.ActionWish, fullSync)
+	comments, songs = scrollAllSong(doubanUid, consts.ActionWish, forceSyncAfter)
 	allComments = append(allComments, *comments...)
 	allSongs = append(allSongs, *songs...)
 
-	comments, songs = scrollAllSong(doubanUid, consts.ActionCollect, fullSync)
+	comments, songs = scrollAllSong(doubanUid, consts.ActionCollect, forceSyncAfter)
 	allComments = append(allComments, *comments...)
 	allSongs = append(allSongs, *songs...)
 
 	return &allComments, &allSongs, nil
 }
 
-func scrollAllSong(doubanUid uint64, action consts.Action, fullSync bool) (*[]model.Comment, *[]model.Song) {
+func scrollAllSong(doubanUid uint64, action consts.Action, forceSyncAfter time.Time) (*[]model.Comment, *[]model.Song) {
 	total := uint32(0)
 	var allComments []model.Comment
 	var allSongs []model.Song
@@ -46,8 +46,8 @@ func scrollAllSong(doubanUid uint64, action consts.Action, fullSync bool) (*[]mo
 		allComments = append(allComments, *comments...)
 		allSongs = append(allSongs, *songs...)
 
-		if !fullSync && len(*comments) > 0 {
-			if (*comments)[len(*comments)-1].MarkDate.Before(time.Now()) {
+		if forceSyncAfter.Unix() > 0 && len(*comments) > 0 {
+			if (*comments)[len(*comments)-1].MarkDate.Before(forceSyncAfter) {
 				break
 			}
 		}
