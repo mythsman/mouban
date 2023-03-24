@@ -64,14 +64,30 @@ func ListUserItem(ctx *gin.Context, t uint8) {
 	id := ctx.Query("id")
 	doubanUid, err := strconv.ParseUint(id, 10, 64)
 	if err != nil || id == "0" {
-		BizError(ctx, "用户ID输入错误")
+		BizError(ctx, "id 参数错误")
 		return
 	}
 	logAccess(ctx, doubanUid)
 
 	action := ctx.Query("action")
 	if action == "" {
-		BizError(ctx, "参数错误")
+		BizError(ctx, "action 参数错误")
+		return
+	}
+
+	var actionType *consts.Action
+	switch action {
+	case consts.ActionWish.Name:
+		actionType = &consts.ActionWish
+	case consts.ActionCollect.Name:
+		actionType = &consts.ActionCollect
+	case consts.ActionDo.Name:
+		actionType = &consts.ActionDo
+	case consts.ActionHide.Name:
+		actionType = &consts.ActionHide
+	}
+	if actionType == nil {
+		BizError(ctx, "action 参数错误")
 		return
 	}
 
@@ -80,26 +96,13 @@ func ListUserItem(ctx *gin.Context, t uint8) {
 		offset, _ = strconv.Atoi(ctx.Query("offset"))
 	}
 
-	schedule := dao.GetSchedule(doubanUid, consts.TypeUser.Code)
-
-	if schedule == nil {
-		BizError(ctx, "当前用户未录入")
-		return
-	}
-
-	if *schedule.Result == consts.ScheduleUnready.Code {
-		BizError(ctx, "当前用户录入中")
-		return
-	}
-
-	if *schedule.Result == consts.ScheduleInvalid.Code {
-		BizError(ctx, "当前用户不存在")
-		return
-	}
-
 	user := dao.GetUser(doubanUid)
+	if user == nil {
+		BizError(ctx, "用户信息找不到")
+		return
+	}
 
-	comments := dao.SearchComment(doubanUid, t, parseAction(action), offset)
+	comments := dao.SearchComment(doubanUid, t, actionType.Code, offset)
 
 	var ids []uint64
 	for _, c := range *comments {
@@ -178,18 +181,4 @@ func logAccess(ctx *gin.Context, doubanUid uint64) {
 	ip := ctx.ClientIP()
 
 	dao.AddAccess(doubanUid, ctx.FullPath(), ip, ua, referer)
-}
-
-func parseAction(action string) uint8 {
-	switch action {
-	case consts.ActionWish.Name:
-		return consts.ActionWish.Code
-	case consts.ActionCollect.Name:
-		return consts.ActionCollect.Code
-	case consts.ActionDo.Name:
-		return consts.ActionDo.Code
-	case consts.ActionHide.Name:
-		return consts.ActionHide.Code
-	}
-	return consts.ActionCollect.Code
 }
