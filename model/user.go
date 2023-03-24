@@ -22,6 +22,8 @@ type User struct {
 	SongWish     uint32 `gorm:"not null default 0"`
 	SongDo       uint32 `gorm:"not null default 0"`
 	SongCollect  uint32 `gorm:"not null default 0"`
+	FullSyncAt   time.Time
+	IncrSyncAt   time.Time
 	RegisterAt   time.Time
 	PublishAt    time.Time
 	CreatedAt    time.Time
@@ -50,6 +52,8 @@ func (user User) Show() *UserVO {
 		SongWish:     user.MovieWish,
 		SongDo:       user.MovieDo,
 		SongCollect:  user.MovieCollect,
+		FullSyncAt:   user.FullSyncAt.Unix(),
+		IncrSyncAt:   user.IncrSyncAt.Unix(),
 	}
 }
 
@@ -70,4 +74,6 @@ type UserVO struct {
 	SongWish     uint32 `json:"song_wish"`
 	SongDo       uint32 `json:"song_do"`
 	SongCollect  uint32 `json:"song_collect"`
+	FullSyncAt   int64  `json:"full_sync_at"`
+	IncrSyncAt   int64  `json:"incr_sync_at"`
 }
