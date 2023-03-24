@@ -207,30 +207,31 @@ func processUser(doubanUid uint64) {
 	}
 
 	// choose update type
-	fullSync := false
-	if rawUser == nil || rawUser.SyncAt.Unix() == 0 || rawUser.SyncAt.Add(time.Hour*24*30).Before(time.Now()) {
-		fullSync = true
+	forceSyncAfter := time.Unix(0, 0)
+	if rawUser != nil && rawUser.SyncAt.AddDate(0, 6, 0).After(time.Now()) {
+		forceSyncAfter = rawUser.SyncAt
 	}
-	logrus.Infoln("user", doubanUid, "full_sync ->", fullSync)
+
+	logrus.Infoln("user", doubanUid, "sync_after ->", forceSyncAfter)
 
 	//book
 	if user.BookDo+user.BookWish+user.BookCollect > 0 {
-		syncCommentBook(doubanUid, fullSync)
+		syncCommentBook(doubanUid, forceSyncAfter)
 	}
 
 	//movie
 	if user.MovieDo+user.MovieWish+user.MovieCollect > 0 {
-		syncCommentMovie(doubanUid, fullSync)
+		syncCommentMovie(doubanUid, forceSyncAfter)
 	}
 
 	//game
 	if user.GameDo+user.GameWish+user.GameCollect > 0 {
-		syncCommentGame(doubanUid, fullSync)
+		syncCommentGame(doubanUid, forceSyncAfter)
 	}
 
 	//song
 	if user.SongDo+user.SongWish+user.SongCollect > 0 {
-		syncCommentSong(doubanUid, fullSync)
+		syncCommentSong(doubanUid, forceSyncAfter)
 	}
 
 	user.CheckAt = time.Now()
@@ -240,13 +241,13 @@ func processUser(doubanUid uint64) {
 	dao.ChangeScheduleResult(doubanUid, consts.TypeUser.Code, consts.ScheduleReady.Code)
 }
 
-func syncCommentGame(doubanUid uint64, fullSync bool) {
-	comment, game, err := crawl.CommentGame(doubanUid, fullSync)
+func syncCommentGame(doubanUid uint64, forceSyncAfter time.Time) {
+	comment, game, err := crawl.CommentGame(doubanUid, forceSyncAfter)
 	if err != nil {
 		panic(err)
 	}
 	go func() {
-		if fullSync {
+		if forceSyncAfter.Unix() == 0 {
 			newCommentIds := make(map[uint64]bool)
 			for i := range *game {
 				newCommentIds[(*game)[i].DoubanId] = true
@@ -270,13 +271,13 @@ func syncCommentGame(doubanUid uint64, fullSync bool) {
 	}()
 }
 
-func syncCommentBook(doubanUid uint64, fullSync bool) {
-	comment, book, err := crawl.CommentBook(doubanUid, fullSync)
+func syncCommentBook(doubanUid uint64, forceSyncAfter time.Time) {
+	comment, book, err := crawl.CommentBook(doubanUid, forceSyncAfter)
 	if err != nil {
 		panic(err)
 	}
 	go func() {
-		if fullSync {
+		if forceSyncAfter.Unix() == 0 {
 			newCommentIds := make(map[uint64]bool)
 			for i := range *book {
 				newCommentIds[(*book)[i].DoubanId] = true
@@ -299,14 +300,14 @@ func syncCommentBook(doubanUid uint64, fullSync bool) {
 	}()
 }
 
-func syncCommentMovie(doubanUid uint64, fullSync bool) {
-	comment, movie, err := crawl.CommentMovie(doubanUid, fullSync)
+func syncCommentMovie(doubanUid uint64, forceSyncAfter time.Time) {
+	comment, movie, err := crawl.CommentMovie(doubanUid, forceSyncAfter)
 	if err != nil {
 		panic(err)
 	}
 
 	go func() {
-		if fullSync {
+		if forceSyncAfter.Unix() == 0 {
 			newCommentIds := make(map[uint64]bool)
 			for i := range *movie {
 				newCommentIds[(*movie)[i].DoubanId] = true
@@ -329,14 +330,14 @@ func syncCommentMovie(doubanUid uint64, fullSync bool) {
 	}()
 }
 
-func syncCommentSong(doubanUid uint64, fullSync bool) {
-	comment, song, err := crawl.CommentSong(doubanUid, fullSync)
+func syncCommentSong(doubanUid uint64, forceSyncAfter time.Time) {
+	comment, song, err := crawl.CommentSong(doubanUid, forceSyncAfter)
 	if err != nil {
 		panic(err)
 	}
 
 	go func() {
-		if fullSync {
+		if forceSyncAfter.Unix() == 0 {
 			newCommentIds := make(map[uint64]bool)
 			for i := range *song {
 				newCommentIds[(*song)[i].DoubanId] = true

@@ -11,26 +11,26 @@ import (
 	"time"
 )
 
-func CommentMovie(doubanUid uint64, fullSync bool) (*[]model.Comment, *[]model.Movie, error) {
+func CommentMovie(doubanUid uint64, forceSyncAfter time.Time) (*[]model.Comment, *[]model.Movie, error) {
 	var allComments []model.Comment
 	var allMovies []model.Movie
 
-	comments, movies := scrollAllMovie(doubanUid, consts.ActionDo, fullSync)
+	comments, movies := scrollAllMovie(doubanUid, consts.ActionDo, forceSyncAfter)
 	allComments = append(allComments, *comments...)
 	allMovies = append(allMovies, *movies...)
 
-	comments, movies = scrollAllMovie(doubanUid, consts.ActionWish, fullSync)
+	comments, movies = scrollAllMovie(doubanUid, consts.ActionWish, forceSyncAfter)
 	allComments = append(allComments, *comments...)
 	allMovies = append(allMovies, *movies...)
 
-	comments, movies = scrollAllMovie(doubanUid, consts.ActionCollect, fullSync)
+	comments, movies = scrollAllMovie(doubanUid, consts.ActionCollect, forceSyncAfter)
 	allComments = append(allComments, *comments...)
 	allMovies = append(allMovies, *movies...)
 
 	return &allComments, &allMovies, nil
 }
 
-func scrollAllMovie(doubanUid uint64, action consts.Action, fullSync bool) (*[]model.Comment, *[]model.Movie) {
+func scrollAllMovie(doubanUid uint64, action consts.Action, forceSyncAfter time.Time) (*[]model.Comment, *[]model.Movie) {
 	total := uint32(0)
 	var allComments []model.Comment
 	var allMovies []model.Movie
@@ -46,8 +46,8 @@ func scrollAllMovie(doubanUid uint64, action consts.Action, fullSync bool) (*[]m
 		allComments = append(allComments, *comments...)
 		allMovies = append(allMovies, *movies...)
 
-		if !fullSync && len(*comments) > 0 {
-			if (*comments)[len(*comments)-1].MarkDate.Before(time.Now()) {
+		if forceSyncAfter.Unix() > 0 && len(*comments) > 0 {
+			if (*comments)[len(*comments)-1].MarkDate.Before(forceSyncAfter) {
 				break
 			}
 		}
