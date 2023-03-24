@@ -11,30 +11,26 @@ import (
 	"time"
 )
 
-func CommentBook(doubanUid uint64) (*model.User, *[]model.Comment, *[]model.Book, error) {
+func CommentBook(doubanUid uint64, fullSync bool) (*[]model.Comment, *[]model.Book, error) {
 	var allComments []model.Comment
 	var allBooks []model.Book
-	user := &model.User{}
 
-	comments, books, total := scrollAllBook(doubanUid, consts.ActionDo)
-	user.BookDo = total
+	comments, books := scrollAllBook(doubanUid, consts.ActionDo, fullSync)
 	allComments = append(allComments, *comments...)
 	allBooks = append(allBooks, *books...)
 
-	comments, books, total = scrollAllBook(doubanUid, consts.ActionWish)
-	user.BookWish = total
+	comments, books = scrollAllBook(doubanUid, consts.ActionWish, fullSync)
 	allComments = append(allComments, *comments...)
 	allBooks = append(allBooks, *books...)
 
-	comments, books, total = scrollAllBook(doubanUid, consts.ActionCollect)
-	user.BookCollect = total
+	comments, books = scrollAllBook(doubanUid, consts.ActionCollect, fullSync)
 	allComments = append(allComments, *comments...)
 	allBooks = append(allBooks, *books...)
 
-	return user, &allComments, &allBooks, nil
+	return &allComments, &allBooks, nil
 }
 
-func scrollAllBook(doubanUid uint64, action consts.Action) (*[]model.Comment, *[]model.Book, uint32) {
+func scrollAllBook(doubanUid uint64, action consts.Action, fullSync bool) (*[]model.Comment, *[]model.Book) {
 	total := uint32(0)
 	var allComments []model.Comment
 	var allBooks []model.Book
@@ -49,11 +45,18 @@ func scrollAllBook(doubanUid uint64, action consts.Action) (*[]model.Comment, *[
 		url = next
 		allComments = append(allComments, *comments...)
 		allBooks = append(allBooks, *books...)
+
+		if !fullSync && len(*comments) > 0 {
+			if (*comments)[len(*comments)-1].MarkDate.Before(time.Now()) {
+				break
+			}
+		}
+
 		if next == "" || total >= viper.GetUint32("agent.item.max") {
 			break
 		}
 	}
-	return &allComments, &allBooks, total
+	return &allComments, &allBooks
 }
 
 func scrollBook(doubanUid uint64, url string, action consts.Action) (*[]model.Comment, *[]model.Book, uint32, string, error) {

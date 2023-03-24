@@ -11,31 +11,26 @@ import (
 	"time"
 )
 
-func CommentSong(doubanUid uint64) (*model.User, *[]model.Comment, *[]model.Song, error) {
+func CommentSong(doubanUid uint64, fullSync bool) (*[]model.Comment, *[]model.Song, error) {
 	var allComments []model.Comment
 	var allSongs []model.Song
 
-	user := &model.User{}
-
-	comments, songs, total := scrollAllSong(doubanUid, consts.ActionDo)
-	user.SongDo = total
+	comments, songs := scrollAllSong(doubanUid, consts.ActionDo, fullSync)
 	allComments = append(allComments, *comments...)
 	allSongs = append(allSongs, *songs...)
 
-	comments, songs, total = scrollAllSong(doubanUid, consts.ActionWish)
-	user.SongWish = total
+	comments, songs = scrollAllSong(doubanUid, consts.ActionWish, fullSync)
 	allComments = append(allComments, *comments...)
 	allSongs = append(allSongs, *songs...)
 
-	comments, songs, total = scrollAllSong(doubanUid, consts.ActionCollect)
-	user.SongCollect = total
+	comments, songs = scrollAllSong(doubanUid, consts.ActionCollect, fullSync)
 	allComments = append(allComments, *comments...)
 	allSongs = append(allSongs, *songs...)
 
-	return user, &allComments, &allSongs, nil
+	return &allComments, &allSongs, nil
 }
 
-func scrollAllSong(doubanUid uint64, action consts.Action) (*[]model.Comment, *[]model.Song, uint32) {
+func scrollAllSong(doubanUid uint64, action consts.Action, fullSync bool) (*[]model.Comment, *[]model.Song) {
 	total := uint32(0)
 	var allComments []model.Comment
 	var allSongs []model.Song
@@ -50,11 +45,18 @@ func scrollAllSong(doubanUid uint64, action consts.Action) (*[]model.Comment, *[
 		url = next
 		allComments = append(allComments, *comments...)
 		allSongs = append(allSongs, *songs...)
+
+		if !fullSync && len(*comments) > 0 {
+			if (*comments)[len(*comments)-1].MarkDate.Before(time.Now()) {
+				break
+			}
+		}
+
 		if next == "" || total >= viper.GetUint32("agent.item.max") {
 			break
 		}
 	}
-	return &allComments, &allSongs, total
+	return &allComments, &allSongs
 }
 
 func scrollSong(doubanUid uint64, url string, action consts.Action) (*[]model.Comment, *[]model.Song, uint32, string, error) {

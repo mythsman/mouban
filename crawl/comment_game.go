@@ -8,32 +8,29 @@ import (
 	"mouban/model"
 	"mouban/util"
 	"strings"
+	"time"
 )
 
-func CommentGame(doubanUid uint64) (*model.User, *[]model.Comment, *[]model.Game, error) {
+func CommentGame(doubanUid uint64, fullSync bool) (*[]model.Comment, *[]model.Game, error) {
 	var allComments []model.Comment
 	var allGames []model.Game
-	user := &model.User{}
 
-	comments, games, total := scrollAllGame(doubanUid, consts.ActionDo)
-	user.GameDo = total
+	comments, games := scrollAllGame(doubanUid, consts.ActionDo, fullSync)
 	allComments = append(allComments, *comments...)
 	allGames = append(allGames, *games...)
 
-	comments, games, total = scrollAllGame(doubanUid, consts.ActionWish)
-	user.GameWish = total
+	comments, games = scrollAllGame(doubanUid, consts.ActionWish, fullSync)
 	allComments = append(allComments, *comments...)
 	allGames = append(allGames, *games...)
 
-	comments, games, total = scrollAllGame(doubanUid, consts.ActionCollect)
-	user.GameCollect = total
+	comments, games = scrollAllGame(doubanUid, consts.ActionCollect, fullSync)
 	allComments = append(allComments, *comments...)
 	allGames = append(allGames, *games...)
 
-	return user, &allComments, &allGames, nil
+	return &allComments, &allGames, nil
 }
 
-func scrollAllGame(doubanUid uint64, action consts.Action) (*[]model.Comment, *[]model.Game, uint32) {
+func scrollAllGame(doubanUid uint64, action consts.Action, fullSync bool) (*[]model.Comment, *[]model.Game) {
 	total := uint32(0)
 	var allComments []model.Comment
 	var allGames []model.Game
@@ -48,11 +45,18 @@ func scrollAllGame(doubanUid uint64, action consts.Action) (*[]model.Comment, *[
 		url = next
 		allComments = append(allComments, *comments...)
 		allGames = append(allGames, *games...)
+
+		if !fullSync && len(*comments) > 0 {
+			if (*comments)[len(*comments)-1].MarkDate.Before(time.Now()) {
+				break
+			}
+		}
+
 		if next == "" || total >= viper.GetUint32("agent.item.max") {
 			break
 		}
 	}
-	return &allComments, &allGames, total
+	return &allComments, &allGames
 }
 
 func scrollGame(doubanUid uint64, url string, action consts.Action) (*[]model.Comment, *[]model.Game, uint32, string, error) {

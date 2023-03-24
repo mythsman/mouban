@@ -11,31 +11,26 @@ import (
 	"time"
 )
 
-func CommentMovie(doubanUid uint64) (*model.User, *[]model.Comment, *[]model.Movie, error) {
+func CommentMovie(doubanUid uint64, fullSync bool) (*[]model.Comment, *[]model.Movie, error) {
 	var allComments []model.Comment
 	var allMovies []model.Movie
 
-	user := &model.User{}
-
-	comments, movies, total := scrollAllMovie(doubanUid, consts.ActionDo)
-	user.MovieDo = total
+	comments, movies := scrollAllMovie(doubanUid, consts.ActionDo, fullSync)
 	allComments = append(allComments, *comments...)
 	allMovies = append(allMovies, *movies...)
 
-	comments, movies, total = scrollAllMovie(doubanUid, consts.ActionWish)
-	user.MovieWish = total
+	comments, movies = scrollAllMovie(doubanUid, consts.ActionWish, fullSync)
 	allComments = append(allComments, *comments...)
 	allMovies = append(allMovies, *movies...)
 
-	comments, movies, total = scrollAllMovie(doubanUid, consts.ActionCollect)
-	user.MovieCollect = total
+	comments, movies = scrollAllMovie(doubanUid, consts.ActionCollect, fullSync)
 	allComments = append(allComments, *comments...)
 	allMovies = append(allMovies, *movies...)
 
-	return user, &allComments, &allMovies, nil
+	return &allComments, &allMovies, nil
 }
 
-func scrollAllMovie(doubanUid uint64, action consts.Action) (*[]model.Comment, *[]model.Movie, uint32) {
+func scrollAllMovie(doubanUid uint64, action consts.Action, fullSync bool) (*[]model.Comment, *[]model.Movie) {
 	total := uint32(0)
 	var allComments []model.Comment
 	var allMovies []model.Movie
@@ -50,11 +45,18 @@ func scrollAllMovie(doubanUid uint64, action consts.Action) (*[]model.Comment, *
 		url = next
 		allComments = append(allComments, *comments...)
 		allMovies = append(allMovies, *movies...)
+
+		if !fullSync && len(*comments) > 0 {
+			if (*comments)[len(*comments)-1].MarkDate.Before(time.Now()) {
+				break
+			}
+		}
+
 		if next == "" || total >= viper.GetUint32("agent.item.max") {
 			break
 		}
 	}
-	return &allComments, &allMovies, total
+	return &allComments, &allMovies
 }
 
 func scrollMovie(doubanUid uint64, url string, action consts.Action) (*[]model.Comment, *[]model.Movie, uint32, string, error) {

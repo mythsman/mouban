@@ -192,27 +192,61 @@ func processUser(doubanUid uint64) {
 	userPublish, _ := crawl.UserPublish(doubanUid)
 	rawUser := dao.GetUser(doubanUid)
 	if rawUser != nil && rawUser.PublishAt.Equal(userPublish) {
-		logrus.Infoln("user", doubanUid, "not changed")
+		logrus.Infoln("user", doubanUid, "changed ->", false)
 		rawUser.CheckAt = time.Now()
 		dao.UpsertUser(rawUser)
 		return
 	}
+	logrus.Infoln("user", doubanUid, "changed ->", true)
+
 	//user
 	user, err := crawl.UserOverview(doubanUid)
 	if err != nil {
 		dao.ChangeScheduleResult(doubanUid, consts.TypeUser.Code, consts.ScheduleInvalid.Code)
 		panic(err)
 	}
+
+	// choose update type
+	fullSync := false
+	if rawUser == nil || rawUser.SyncAt.Unix() == 0 || rawUser.SyncAt.Add(time.Hour*24*30).Before(time.Now()) {
+		fullSync = true
+	}
+	logrus.Infoln("user", doubanUid, "full_sync ->", fullSync)
+
+	//book
+	if user.BookDo+user.BookWish+user.BookCollect > 0 {
+		syncCommentBook(doubanUid, fullSync)
+	}
+
+	//movie
+	if user.MovieDo+user.MovieWish+user.MovieCollect > 0 {
+		syncCommentMovie(doubanUid, fullSync)
+	}
+
+	//game
+	if user.GameDo+user.GameWish+user.GameCollect > 0 {
+		syncCommentGame(doubanUid, fullSync)
+	}
+
+	//song
+	if user.SongDo+user.SongWish+user.SongCollect > 0 {
+		syncCommentSong(doubanUid, fullSync)
+	}
+
 	user.CheckAt = time.Now()
 	user.SyncAt = time.Now()
 
-	//game
-	if user.GameDo > 0 || user.GameWish > 0 || user.GameCollect > 0 {
-		_, comment, game, err := crawl.CommentGame(doubanUid)
-		if err != nil {
-			panic(err)
-		}
-		go func() {
+	dao.UpsertUser(user)
+	dao.ChangeScheduleResult(doubanUid, consts.TypeUser.Code, consts.ScheduleReady.Code)
+}
+
+func syncCommentGame(doubanUid uint64, fullSync bool) {
+	comment, game, err := crawl.CommentGame(doubanUid, fullSync)
+	if err != nil {
+		panic(err)
+	}
+	go func() {
+		if fullSync {
 			newCommentIds := make(map[uint64]bool)
 			for i := range *game {
 				newCommentIds[(*game)[i].DoubanId] = true
@@ -224,25 +258,25 @@ func processUser(doubanUid uint64) {
 					dao.HideComment(doubanUid, consts.TypeGame.Code, id)
 				}
 			}
-			for i := range *game {
-				dao.UpsertComment(&(*comment)[i])
-				added := dao.CreateGameNx(&(*game)[i])
-				if added {
-					dao.CreateScheduleNx((*game)[i].DoubanId, consts.TypeGame.Code, consts.ScheduleToCrawl.Code, consts.ScheduleUnready.Code)
-				}
-			}
-		}()
-
-	}
-
-	//book
-	if user.BookDo > 0 || user.BookWish > 0 || user.BookCollect > 0 {
-
-		_, comment, book, err := crawl.CommentBook(doubanUid)
-		if err != nil {
-			panic(err)
 		}
-		go func() {
+
+		for i := range *game {
+			dao.UpsertComment(&(*comment)[i])
+			added := dao.CreateGameNx(&(*game)[i])
+			if added {
+				dao.CreateScheduleNx((*game)[i].DoubanId, consts.TypeGame.Code, consts.ScheduleToCrawl.Code, consts.ScheduleUnready.Code)
+			}
+		}
+	}()
+}
+
+func syncCommentBook(doubanUid uint64, fullSync bool) {
+	comment, book, err := crawl.CommentBook(doubanUid, fullSync)
+	if err != nil {
+		panic(err)
+	}
+	go func() {
+		if fullSync {
 			newCommentIds := make(map[uint64]bool)
 			for i := range *book {
 				newCommentIds[(*book)[i].DoubanId] = true
@@ -254,26 +288,25 @@ func processUser(doubanUid uint64) {
 					dao.HideComment(doubanUid, consts.TypeBook.Code, id)
 				}
 			}
-			for i := range *book {
-				added := dao.CreateBookNx(&(*book)[i])
-				dao.UpsertComment(&(*comment)[i])
-				if added {
-					dao.CreateScheduleNx((*book)[i].DoubanId, consts.TypeBook.Code, consts.ScheduleToCrawl.Code, consts.ScheduleUnready.Code)
-				}
+		}
+		for i := range *book {
+			added := dao.CreateBookNx(&(*book)[i])
+			dao.UpsertComment(&(*comment)[i])
+			if added {
+				dao.CreateScheduleNx((*book)[i].DoubanId, consts.TypeBook.Code, consts.ScheduleToCrawl.Code, consts.ScheduleUnready.Code)
 			}
-		}()
+		}
+	}()
+}
 
+func syncCommentMovie(doubanUid uint64, fullSync bool) {
+	comment, movie, err := crawl.CommentMovie(doubanUid, fullSync)
+	if err != nil {
+		panic(err)
 	}
 
-	//movie
-	if user.MovieDo > 0 || user.MovieWish > 0 || user.MovieCollect > 0 {
-
-		_, comment, movie, err := crawl.CommentMovie(doubanUid)
-		if err != nil {
-			panic(err)
-		}
-
-		go func() {
+	go func() {
+		if fullSync {
 			newCommentIds := make(map[uint64]bool)
 			for i := range *movie {
 				newCommentIds[(*movie)[i].DoubanId] = true
@@ -285,26 +318,25 @@ func processUser(doubanUid uint64) {
 					dao.HideComment(doubanUid, consts.TypeMovie.Code, id)
 				}
 			}
-			for i := range *movie {
-				dao.UpsertComment(&(*comment)[i])
-				added := dao.CreateMovieNx(&(*movie)[i])
-				if added {
-					dao.CreateScheduleNx((*movie)[i].DoubanId, consts.TypeMovie.Code, consts.ScheduleToCrawl.Code, consts.ScheduleUnready.Code)
-				}
+		}
+		for i := range *movie {
+			dao.UpsertComment(&(*comment)[i])
+			added := dao.CreateMovieNx(&(*movie)[i])
+			if added {
+				dao.CreateScheduleNx((*movie)[i].DoubanId, consts.TypeMovie.Code, consts.ScheduleToCrawl.Code, consts.ScheduleUnready.Code)
 			}
-		}()
+		}
+	}()
+}
 
+func syncCommentSong(doubanUid uint64, fullSync bool) {
+	comment, song, err := crawl.CommentSong(doubanUid, fullSync)
+	if err != nil {
+		panic(err)
 	}
 
-	//song
-	if user.SongDo > 0 || user.SongWish > 0 || user.SongCollect > 0 {
-
-		_, comment, song, err := crawl.CommentSong(doubanUid)
-		if err != nil {
-			panic(err)
-		}
-
-		go func() {
+	go func() {
+		if fullSync {
 			newCommentIds := make(map[uint64]bool)
 			for i := range *song {
 				newCommentIds[(*song)[i].DoubanId] = true
@@ -316,17 +348,13 @@ func processUser(doubanUid uint64) {
 					dao.HideComment(doubanUid, consts.TypeSong.Code, id)
 				}
 			}
-			for i := range *song {
-				dao.UpsertComment(&(*comment)[i])
-				added := dao.CreateSongNx(&(*song)[i])
-				if added {
-					dao.CreateScheduleNx((*song)[i].DoubanId, consts.TypeSong.Code, consts.ScheduleToCrawl.Code, consts.ScheduleUnready.Code)
-				}
+		}
+		for i := range *song {
+			dao.UpsertComment(&(*comment)[i])
+			added := dao.CreateSongNx(&(*song)[i])
+			if added {
+				dao.CreateScheduleNx((*song)[i].DoubanId, consts.TypeSong.Code, consts.ScheduleToCrawl.Code, consts.ScheduleUnready.Code)
 			}
-		}()
-
-	}
-
-	dao.UpsertUser(user)
-	dao.ChangeScheduleResult(doubanUid, consts.TypeUser.Code, consts.ScheduleReady.Code)
+		}
+	}()
 }

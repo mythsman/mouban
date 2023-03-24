@@ -19,11 +19,10 @@ func Test_scrollBook(t *testing.T) {
 }
 
 func Test_CommentBook(t *testing.T) {
-	user, comments, books, err := CommentBook(162448367)
+	comments, books, err := CommentBook(162448367, true)
 	if err != nil {
 		return
 	}
-	logrus.Infoln(util.ToJson(*user))
 	logrus.Infoln(util.ToJson(*comments))
 	logrus.Infoln(util.ToJson(*books))
 
