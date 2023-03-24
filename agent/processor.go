@@ -8,6 +8,7 @@ import (
 	"mouban/dao"
 	"mouban/util"
 	"strconv"
+	"time"
 )
 
 func processItem(t uint8, doubanId uint64) {
@@ -192,6 +193,8 @@ func processUser(doubanUid uint64) {
 	rawUser := dao.GetUser(doubanUid)
 	if rawUser != nil && rawUser.PublishAt.Equal(userPublish) {
 		logrus.Infoln("user", doubanUid, "not changed")
+		rawUser.CheckAt = time.Now()
+		dao.UpsertUser(rawUser)
 		return
 	}
 	//user
@@ -200,6 +203,8 @@ func processUser(doubanUid uint64) {
 		dao.ChangeScheduleResult(doubanUid, consts.TypeUser.Code, consts.ScheduleInvalid.Code)
 		panic(err)
 	}
+	user.CheckAt = time.Now()
+	user.SyncAt = time.Now()
 
 	//game
 	if user.GameDo > 0 || user.GameWish > 0 || user.GameCollect > 0 {
