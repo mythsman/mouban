@@ -5,6 +5,7 @@ import (
 	"mouban/consts"
 	"mouban/util"
 	"testing"
+	"time"
 )
 
 func Test_scrollBook(t *testing.T) {
@@ -19,7 +20,7 @@ func Test_scrollBook(t *testing.T) {
 }
 
 func Test_CommentBook(t *testing.T) {
-	comments, books, err := CommentBook(162448367, true)
+	comments, books, err := CommentBook(162448367, time.Unix(0, 0))
 	if err != nil {
 		return
 	}
