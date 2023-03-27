@@ -28,10 +28,10 @@ func runItem(index int) {
 			changed := dao.CasScheduleStatus(schedule.DoubanId, schedule.Type, consts.ScheduleCrawling.Code, consts.ScheduleToCrawl.Code)
 			if changed {
 				found = true
-				logrus.Infoln("item", index, "start", t.Name, strconv.FormatUint(schedule.DoubanId, 10))
+				logrus.Infoln("item thread", index, "start", t.Name, strconv.FormatUint(schedule.DoubanId, 10))
 				processItem(t.Code, schedule.DoubanId)
 				dao.CasScheduleStatus(schedule.DoubanId, schedule.Type, consts.ScheduleCrawled.Code, consts.ScheduleCrawling.Code)
-				logrus.Infoln("item", index, "end", t.Name, strconv.FormatUint(schedule.DoubanId, 10))
+				logrus.Infoln("item thread", index, "end", t.Name, strconv.FormatUint(schedule.DoubanId, 10))
 			}
 			break
 		}
