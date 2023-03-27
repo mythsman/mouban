@@ -3,6 +3,7 @@ package agent
 import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
+	"math/rand"
 	"mouban/consts"
 	"mouban/dao"
 	"mouban/util"
@@ -16,77 +17,30 @@ func runFlow() {
 		}
 	}()
 
-	pendingBook := dao.SearchScheduleByStatus(consts.TypeBook.Code, consts.ScheduleToCrawl.Code)
-	if pendingBook == nil {
-		retryBook := dao.SearchScheduleByAll(consts.TypeBook.Code, consts.ScheduleCrawled.Code, consts.ScheduleUnready.Code)
-		if retryBook != nil {
-			changed := dao.CasScheduleStatus(retryBook.DoubanId, retryBook.Type, consts.ScheduleToCrawl.Code, consts.ScheduleCrawled.Code)
-			if changed {
-				logrus.Infoln("flow retry book ", retryBook.DoubanId)
-			}
-		} else {
-			discoverBook := dao.SearchScheduleByStatus(consts.TypeBook.Code, consts.ScheduleCanCrawl.Code)
-			if discoverBook != nil {
-				changed := dao.CasScheduleStatus(discoverBook.DoubanId, discoverBook.Type, consts.ScheduleToCrawl.Code, consts.ScheduleCanCrawl.Code)
-				if changed {
-					logrus.Infoln("flow discover book", discoverBook.DoubanId)
-				}
-			}
-		}
-	}
+	types := []consts.Type{consts.TypeBook, consts.TypeMovie, consts.TypeGame, consts.TypeSong}
+	rand.Shuffle(len(types), func(i, j int) { types[i], types[j] = types[j], types[i] })
 
-	pendingMovie := dao.SearchScheduleByStatus(consts.TypeMovie.Code, consts.ScheduleToCrawl.Code)
-	if pendingMovie == nil {
-		retryMovie := dao.SearchScheduleByAll(consts.TypeMovie.Code, consts.ScheduleCrawled.Code, consts.ScheduleUnready.Code)
-		if retryMovie != nil {
-			changed := dao.CasScheduleStatus(retryMovie.DoubanId, retryMovie.Type, consts.ScheduleToCrawl.Code, consts.ScheduleCrawled.Code)
-			if changed {
-				logrus.Infoln("flow retry movie ", retryMovie.DoubanId)
-			}
-		} else {
-			discoverMovie := dao.SearchScheduleByStatus(consts.TypeMovie.Code, consts.ScheduleCanCrawl.Code)
-			if discoverMovie != nil {
-				changed := dao.CasScheduleStatus(discoverMovie.DoubanId, discoverMovie.Type, consts.ScheduleToCrawl.Code, consts.ScheduleCanCrawl.Code)
+	for _, t := range types {
+		pendingItem := dao.SearchScheduleByStatus(t.Code, consts.ScheduleToCrawl.Code)
+		if pendingItem == nil {
+			retryItem := dao.SearchScheduleByAll(t.Code, consts.ScheduleCrawled.Code, consts.ScheduleUnready.Code)
+			if retryItem != nil {
+				changed := dao.CasScheduleStatus(retryItem.DoubanId, retryItem.Type, consts.ScheduleToCrawl.Code, consts.ScheduleCrawled.Code)
 				if changed {
-					logrus.Infoln("flow discover movie", discoverMovie.DoubanId)
+					logrus.Infoln("flow retry", t.Name, retryItem.DoubanId)
 				}
-			}
-		}
-	}
-
-	pendingGame := dao.SearchScheduleByStatus(consts.TypeGame.Code, consts.ScheduleToCrawl.Code)
-	if pendingGame == nil {
-		retryGame := dao.SearchScheduleByAll(consts.TypeGame.Code, consts.ScheduleCrawled.Code, consts.ScheduleUnready.Code)
-		if retryGame != nil {
-			changed := dao.CasScheduleStatus(retryGame.DoubanId, retryGame.Type, consts.ScheduleToCrawl.Code, consts.ScheduleCrawled.Code)
-			if changed {
-				logrus.Infoln("flow retry game ", retryGame.DoubanId)
-			}
-		} else {
-			discoverGame := dao.SearchScheduleByStatus(consts.TypeGame.Code, consts.ScheduleCanCrawl.Code)
-			if discoverGame != nil {
-				changed := dao.CasScheduleStatus(discoverGame.DoubanId, discoverGame.Type, consts.ScheduleToCrawl.Code, consts.ScheduleCanCrawl.Code)
-				if changed {
-					logrus.Infoln("flow discover game", discoverGame.DoubanId)
-				}
-			}
-		}
-	}
-
-	pendingSong := dao.SearchScheduleByStatus(consts.TypeSong.Code, consts.ScheduleToCrawl.Code)
-	if pendingSong == nil {
-		retrySong := dao.SearchScheduleByAll(consts.TypeSong.Code, consts.ScheduleCrawled.Code, consts.ScheduleUnready.Code)
-		if retrySong != nil {
-			changed := dao.CasScheduleStatus(retrySong.DoubanId, retrySong.Type, consts.ScheduleToCrawl.Code, consts.ScheduleCrawled.Code)
-			if changed {
-				logrus.Infoln("flow retry song ", retrySong.DoubanId)
-			}
-		} else {
-			discoverSong := dao.SearchScheduleByStatus(consts.TypeSong.Code, consts.ScheduleCanCrawl.Code)
-			if discoverSong != nil {
-				changed := dao.CasScheduleStatus(discoverSong.DoubanId, discoverSong.Type, consts.ScheduleToCrawl.Code, consts.ScheduleCanCrawl.Code)
-				if changed {
-					logrus.Infoln("flow discover song", discoverSong.DoubanId)
+			} else {
+				concurrency := viper.GetInt("agent.item.concurrency")
+				for i := 0; i < concurrency; i++ {
+					discoverItem := dao.SearchScheduleByStatus(t.Code, consts.ScheduleCanCrawl.Code)
+					if discoverItem != nil {
+						changed := dao.CasScheduleStatus(discoverItem.DoubanId, discoverItem.Type, consts.ScheduleToCrawl.Code, consts.ScheduleCanCrawl.Code)
+						if changed {
+							logrus.Infoln("flow discover", t.Name, discoverItem.DoubanId)
+						}
+					} else {
+						break
+					}
 				}
 			}
 		}
@@ -98,7 +52,7 @@ func runFlow() {
 		if retryUser != nil {
 			changed := dao.CasScheduleStatus(retryUser.DoubanId, retryUser.Type, consts.ScheduleToCrawl.Code, consts.ScheduleCrawled.Code)
 			if changed {
-				logrus.Infoln("flow retry user ", retryUser.DoubanId)
+				logrus.Infoln("flow retry user", retryUser.DoubanId)
 			}
 		} else {
 			if viper.GetBool("agent.flow.discover") {
@@ -120,7 +74,7 @@ func init() {
 		return
 	}
 	go func() {
-		for range time.NewTicker(time.Second).C {
+		for range time.NewTicker(time.Second * 5).C {
 			runFlow()
 		}
 	}()
