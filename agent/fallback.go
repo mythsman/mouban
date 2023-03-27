@@ -14,9 +14,8 @@ func runFallback() {
 		if r := recover(); r != nil {
 			logrus.Errorln(r, "fallback agent crashed  => ", util.GetCurrentGoroutineStack())
 		}
-		time.Sleep(time.Hour * 1)
 	}()
-	
+
 	cnt := dao.CasOrphanSchedule(consts.TypeUser.Code, time.Hour*6)
 	logrus.Infoln(cnt, "orphan users reset")
 
@@ -41,7 +40,7 @@ func init() {
 	}
 
 	go func() {
-		for {
+		for range time.NewTicker(time.Hour).C {
 			runFallback()
 		}
 	}()

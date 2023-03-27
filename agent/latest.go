@@ -14,7 +14,6 @@ func runLatest() {
 		if r := recover(); r != nil {
 			logrus.Errorln(r, "latest agent crashed  => ", util.GetCurrentGoroutineStack())
 		}
-		time.Sleep(time.Second * 1)
 	}()
 
 	bookIds := crawl.LatestBook()

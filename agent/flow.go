@@ -14,7 +14,6 @@ func runFlow() {
 		if r := recover(); r != nil {
 			logrus.Errorln(r, "flow agent crashed  => ", util.GetCurrentGoroutineStack())
 		}
-		time.Sleep(time.Second * 1)
 	}()
 
 	pendingBook := dao.SearchScheduleByStatus(consts.TypeBook.Code, consts.ScheduleToCrawl.Code)
@@ -121,7 +120,7 @@ func init() {
 		return
 	}
 	go func() {
-		for {
+		for range time.NewTicker(time.Second).C {
 			runFlow()
 		}
 	}()
