@@ -208,7 +208,7 @@ func processUser(doubanUid uint64) {
 
 	// choose update type
 	forceSyncAfter := time.Unix(0, 0)
-	if rawUser != nil && rawUser.SyncAt.AddDate(0, 6, 0).After(time.Now()) {
+	if rawUser != nil && rawUser.SyncAt.AddDate(1, 0, 0).After(time.Now()) {
 		forceSyncAfter = rawUser.SyncAt
 	}
 
