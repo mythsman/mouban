@@ -15,7 +15,6 @@ func runUser() {
 		if r := recover(); r != nil {
 			logrus.Errorln(r, "user agent crashed  => ", util.GetCurrentGoroutineStack())
 		}
-		time.Sleep(time.Second * 1)
 	}()
 	schedule := dao.SearchScheduleByAll(consts.TypeUser.Code, consts.ScheduleToCrawl.Code, consts.ScheduleReady.Code)
 	if schedule == nil {
@@ -29,6 +28,8 @@ func runUser() {
 			dao.CasScheduleStatus(schedule.DoubanId, schedule.Type, consts.ScheduleCrawled.Code, consts.ScheduleCrawling.Code)
 			logrus.Infoln("end process user", strconv.FormatUint(schedule.DoubanId, 10))
 		}
+	} else {
+		time.Sleep(time.Second * 10)
 	}
 }
 
@@ -39,7 +40,7 @@ func init() {
 	}
 
 	go func() {
-		for {
+		for range time.NewTicker(time.Second).C {
 			runUser()
 		}
 	}()
