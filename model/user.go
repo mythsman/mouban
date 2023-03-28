@@ -49,9 +49,9 @@ func (user User) Show() *UserVO {
 		MovieWish:    user.MovieWish,
 		MovieDo:      user.MovieDo,
 		MovieCollect: user.MovieCollect,
-		SongWish:     user.MovieWish,
-		SongDo:       user.MovieDo,
-		SongCollect:  user.MovieCollect,
+		SongWish:     user.SongWish,
+		SongDo:       user.SongDo,
+		SongCollect:  user.SongCollect,
 		SyncAt:       user.SyncAt.Unix(),
 		CheckAt:      user.CheckAt.Unix(),
 	}
