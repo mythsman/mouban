@@ -21,7 +21,10 @@ func itemPendingSelector(t consts.Type, ch chan *model.Schedule) {
 	schedule := dao.SearchScheduleByStatus(t.Code, consts.ScheduleToCrawl.Code)
 	if schedule != nil {
 		logrus.Infoln("pending", t.Name, "item found", schedule.DoubanId)
-		ch <- schedule
+		changed := dao.CasScheduleStatus(schedule.DoubanId, t.Code, consts.ScheduleCrawling.Code, *schedule.Status)
+		if changed {
+			ch <- schedule
+		}
 	} else {
 		logrus.Infoln("item", t.Name, "pending selector idle")
 		time.Sleep(10 * time.Second)
@@ -38,7 +41,10 @@ func itemRetrySelector(t consts.Type, ch chan *model.Schedule) {
 	schedule := dao.SearchScheduleByAll(t.Code, consts.ScheduleCrawled.Code, consts.ScheduleUnready.Code)
 	if schedule != nil {
 		logrus.Infoln("retry", t.Name, "item found", schedule.DoubanId)
-		ch <- schedule
+		changed := dao.CasScheduleStatus(schedule.DoubanId, t.Code, consts.ScheduleCrawling.Code, *schedule.Status)
+		if changed {
+			ch <- schedule
+		}
 	} else {
 		logrus.Infoln("item", t.Name, "retry selector idle")
 		time.Sleep(time.Minute)
@@ -56,7 +62,10 @@ func itemDiscoverSelector(t consts.Type, ch chan *model.Schedule) {
 
 	if schedule != nil {
 		logrus.Infoln("discover", t.Name, "item found", schedule.DoubanId)
-		ch <- schedule
+		changed := dao.CasScheduleStatus(schedule.DoubanId, t.Code, consts.ScheduleCrawling.Code, *schedule.Status)
+		if changed {
+			ch <- schedule
+		}
 	} else {
 		logrus.Infoln("item", t.Name, "discover selector idle")
 		time.Sleep(time.Minute)
@@ -72,13 +81,10 @@ func itemWorker(index int, ch chan *model.Schedule) {
 
 	for schedule := range ch {
 		t := consts.ParseType(schedule.Type)
-		changed := dao.CasScheduleStatus(schedule.DoubanId, t.Code, consts.ScheduleCrawling.Code, *schedule.Status)
-		if changed {
-			logrus.Infoln("item thread", index, "start", t.Name, strconv.FormatUint(schedule.DoubanId, 10))
-			processItem(schedule.Type, schedule.DoubanId)
-			dao.CasScheduleStatus(schedule.DoubanId, t.Code, consts.ScheduleCrawled.Code, consts.ScheduleCrawling.Code)
-			logrus.Infoln("item thread", index, "end", t.Name, strconv.FormatUint(schedule.DoubanId, 10))
-		}
+		logrus.Infoln("item thread", index, "start", t.Name, strconv.FormatUint(schedule.DoubanId, 10))
+		processItem(schedule.Type, schedule.DoubanId)
+		dao.CasScheduleStatus(schedule.DoubanId, t.Code, consts.ScheduleCrawled.Code, consts.ScheduleCrawling.Code)
+		logrus.Infoln("item thread", index, "end", t.Name, strconv.FormatUint(schedule.DoubanId, 10))
 	}
 }
 

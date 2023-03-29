@@ -21,7 +21,10 @@ func userPendingSelector(ch chan *model.Schedule) {
 	schedule := dao.SearchScheduleByStatus(consts.TypeUser.Code, consts.ScheduleToCrawl.Code)
 	if schedule != nil {
 		logrus.Infoln("pending user found", schedule.DoubanId)
-		ch <- schedule
+		changed := dao.CasScheduleStatus(schedule.DoubanId, consts.TypeUser.Code, consts.ScheduleCrawling.Code, *schedule.Status)
+		if changed {
+			ch <- schedule
+		}
 	} else {
 		logrus.Infoln("user pending selector idle")
 		time.Sleep(10 * time.Second)
@@ -38,7 +41,10 @@ func userRetrySelector(ch chan *model.Schedule) {
 	schedule := dao.SearchScheduleByAll(consts.TypeUser.Code, consts.ScheduleCrawled.Code, consts.ScheduleUnready.Code)
 	if schedule != nil {
 		logrus.Infoln("retry user found", schedule.DoubanId)
-		ch <- schedule
+		changed := dao.CasScheduleStatus(schedule.DoubanId, consts.TypeUser.Code, consts.ScheduleCrawling.Code, *schedule.Status)
+		if changed {
+			ch <- schedule
+		}
 	} else {
 		logrus.Infoln("user retry selector idle")
 		time.Sleep(time.Minute)
@@ -56,7 +62,10 @@ func userDiscoverSelector(ch chan *model.Schedule) {
 
 	if schedule != nil {
 		logrus.Infoln("discover user found", schedule.DoubanId)
-		ch <- schedule
+		changed := dao.CasScheduleStatus(schedule.DoubanId, consts.TypeUser.Code, consts.ScheduleCrawling.Code, *schedule.Status)
+		if changed {
+			ch <- schedule
+		}
 	} else {
 		logrus.Infoln("user discover selector idle")
 		time.Sleep(time.Minute)
@@ -72,13 +81,10 @@ func userWorker(ch chan *model.Schedule) {
 
 	for schedule := range ch {
 		t := consts.ParseType(schedule.Type)
-		changed := dao.CasScheduleStatus(schedule.DoubanId, t.Code, consts.ScheduleCrawling.Code, consts.ScheduleToCrawl.Code)
-		if changed {
-			logrus.Infoln("start process user", strconv.FormatUint(schedule.DoubanId, 10))
-			processUser(schedule.DoubanId)
-			dao.CasScheduleStatus(schedule.DoubanId, t.Code, consts.ScheduleCrawled.Code, consts.ScheduleCrawling.Code)
-			logrus.Infoln("end process user", strconv.FormatUint(schedule.DoubanId, 10))
-		}
+		logrus.Infoln("start process user", strconv.FormatUint(schedule.DoubanId, 10))
+		processUser(schedule.DoubanId)
+		dao.CasScheduleStatus(schedule.DoubanId, t.Code, consts.ScheduleCrawled.Code, consts.ScheduleCrawling.Code)
+		logrus.Infoln("end process user", strconv.FormatUint(schedule.DoubanId, 10))
 	}
 }
 
