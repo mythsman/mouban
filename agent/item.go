@@ -20,8 +20,10 @@ func itemPendingSelector(t consts.Type, ch chan *model.Schedule) {
 
 	schedule := dao.SearchScheduleByStatus(t.Code, consts.ScheduleToCrawl.Code)
 	if schedule != nil {
+		logrus.Infoln("pending", t.Name, "item found", schedule.DoubanId)
 		ch <- schedule
 	} else {
+		logrus.Infoln("item", t.Name, "pending selector idle")
 		time.Sleep(10 * time.Second)
 	}
 }
@@ -35,8 +37,10 @@ func itemRetrySelector(t consts.Type, ch chan *model.Schedule) {
 
 	schedule := dao.SearchScheduleByAll(t.Code, consts.ScheduleCrawled.Code, consts.ScheduleUnready.Code)
 	if schedule != nil {
+		logrus.Infoln("retry", t.Name, "item found", schedule.DoubanId)
 		ch <- schedule
 	} else {
+		logrus.Infoln("item", t.Name, "retry selector idle")
 		time.Sleep(time.Minute)
 	}
 }
@@ -51,8 +55,10 @@ func itemDiscoverSelector(t consts.Type, ch chan *model.Schedule) {
 	schedule := dao.SearchScheduleByStatus(t.Code, consts.ScheduleCanCrawl.Code)
 
 	if schedule != nil {
+		logrus.Infoln("discover", t.Name, "item found", schedule.DoubanId)
 		ch <- schedule
 	} else {
+		logrus.Infoln("item", t.Name, "discover selector idle")
 		time.Sleep(time.Minute)
 	}
 }
@@ -85,20 +91,21 @@ func init() {
 	ch := make(chan *model.Schedule)
 
 	types := []consts.Type{consts.TypeBook, consts.TypeMovie, consts.TypeGame, consts.TypeSong}
-	for _, t := range types {
+	for i := range types {
+		i := i
 		go func() {
 			for range time.NewTicker(time.Second).C {
-				itemPendingSelector(t, ch)
+				itemPendingSelector(types[i], ch)
 			}
 		}()
 		go func() {
 			for range time.NewTicker(time.Second).C {
-				itemRetrySelector(t, ch)
+				itemRetrySelector(types[i], ch)
 			}
 		}()
 		go func() {
 			for range time.NewTicker(time.Second).C {
-				itemDiscoverSelector(t, ch)
+				itemDiscoverSelector(types[i], ch)
 			}
 		}()
 	}

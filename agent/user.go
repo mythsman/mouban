@@ -20,8 +20,10 @@ func userPendingSelector(ch chan *model.Schedule) {
 
 	schedule := dao.SearchScheduleByStatus(consts.TypeUser.Code, consts.ScheduleToCrawl.Code)
 	if schedule != nil {
+		logrus.Infoln("pending user found", schedule.DoubanId)
 		ch <- schedule
 	} else {
+		logrus.Infoln("user pending selector idle")
 		time.Sleep(10 * time.Second)
 	}
 }
@@ -35,8 +37,10 @@ func userRetrySelector(ch chan *model.Schedule) {
 
 	schedule := dao.SearchScheduleByAll(consts.TypeUser.Code, consts.ScheduleCrawled.Code, consts.ScheduleUnready.Code)
 	if schedule != nil {
+		logrus.Infoln("retry user found", schedule.DoubanId)
 		ch <- schedule
 	} else {
+		logrus.Infoln("user retry selector idle")
 		time.Sleep(time.Minute)
 	}
 }
@@ -51,8 +55,10 @@ func userDiscoverSelector(ch chan *model.Schedule) {
 	schedule := dao.SearchScheduleByStatus(consts.TypeUser.Code, consts.ScheduleCanCrawl.Code)
 
 	if schedule != nil {
+		logrus.Infoln("discover user found", schedule.DoubanId)
 		ch <- schedule
 	} else {
+		logrus.Infoln("user discover selector idle")
 		time.Sleep(time.Minute)
 	}
 }
@@ -99,7 +105,7 @@ func init() {
 
 	go func() {
 		for range time.NewTicker(time.Second).C {
-			userWorker(discoverCh)
+			userWorker(commonCh)
 		}
 	}()
 
@@ -111,7 +117,7 @@ func init() {
 		}()
 		go func() {
 			for range time.NewTicker(time.Second).C {
-				userWorker(commonCh)
+				userWorker(discoverCh)
 			}
 		}()
 	}
