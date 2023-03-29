@@ -122,6 +122,7 @@ func Get(url string, limiter *rate.Limiter) (*string, int, error) {
 		return nil, 0, err
 	}
 
+	startTime := time.Now()
 	req, err := retryablehttp.NewRequest("GET", url, nil)
 	req.Header.Set("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36")
 	req.Header.Set("Referer", "https://www.douban.com/")
@@ -134,9 +135,12 @@ func Get(url string, limiter *rate.Limiter) (*string, int, error) {
 		return nil, 0, err
 	}
 
-	logrus.Infoln("code is", strconv.Itoa(resp.StatusCode), "at", 1+clientIdx, "for", url)
+	defer func() {
+		duration := time.Now().Sub(startTime).Milliseconds()
+		logrus.Infoln("code is", strconv.Itoa(resp.StatusCode), "in", duration, "ms", "at user", 1+clientIdx, "for", url)
+		resp.Body.Close()
+	}()
 
-	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return nil, 0, err
