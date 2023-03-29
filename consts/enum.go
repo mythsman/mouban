@@ -30,6 +30,23 @@ var TypeMovie = Type{2, "movie"}
 var TypeGame = Type{3, "game"}
 var TypeSong = Type{4, "song"}
 
+func ParseType(code uint8) Type {
+	switch code {
+	case 0:
+		return TypeUser
+	case 1:
+		return TypeBook
+	case 2:
+		return TypeMovie
+	case 3:
+		return TypeGame
+	case 4:
+		return TypeSong
+	default:
+		return TypeUser
+	}
+}
+
 type ScheduleStatus struct {
 	Code uint8
 	Name string
