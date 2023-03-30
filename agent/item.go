@@ -26,7 +26,6 @@ func itemPendingSelector(t consts.Type, ch chan *model.Schedule) {
 			ch <- schedule
 		}
 	} else {
-		logrus.Infoln("item", t.Name, "pending selector idle")
 		time.Sleep(10 * time.Second)
 	}
 }
@@ -46,7 +45,6 @@ func itemRetrySelector(t consts.Type, ch chan *model.Schedule) {
 			ch <- schedule
 		}
 	} else {
-		logrus.Infoln("item", t.Name, "retry selector idle")
 		time.Sleep(time.Minute)
 	}
 }
@@ -67,7 +65,6 @@ func itemDiscoverSelector(t consts.Type, ch chan *model.Schedule) {
 			ch <- schedule
 		}
 	} else {
-		logrus.Infoln("item", t.Name, "discover selector idle")
 		time.Sleep(time.Minute)
 	}
 }

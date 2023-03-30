@@ -26,7 +26,6 @@ func userPendingSelector(ch chan *model.Schedule) {
 			ch <- schedule
 		}
 	} else {
-		logrus.Infoln("user pending selector idle")
 		time.Sleep(10 * time.Second)
 	}
 }
@@ -46,7 +45,6 @@ func userRetrySelector(ch chan *model.Schedule) {
 			ch <- schedule
 		}
 	} else {
-		logrus.Infoln("user retry selector idle")
 		time.Sleep(time.Minute)
 	}
 }
@@ -67,7 +65,6 @@ func userDiscoverSelector(ch chan *model.Schedule) {
 			ch <- schedule
 		}
 	} else {
-		logrus.Infoln("user discover selector idle")
 		time.Sleep(time.Minute)
 	}
 }
