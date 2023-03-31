@@ -52,6 +52,7 @@ func (user User) Show() *UserVO {
 		SongWish:     user.SongWish,
 		SongDo:       user.SongDo,
 		SongCollect:  user.SongCollect,
+		PublishAt:    user.PublishAt.Unix(),
 		SyncAt:       user.SyncAt.Unix(),
 		CheckAt:      user.CheckAt.Unix(),
 	}
@@ -74,6 +75,7 @@ type UserVO struct {
 	SongWish     uint32 `json:"song_wish"`
 	SongDo       uint32 `json:"song_do"`
 	SongCollect  uint32 `json:"song_collect"`
+	PublishAt    int64  `json:"publish_at"`
 	SyncAt       int64  `json:"sync_at"`
 	CheckAt      int64  `json:"check_at"`
 }
