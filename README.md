@@ -148,6 +148,6 @@ sitemap，并且一直持续更新。因此我们可以通过 [sitemap_index](ht
 
 目前条目下载好后，后续不会进行更新，如有更新需要，目前暂时需要手动强制更新一下。
 
-item_type 取: 0-book 1-movie 2-game 3-song
+item_type 取: 1-book 2-movie 3-game 4-song
 
 `http://localhost:8080/admin/refresh_item?type={item_type}&id={item_douban_id}`
