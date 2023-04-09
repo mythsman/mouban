@@ -149,10 +149,10 @@ func bookOverview(doubanUid uint64) (*model.User, error) {
 	bannedNode := htmlquery.FindOne(doc, "//div[@class='mn']")
 	if bannedNode != nil {
 		prompt := htmlquery.InnerText(bannedNode)
-		if strings.Contains(prompt, "此帐号已被永久停用") {
+		if strings.Contains(prompt, "已被永久停用") {
 			return nil, errors.New("account banned")
 		}
-		if strings.Contains(prompt, "该用户已经主动注销帐号") {
+		if strings.Contains(prompt, "已经主动注销帐号") {
 			return nil, errors.New("account canceled")
 		}
 	}
