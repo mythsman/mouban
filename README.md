@@ -20,7 +20,7 @@
 
 ## 部署
 
-可以使用 docker-compose 进行快速部署（`docker pull mythsman/mouban`），环境变量与 application.yml.sample 中的配置对应：
+可以使用 docker-compose 进行快速部署，环境变量与 application.yml.sample 中的配置对应：
 
 ```yaml
     mouban:
