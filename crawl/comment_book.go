@@ -11,21 +11,27 @@ import (
 	"time"
 )
 
-func CommentBook(doubanUid uint64, forceSyncAfter time.Time) (*[]model.Comment, *[]model.Book, error) {
+func CommentBook(user *model.User, forceSyncAfter time.Time) (*[]model.Comment, *[]model.Book, error) {
 	var allComments []model.Comment
 	var allBooks []model.Book
 
-	comments, books := scrollAllBook(doubanUid, consts.ActionDo, forceSyncAfter)
-	allComments = append(allComments, *comments...)
-	allBooks = append(allBooks, *books...)
+	if user.BookDo <= viper.GetUint32("agent.item.max") {
+		comments, books := scrollAllBook(user.DoubanUid, consts.ActionDo, forceSyncAfter)
+		allComments = append(allComments, *comments...)
+		allBooks = append(allBooks, *books...)
+	}
 
-	comments, books = scrollAllBook(doubanUid, consts.ActionWish, forceSyncAfter)
-	allComments = append(allComments, *comments...)
-	allBooks = append(allBooks, *books...)
+	if user.BookWish <= viper.GetUint32("agent.item.max") {
+		comments, books := scrollAllBook(user.DoubanUid, consts.ActionWish, forceSyncAfter)
+		allComments = append(allComments, *comments...)
+		allBooks = append(allBooks, *books...)
+	}
 
-	comments, books = scrollAllBook(doubanUid, consts.ActionCollect, forceSyncAfter)
-	allComments = append(allComments, *comments...)
-	allBooks = append(allBooks, *books...)
+	if user.BookCollect <= viper.GetUint32("agent.item.max") {
+		comments, books := scrollAllBook(user.DoubanUid, consts.ActionCollect, forceSyncAfter)
+		allComments = append(allComments, *comments...)
+		allBooks = append(allBooks, *books...)
+	}
 
 	return &allComments, &allBooks, nil
 }

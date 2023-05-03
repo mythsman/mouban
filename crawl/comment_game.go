@@ -11,21 +11,27 @@ import (
 	"time"
 )
 
-func CommentGame(doubanUid uint64, forceSyncAfter time.Time) (*[]model.Comment, *[]model.Game, error) {
+func CommentGame(user *model.User, forceSyncAfter time.Time) (*[]model.Comment, *[]model.Game, error) {
 	var allComments []model.Comment
 	var allGames []model.Game
 
-	comments, games := scrollAllGame(doubanUid, consts.ActionDo, forceSyncAfter)
-	allComments = append(allComments, *comments...)
-	allGames = append(allGames, *games...)
+	if user.GameDo <= viper.GetUint32("agent.item.max") {
+		comments, games := scrollAllGame(user.DoubanUid, consts.ActionDo, forceSyncAfter)
+		allComments = append(allComments, *comments...)
+		allGames = append(allGames, *games...)
+	}
 
-	comments, games = scrollAllGame(doubanUid, consts.ActionWish, forceSyncAfter)
-	allComments = append(allComments, *comments...)
-	allGames = append(allGames, *games...)
+	if user.GameWish <= viper.GetUint32("agent.item.max") {
+		comments, games := scrollAllGame(user.DoubanUid, consts.ActionWish, forceSyncAfter)
+		allComments = append(allComments, *comments...)
+		allGames = append(allGames, *games...)
+	}
 
-	comments, games = scrollAllGame(doubanUid, consts.ActionCollect, forceSyncAfter)
-	allComments = append(allComments, *comments...)
-	allGames = append(allGames, *games...)
+	if user.GameCollect <= viper.GetUint32("agent.item.max") {
+		comments, games := scrollAllGame(user.DoubanUid, consts.ActionCollect, forceSyncAfter)
+		allComments = append(allComments, *comments...)
+		allGames = append(allGames, *games...)
+	}
 
 	return &allComments, &allGames, nil
 }

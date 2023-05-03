@@ -6,6 +6,7 @@ import (
 	"mouban/consts"
 	"mouban/crawl"
 	"mouban/dao"
+	"mouban/model"
 	"mouban/util"
 	"strconv"
 	"time"
@@ -216,22 +217,22 @@ func processUser(doubanUid uint64) {
 
 	//book
 	if user.BookDo+user.BookWish+user.BookCollect > 0 {
-		syncCommentBook(doubanUid, forceSyncAfter)
+		syncCommentBook(user, forceSyncAfter)
 	}
 
 	//movie
 	if user.MovieDo+user.MovieWish+user.MovieCollect > 0 {
-		syncCommentMovie(doubanUid, forceSyncAfter)
+		syncCommentMovie(user, forceSyncAfter)
 	}
 
 	//game
 	if user.GameDo+user.GameWish+user.GameCollect > 0 {
-		syncCommentGame(doubanUid, forceSyncAfter)
+		syncCommentGame(user, forceSyncAfter)
 	}
 
 	//song
 	if user.SongDo+user.SongWish+user.SongCollect > 0 {
-		syncCommentSong(doubanUid, forceSyncAfter)
+		syncCommentSong(user, forceSyncAfter)
 	}
 
 	user.CheckAt = time.Now()
@@ -241,8 +242,8 @@ func processUser(doubanUid uint64) {
 	dao.ChangeScheduleResult(doubanUid, consts.TypeUser.Code, consts.ScheduleReady.Code)
 }
 
-func syncCommentGame(doubanUid uint64, forceSyncAfter time.Time) {
-	comment, game, err := crawl.CommentGame(doubanUid, forceSyncAfter)
+func syncCommentGame(user *model.User, forceSyncAfter time.Time) {
+	comment, game, err := crawl.CommentGame(user, forceSyncAfter)
 	if err != nil {
 		panic(err)
 	}
@@ -252,11 +253,11 @@ func syncCommentGame(doubanUid uint64, forceSyncAfter time.Time) {
 			for i := range *game {
 				newCommentIds[(*game)[i].DoubanId] = true
 			}
-			oldCommentIds := dao.GetCommentIds(doubanUid, consts.TypeGame.Code)
+			oldCommentIds := dao.GetCommentIds(user.DoubanUid, consts.TypeGame.Code)
 			for i := range *oldCommentIds {
 				id := (*oldCommentIds)[i]
 				if !newCommentIds[id] {
-					dao.HideComment(doubanUid, consts.TypeGame.Code, id)
+					dao.HideComment(user.DoubanUid, consts.TypeGame.Code, id)
 				}
 			}
 		}
@@ -271,8 +272,8 @@ func syncCommentGame(doubanUid uint64, forceSyncAfter time.Time) {
 	}()
 }
 
-func syncCommentBook(doubanUid uint64, forceSyncAfter time.Time) {
-	comment, book, err := crawl.CommentBook(doubanUid, forceSyncAfter)
+func syncCommentBook(user *model.User, forceSyncAfter time.Time) {
+	comment, book, err := crawl.CommentBook(user, forceSyncAfter)
 	if err != nil {
 		panic(err)
 	}
@@ -282,11 +283,11 @@ func syncCommentBook(doubanUid uint64, forceSyncAfter time.Time) {
 			for i := range *book {
 				newCommentIds[(*book)[i].DoubanId] = true
 			}
-			oldCommentIds := dao.GetCommentIds(doubanUid, consts.TypeBook.Code)
+			oldCommentIds := dao.GetCommentIds(user.DoubanUid, consts.TypeBook.Code)
 			for i := range *oldCommentIds {
 				id := (*oldCommentIds)[i]
 				if !newCommentIds[id] {
-					dao.HideComment(doubanUid, consts.TypeBook.Code, id)
+					dao.HideComment(user.DoubanUid, consts.TypeBook.Code, id)
 				}
 			}
 		}
@@ -300,8 +301,8 @@ func syncCommentBook(doubanUid uint64, forceSyncAfter time.Time) {
 	}()
 }
 
-func syncCommentMovie(doubanUid uint64, forceSyncAfter time.Time) {
-	comment, movie, err := crawl.CommentMovie(doubanUid, forceSyncAfter)
+func syncCommentMovie(user *model.User, forceSyncAfter time.Time) {
+	comment, movie, err := crawl.CommentMovie(user, forceSyncAfter)
 	if err != nil {
 		panic(err)
 	}
@@ -312,11 +313,11 @@ func syncCommentMovie(doubanUid uint64, forceSyncAfter time.Time) {
 			for i := range *movie {
 				newCommentIds[(*movie)[i].DoubanId] = true
 			}
-			oldCommentIds := dao.GetCommentIds(doubanUid, consts.TypeMovie.Code)
+			oldCommentIds := dao.GetCommentIds(user.DoubanUid, consts.TypeMovie.Code)
 			for i := range *oldCommentIds {
 				id := (*oldCommentIds)[i]
 				if !newCommentIds[id] {
-					dao.HideComment(doubanUid, consts.TypeMovie.Code, id)
+					dao.HideComment(user.DoubanUid, consts.TypeMovie.Code, id)
 				}
 			}
 		}
@@ -330,8 +331,8 @@ func syncCommentMovie(doubanUid uint64, forceSyncAfter time.Time) {
 	}()
 }
 
-func syncCommentSong(doubanUid uint64, forceSyncAfter time.Time) {
-	comment, song, err := crawl.CommentSong(doubanUid, forceSyncAfter)
+func syncCommentSong(user *model.User, forceSyncAfter time.Time) {
+	comment, song, err := crawl.CommentSong(user, forceSyncAfter)
 	if err != nil {
 		panic(err)
 	}
@@ -342,11 +343,11 @@ func syncCommentSong(doubanUid uint64, forceSyncAfter time.Time) {
 			for i := range *song {
 				newCommentIds[(*song)[i].DoubanId] = true
 			}
-			oldCommentIds := dao.GetCommentIds(doubanUid, consts.TypeSong.Code)
+			oldCommentIds := dao.GetCommentIds(user.DoubanUid, consts.TypeSong.Code)
 			for i := range *oldCommentIds {
 				id := (*oldCommentIds)[i]
 				if !newCommentIds[id] {
-					dao.HideComment(doubanUid, consts.TypeSong.Code, id)
+					dao.HideComment(user.DoubanUid, consts.TypeSong.Code, id)
 				}
 			}
 		}

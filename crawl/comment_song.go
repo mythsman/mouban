@@ -11,22 +11,27 @@ import (
 	"time"
 )
 
-func CommentSong(doubanUid uint64, forceSyncAfter time.Time) (*[]model.Comment, *[]model.Song, error) {
+func CommentSong(user *model.User, forceSyncAfter time.Time) (*[]model.Comment, *[]model.Song, error) {
 	var allComments []model.Comment
 	var allSongs []model.Song
 
-	comments, songs := scrollAllSong(doubanUid, consts.ActionDo, forceSyncAfter)
-	allComments = append(allComments, *comments...)
-	allSongs = append(allSongs, *songs...)
+	if user.SongDo <= viper.GetUint32("agent.item.max") {
+		comments, songs := scrollAllSong(user.DoubanUid, consts.ActionDo, forceSyncAfter)
+		allComments = append(allComments, *comments...)
+		allSongs = append(allSongs, *songs...)
+	}
 
-	comments, songs = scrollAllSong(doubanUid, consts.ActionWish, forceSyncAfter)
-	allComments = append(allComments, *comments...)
-	allSongs = append(allSongs, *songs...)
+	if user.SongWish <= viper.GetUint32("agent.item.max") {
+		comments, songs := scrollAllSong(user.DoubanUid, consts.ActionWish, forceSyncAfter)
+		allComments = append(allComments, *comments...)
+		allSongs = append(allSongs, *songs...)
+	}
 
-	comments, songs = scrollAllSong(doubanUid, consts.ActionCollect, forceSyncAfter)
-	allComments = append(allComments, *comments...)
-	allSongs = append(allSongs, *songs...)
-
+	if user.SongCollect <= viper.GetUint32("agent.item.max") {
+		comments, songs := scrollAllSong(user.DoubanUid, consts.ActionCollect, forceSyncAfter)
+		allComments = append(allComments, *comments...)
+		allSongs = append(allSongs, *songs...)
+	}
 	return &allComments, &allSongs, nil
 }
 
