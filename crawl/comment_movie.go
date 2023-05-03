@@ -11,21 +11,27 @@ import (
 	"time"
 )
 
-func CommentMovie(doubanUid uint64, forceSyncAfter time.Time) (*[]model.Comment, *[]model.Movie, error) {
+func CommentMovie(user *model.User, forceSyncAfter time.Time) (*[]model.Comment, *[]model.Movie, error) {
 	var allComments []model.Comment
 	var allMovies []model.Movie
 
-	comments, movies := scrollAllMovie(doubanUid, consts.ActionDo, forceSyncAfter)
-	allComments = append(allComments, *comments...)
-	allMovies = append(allMovies, *movies...)
+	if user.MovieDo <= viper.GetUint32("agent.item.max") {
+		comments, movies := scrollAllMovie(user.DoubanUid, consts.ActionDo, forceSyncAfter)
+		allComments = append(allComments, *comments...)
+		allMovies = append(allMovies, *movies...)
+	}
 
-	comments, movies = scrollAllMovie(doubanUid, consts.ActionWish, forceSyncAfter)
-	allComments = append(allComments, *comments...)
-	allMovies = append(allMovies, *movies...)
+	if user.MovieWish <= viper.GetUint32("agent.item.max") {
+		comments, movies := scrollAllMovie(user.DoubanUid, consts.ActionWish, forceSyncAfter)
+		allComments = append(allComments, *comments...)
+		allMovies = append(allMovies, *movies...)
+	}
 
-	comments, movies = scrollAllMovie(doubanUid, consts.ActionCollect, forceSyncAfter)
-	allComments = append(allComments, *comments...)
-	allMovies = append(allMovies, *movies...)
+	if user.MovieCollect <= viper.GetUint32("agent.item.max") {
+		comments, movies := scrollAllMovie(user.DoubanUid, consts.ActionCollect, forceSyncAfter)
+		allComments = append(allComments, *comments...)
+		allMovies = append(allMovies, *movies...)
+	}
 
 	return &allComments, &allMovies, nil
 }
