@@ -4,12 +4,20 @@ import (
 	"github.com/sirupsen/logrus"
 	"mouban/common"
 	"mouban/model"
+	"time"
 )
 
 func UpsertUser(user *model.User) {
 	logrus.Infoln("upsert user", user.DoubanUid, user.Name)
 	data := &model.User{}
 	common.Db.Where("douban_uid = ? ", user.DoubanUid).Assign(user).FirstOrCreate(data)
+}
+
+func RefreshUser(user *model.User) {
+	logrus.Infoln("refresh user", user.DoubanUid, user.Name)
+	common.Db.Model(&model.User{}).
+		Where("douban_uid = ? ", user.DoubanUid).
+		Updates(model.User{CheckAt: time.Unix(0, 0), SyncAt: time.Unix(0, 0)})
 }
 
 func GetUser(doubanUid uint64) *model.User {

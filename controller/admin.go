@@ -13,6 +13,31 @@ import (
 	"os"
 )
 
+func RefreshUser(ctx *gin.Context) {
+	idStr := ctx.Query("id")
+	id := util.ParseNumber(idStr)
+	if id == 0 {
+		BizError(ctx, "参数错误")
+		return
+	}
+	schedule := dao.GetSchedule(id, consts.TypeUser.Code)
+	if schedule == nil {
+		BizError(ctx, "条目未收录，无法更新")
+		return
+	}
+
+	user := dao.GetUser(id)
+	if user == nil {
+		BizError(ctx, "用户未收录，无法更新")
+		return
+	}
+
+	dao.RefreshUser(user)
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"success": true,
+	})
+}
 func RefreshItem(ctx *gin.Context) {
 	typeStr := ctx.Query("type")
 	idStr := ctx.Query("id")
