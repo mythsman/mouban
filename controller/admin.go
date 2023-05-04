@@ -37,6 +37,9 @@ func RefreshUser(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{
 		"success": true,
 	})
+
+	dao.CasScheduleStatus(user.DoubanUid, consts.TypeUser.Code, consts.ScheduleToCrawl.Code, *schedule.Status)
+
 }
 func RefreshItem(ctx *gin.Context) {
 	typeStr := ctx.Query("type")
