@@ -151,3 +151,11 @@ sitemap，并且一直持续更新。因此我们可以通过 [sitemap_index](ht
 item_type 取: 1-book 2-movie 3-game 4-song
 
 `http://localhost:8080/admin/refresh_item?type={item_type}&id={item_douban_id}`
+
+#### 强制更新用户
+
+目前用户的评论信息更新下载好后，后续只会进行增量更新。如果对老的条目进行评论修改、删除等操作是不会同步更新的。
+
+如有更新的要求，目前暂时需要手动强制更新一下。（谨慎使用，会对系统造成较大压力）
+
+`http://localhost:8080/admin/refresh_user?id={douban_uid}`
