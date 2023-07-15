@@ -16,6 +16,7 @@ import (
 	"mouban/model"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 )
 
@@ -31,6 +32,11 @@ func Storage(url string) string {
 	storageHit := dao.GetStorage(url)
 	if storageHit != nil {
 		logrus.Infoln("storage hit :", url, "->", storageHit.Target)
+		return storageHit.Target
+	}
+
+	if strings.Contains(url, viper.GetString("minio.endpoint")) {
+		logrus.Infoln("storage ignore :", url)
 		return storageHit.Target
 	}
 
