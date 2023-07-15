@@ -44,6 +44,8 @@ func processBook(doubanId uint64) {
 		dao.ChangeScheduleResult(doubanId, consts.TypeBook.Code, consts.ScheduleInvalid.Code)
 		panic(err)
 	}
+
+	book.Thumbnail = crawl.Storage(book.Thumbnail)
 	dao.UpsertBook(book)
 	dao.UpsertRating(rating)
 
@@ -65,6 +67,7 @@ func processMovie(doubanId uint64) {
 		dao.ChangeScheduleResult(doubanId, consts.TypeMovie.Code, consts.ScheduleInvalid.Code)
 		panic(err)
 	}
+	movie.Thumbnail = crawl.Storage(movie.Thumbnail)
 	dao.UpsertMovie(movie)
 	dao.UpsertRating(rating)
 
@@ -87,6 +90,7 @@ func processGame(doubanId uint64) {
 		dao.ChangeScheduleResult(doubanId, consts.TypeGame.Code, consts.ScheduleInvalid.Code)
 		panic(err)
 	}
+	game.Thumbnail = crawl.Storage(game.Thumbnail)
 	dao.UpsertGame(game)
 	dao.UpsertRating(rating)
 
@@ -109,6 +113,7 @@ func processSong(doubanId uint64) {
 		dao.ChangeScheduleResult(doubanId, consts.TypeSong.Code, consts.ScheduleInvalid.Code)
 		panic(err)
 	}
+	song.Thumbnail = crawl.Storage(song.Thumbnail)
 	dao.UpsertSong(song)
 	dao.UpsertRating(rating)
 
@@ -238,6 +243,7 @@ func processUser(doubanUid uint64) {
 	user.CheckAt = time.Now()
 	user.SyncAt = time.Now()
 
+	user.Thumbnail = crawl.Storage(user.Thumbnail)
 	dao.UpsertUser(user)
 	dao.ChangeScheduleResult(doubanUid, consts.TypeUser.Code, consts.ScheduleReady.Code)
 }
@@ -263,8 +269,10 @@ func syncCommentGame(user *model.User, forceSyncAfter time.Time) {
 		}
 
 		for i := range *game {
+			item := &(*game)[i]
+			item.Thumbnail = crawl.Storage(item.Thumbnail)
 			dao.UpsertComment(&(*comment)[i])
-			added := dao.CreateGameNx(&(*game)[i])
+			added := dao.CreateGameNx(item)
 			if added {
 				dao.CreateScheduleNx((*game)[i].DoubanId, consts.TypeGame.Code, consts.ScheduleToCrawl.Code, consts.ScheduleUnready.Code)
 			}
@@ -292,7 +300,9 @@ func syncCommentBook(user *model.User, forceSyncAfter time.Time) {
 			}
 		}
 		for i := range *book {
-			added := dao.CreateBookNx(&(*book)[i])
+			item := &(*book)[i]
+			item.Thumbnail = crawl.Storage(item.Thumbnail)
+			added := dao.CreateBookNx(item)
 			dao.UpsertComment(&(*comment)[i])
 			if added {
 				dao.CreateScheduleNx((*book)[i].DoubanId, consts.TypeBook.Code, consts.ScheduleToCrawl.Code, consts.ScheduleUnready.Code)
@@ -322,8 +332,10 @@ func syncCommentMovie(user *model.User, forceSyncAfter time.Time) {
 			}
 		}
 		for i := range *movie {
+			item := &(*movie)[i]
+			item.Thumbnail = crawl.Storage(item.Thumbnail)
 			dao.UpsertComment(&(*comment)[i])
-			added := dao.CreateMovieNx(&(*movie)[i])
+			added := dao.CreateMovieNx(item)
 			if added {
 				dao.CreateScheduleNx((*movie)[i].DoubanId, consts.TypeMovie.Code, consts.ScheduleToCrawl.Code, consts.ScheduleUnready.Code)
 			}
@@ -352,8 +364,10 @@ func syncCommentSong(user *model.User, forceSyncAfter time.Time) {
 			}
 		}
 		for i := range *song {
+			item := &(*song)[i]
+			item.Thumbnail = crawl.Storage(item.Thumbnail)
 			dao.UpsertComment(&(*comment)[i])
-			added := dao.CreateSongNx(&(*song)[i])
+			added := dao.CreateSongNx(item)
 			if added {
 				dao.CreateScheduleNx((*song)[i].DoubanId, consts.TypeSong.Code, consts.ScheduleToCrawl.Code, consts.ScheduleUnready.Code)
 			}
