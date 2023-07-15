@@ -3,6 +3,7 @@ package crawl
 import (
 	"crypto/md5"
 	"encoding/hex"
+	"errors"
 	"github.com/gabriel-vasile/mimetype"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
@@ -14,6 +15,12 @@ import (
 	"os"
 	"time"
 )
+
+var minioClient *minio.Client
+var endpoint string
+var accessKeyID string
+var secretAccessKey string
+var bucketName string
 
 // Storage source url -> stored url
 func Storage(url string) string {
@@ -80,19 +87,31 @@ func md5sum(path string) string {
 }
 
 func upload(file string, name string, mimeType string) string {
-	endpoint := viper.GetString("minio.endpoint")
-	accessKeyID := viper.GetString("minio.id")
-	secretAccessKey := viper.GetString("minio.key")
+	options := minio.PutObjectOptions{
+		ContentType: mimeType,
+	}
+	_, err := minioClient.FPutObject(context.Background(), bucketName, name, file, options)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	return "https://" + endpoint + "/" + bucketName + "/" + name
+}
+
+func init() {
+	endpoint = viper.GetString("minio.endpoint")
+	accessKeyID = viper.GetString("minio.id")
+	secretAccessKey = viper.GetString("minio.key")
+	bucketName = viper.GetString("minio.bucket")
 
 	// Initialize minio client object.
-	minioClient, err := minio.New(endpoint, &minio.Options{
+	err := errors.New("")
+	minioClient, err = minio.New(endpoint, &minio.Options{
 		Creds:  credentials.NewStaticV4(accessKeyID, secretAccessKey, ""),
 		Secure: true,
 	})
 	if err != nil {
 		log.Fatalln(err)
 	}
-	bucketName := "douban"
 
 	err = minioClient.MakeBucket(context.Background(), bucketName, minio.MakeBucketOptions{})
 	if err != nil {
@@ -103,13 +122,4 @@ func upload(file string, name string, mimeType string) string {
 	} else {
 		log.Printf("Successfully created %s\n", bucketName)
 	}
-
-	options := minio.PutObjectOptions{
-		ContentType: mimeType,
-	}
-	_, err = minioClient.FPutObject(context.Background(), bucketName, name, file, options)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	return "https://" + endpoint + "/" + bucketName + "/" + name
 }
