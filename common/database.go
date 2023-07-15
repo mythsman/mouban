@@ -95,6 +95,7 @@ func migrateTables() {
 		&model.Rating{},
 		&model.Schedule{},
 		&model.User{},
+		&model.Storage{},
 	)
 	if err != nil {
 		panic("init database failed " + err.Error())

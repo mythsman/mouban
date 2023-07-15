@@ -7,10 +7,13 @@ import (
 	"github.com/gabriel-vasile/mimetype"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"golang.org/x/net/context"
 	"io"
 	"log"
+	"mouban/dao"
+	"mouban/model"
 	"net/http"
 	"os"
 	"time"
@@ -24,6 +27,13 @@ var bucketName string
 
 // Storage source url -> stored url
 func Storage(url string) string {
+
+	storageHit := dao.GetStorage(url)
+	if storageHit != nil {
+		logrus.Infoln("storage hit : ", url)
+		return storageHit.Target
+	}
+
 	file := download(url, "https://www.douban.com/")
 	mtype, extension := mime(file.Name())
 
@@ -36,6 +46,15 @@ func Storage(url string) string {
 	if e != nil {
 		log.Fatal(e)
 	}
+	storage := &model.Storage{
+		Source: url,
+		Target: result,
+		Md5:    md5Result,
+		Extra:  "",
+	}
+	dao.UpsertStorage(storage)
+	logrus.Infoln("storage add :", url, "->", result)
+
 	return result
 }
 
