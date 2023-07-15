@@ -30,7 +30,7 @@ func Storage(url string) string {
 
 	storageHit := dao.GetStorage(url)
 	if storageHit != nil {
-		logrus.Infoln("storage hit : ", url)
+		logrus.Infoln("storage hit :", url, "->", storageHit.Target)
 		return storageHit.Target
 	}
 
@@ -50,7 +50,6 @@ func Storage(url string) string {
 		Source: url,
 		Target: result,
 		Md5:    md5Result,
-		Extra:  "",
 	}
 	dao.UpsertStorage(storage)
 	logrus.Infoln("storage add :", url, "->", result)
