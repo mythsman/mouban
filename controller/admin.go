@@ -87,7 +87,7 @@ func loadFile(path string) {
 	f, err := os.Open(path)
 
 	if err != nil {
-		logrus.Fatalln(err)
+		logrus.Errorln(err)
 		return
 	}
 
@@ -111,7 +111,7 @@ func loadFile(path string) {
 	}
 
 	if err := scanner.Err(); err != nil {
-		logrus.Fatalln(err)
+		logrus.Errorln(err)
 	}
 }
 

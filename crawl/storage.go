@@ -66,7 +66,7 @@ func download(url string, referer string) *os.File {
 	// 创建一个文件用于保存
 	out, err := os.CreateTemp("/tmp", "mouban-")
 	if err != nil {
-		logrus.Fatalln("create tmp file failed")
+		logrus.Errorln("create tmp file failed")
 		panic(err)
 	}
 	defer out.Close()
@@ -86,7 +86,7 @@ func download(url string, referer string) *os.File {
 	// 然后将响应流和文件流对接起来
 	_, err = io.Copy(out, resp.Body)
 	if err != nil {
-		logrus.Fatalln("write file", url, "failed")
+		logrus.Errorln("write file", url, "failed")
 		panic(err)
 	}
 	return out
@@ -113,7 +113,7 @@ func upload(file string, name string, mimeType string) string {
 	}
 	_, err := minioClient.FPutObject(context.Background(), bucketName, name, file, options)
 	if err != nil {
-		logrus.Fatalln("minio put failed,", err)
+		logrus.Errorln("minio put failed,", err)
 	}
 	return "https://" + endpoint + "/" + bucketName + "/" + name
 }
