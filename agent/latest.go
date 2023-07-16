@@ -12,7 +12,7 @@ import (
 func runLatest() {
 	defer func() {
 		if r := recover(); r != nil {
-			logrus.Errorln(r, "latest agent crashed  => ", util.GetCurrentGoroutineStack())
+			logrus.Errorln("run latest panic", r, "latest agent crashed  => ", util.GetCurrentGoroutineStack())
 		}
 	}()
 

@@ -14,7 +14,7 @@ import (
 func itemPendingSelector(t consts.Type, ch chan *model.Schedule) {
 	defer func() {
 		if r := recover(); r != nil {
-			logrus.Errorln(r, "item pending selector for", t.Name, "crashed  => ", util.GetCurrentGoroutineStack())
+			logrus.Errorln("item pending selector panic", r, "item pending selector for", t.Name, "crashed  => ", util.GetCurrentGoroutineStack())
 		}
 	}()
 
@@ -33,7 +33,7 @@ func itemPendingSelector(t consts.Type, ch chan *model.Schedule) {
 func itemRetrySelector(t consts.Type, ch chan *model.Schedule) {
 	defer func() {
 		if r := recover(); r != nil {
-			logrus.Errorln(r, "item retry selector for", t.Name, "crashed  => ", util.GetCurrentGoroutineStack())
+			logrus.Errorln("item retry selector panic", r, "item retry selector for", t.Name, "crashed  => ", util.GetCurrentGoroutineStack())
 		}
 	}()
 
@@ -52,7 +52,7 @@ func itemRetrySelector(t consts.Type, ch chan *model.Schedule) {
 func itemDiscoverSelector(t consts.Type, ch chan *model.Schedule) {
 	defer func() {
 		if r := recover(); r != nil {
-			logrus.Errorln(r, "item discover selector for", t.Name, "crashed  => ", util.GetCurrentGoroutineStack())
+			logrus.Errorln("item discover selector panic", r, "item discover selector for", t.Name, "crashed  => ", util.GetCurrentGoroutineStack())
 		}
 	}()
 
@@ -72,7 +72,7 @@ func itemDiscoverSelector(t consts.Type, ch chan *model.Schedule) {
 func itemWorker(index int, ch chan *model.Schedule) {
 	defer func() {
 		if r := recover(); r != nil {
-			logrus.Errorln(r, "item worker (", index, ") crashed  => ", util.GetCurrentGoroutineStack())
+			logrus.Errorln("item worker panic", r, "item worker (", index, ") crashed  => ", util.GetCurrentGoroutineStack())
 		}
 	}()
 

@@ -32,7 +32,7 @@ func processItem(t uint8, doubanId uint64) {
 func processBook(doubanId uint64) {
 	defer func() {
 		if r := recover(); r != nil {
-			logrus.Errorln(r, " => ", util.GetCurrentGoroutineStack())
+			logrus.Errorln("process book panic", r, "=>", util.GetCurrentGoroutineStack())
 		}
 	}()
 	book, rating, newUser, newItems, err := crawl.Book(doubanId)
@@ -55,7 +55,7 @@ func processBook(doubanId uint64) {
 func processMovie(doubanId uint64) {
 	defer func() {
 		if r := recover(); r != nil {
-			logrus.Errorln(r, " => ", util.GetCurrentGoroutineStack())
+			logrus.Errorln("process movie panic", r, "=>", util.GetCurrentGoroutineStack())
 		}
 	}()
 	movie, rating, newUser, newItems, err := crawl.Movie(doubanId)
@@ -77,7 +77,7 @@ func processMovie(doubanId uint64) {
 func processGame(doubanId uint64) {
 	defer func() {
 		if r := recover(); r != nil {
-			logrus.Errorln(r, " => ", util.GetCurrentGoroutineStack())
+			logrus.Errorln("process game panic", r, "=>", util.GetCurrentGoroutineStack())
 		}
 	}()
 
@@ -100,7 +100,7 @@ func processGame(doubanId uint64) {
 func processSong(doubanId uint64) {
 	defer func() {
 		if r := recover(); r != nil {
-			logrus.Errorln(r, " => ", util.GetCurrentGoroutineStack())
+			logrus.Errorln("process song panic", r, "=>", util.GetCurrentGoroutineStack())
 		}
 	}()
 
@@ -131,7 +131,7 @@ func processDiscoverUser(newUsers *[]string) {
 	go func() {
 		defer func() {
 			if r := recover(); r != nil {
-				logrus.Errorln(r, " => ", util.GetCurrentGoroutineStack())
+				logrus.Errorln("process discover user panic", r, "=>", util.GetCurrentGoroutineStack())
 			}
 		}()
 		totalFound := len(*newUsers)
@@ -171,7 +171,7 @@ func processDiscoverItem(newItems *[]uint64, t consts.Type) {
 	go func() {
 		defer func() {
 			if r := recover(); r != nil {
-				logrus.Errorln(r, " => ", util.GetCurrentGoroutineStack())
+				logrus.Errorln("process discover item panic", r, "=>", util.GetCurrentGoroutineStack())
 			}
 		}()
 		totalFound := len(*newItems)
@@ -191,7 +191,7 @@ func processDiscoverItem(newItems *[]uint64, t consts.Type) {
 func processUser(doubanUid uint64) {
 	defer func() {
 		if r := recover(); r != nil {
-			logrus.Errorln(r, " => ", util.GetCurrentGoroutineStack())
+			logrus.Errorln("process user panic", r, "=>", util.GetCurrentGoroutineStack())
 		}
 	}()
 
@@ -254,6 +254,11 @@ func syncCommentGame(user *model.User, forceSyncAfter time.Time) {
 		panic(err)
 	}
 	go func() {
+		defer func() {
+			if r := recover(); r != nil {
+				logrus.Errorln("sync comment game panic", r, "=>", util.GetCurrentGoroutineStack())
+			}
+		}()
 		if forceSyncAfter.Unix() == 0 {
 			newCommentIds := make(map[uint64]bool)
 			for i := range *game {
@@ -286,6 +291,11 @@ func syncCommentBook(user *model.User, forceSyncAfter time.Time) {
 		panic(err)
 	}
 	go func() {
+		defer func() {
+			if r := recover(); r != nil {
+				logrus.Errorln("sync comment book panic", r, "=>", util.GetCurrentGoroutineStack())
+			}
+		}()
 		if forceSyncAfter.Unix() == 0 {
 			newCommentIds := make(map[uint64]bool)
 			for i := range *book {
@@ -318,6 +328,11 @@ func syncCommentMovie(user *model.User, forceSyncAfter time.Time) {
 	}
 
 	go func() {
+		defer func() {
+			if r := recover(); r != nil {
+				logrus.Errorln("sync comment movie panic", r, "=>", util.GetCurrentGoroutineStack())
+			}
+		}()
 		if forceSyncAfter.Unix() == 0 {
 			newCommentIds := make(map[uint64]bool)
 			for i := range *movie {
@@ -350,6 +365,11 @@ func syncCommentSong(user *model.User, forceSyncAfter time.Time) {
 	}
 
 	go func() {
+		defer func() {
+			if r := recover(); r != nil {
+				logrus.Errorln("sync comment song panic", r, "=>", util.GetCurrentGoroutineStack())
+			}
+		}()
 		if forceSyncAfter.Unix() == 0 {
 			newCommentIds := make(map[uint64]bool)
 			for i := range *song {

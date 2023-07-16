@@ -62,7 +62,7 @@ func handle(ctx *gin.Context) {
 				"success": false,
 				"msg":     "服务内部错误，请联系开发者处理",
 			})
-			logrus.Errorln(r, " => ", util.GetCurrentGoroutineStack())
+			logrus.Errorln("handle panic", r, "=>", util.GetCurrentGoroutineStack())
 		}
 	}()
 	ctx.Next()
