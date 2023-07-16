@@ -6,5 +6,5 @@ import (
 )
 
 func TestLog(t *testing.T) {
-	logrus.Infolnln("test", "test", "test")
+	logrus.Infoln("test", "test", "test")
 }

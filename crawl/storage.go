@@ -14,6 +14,7 @@ import (
 	"io"
 	"mouban/dao"
 	"mouban/model"
+	"mouban/util"
 	"net/http"
 	"os"
 	"strings"
@@ -42,7 +43,17 @@ func Storage(url string) string {
 		return storageHit.Target
 	}
 
-	file := download(url, "https://www.douban.com/")
+	var file *os.File
+	for i := 0; i < 3; i++ {
+		file = download(url, "https://www.douban.com/")
+		if file != nil {
+			break
+		}
+	}
+	if file == nil {
+		panic("download file finally failed for : " + url)
+	}
+
 	mtype, extension := mime(file.Name())
 
 	md5Result := md5sum(file.Name())
@@ -62,7 +73,13 @@ func Storage(url string) string {
 	return result
 }
 
-func download(url string, referer string) *os.File {
+func download(url string, referer string) (o *os.File) {
+	defer func() {
+		if r := recover(); r != nil {
+			logrus.Errorln("download panic", r, "=>", util.GetCurrentGoroutineStack())
+			o = nil
+		}
+	}()
 	// 创建一个文件用于保存
 	out, err := os.CreateTemp("/tmp", "mouban-")
 	if err != nil {
