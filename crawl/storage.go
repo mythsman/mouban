@@ -44,7 +44,7 @@ func Storage(url string) string {
 	}
 
 	var file *os.File
-	for i := 0; i < 3; i++ {
+	for i := 0; i < 5; i++ {
 		file = download(url, "https://www.douban.com/")
 		if file != nil {
 			break
