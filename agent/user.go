@@ -14,7 +14,7 @@ import (
 func userPendingSelector(ch chan *model.Schedule) {
 	defer func() {
 		if r := recover(); r != nil {
-			logrus.Errorln(r, "user pending selector", "crashed  => ", util.GetCurrentGoroutineStack())
+			logrus.Errorln("user pending selector panic", r, "user pending selector", "crashed  => ", util.GetCurrentGoroutineStack())
 		}
 	}()
 
@@ -33,7 +33,7 @@ func userPendingSelector(ch chan *model.Schedule) {
 func userRetrySelector(ch chan *model.Schedule) {
 	defer func() {
 		if r := recover(); r != nil {
-			logrus.Errorln(r, "user retry selector", "crashed  => ", util.GetCurrentGoroutineStack())
+			logrus.Errorln("user retry selector panic", r, "user retry selector", "crashed  => ", util.GetCurrentGoroutineStack())
 		}
 	}()
 
@@ -52,7 +52,7 @@ func userRetrySelector(ch chan *model.Schedule) {
 func userDiscoverSelector(ch chan *model.Schedule) {
 	defer func() {
 		if r := recover(); r != nil {
-			logrus.Errorln(r, "user discover selector", "crashed  => ", util.GetCurrentGoroutineStack())
+			logrus.Errorln("user discover selector panic", r, "user discover selector", "crashed  => ", util.GetCurrentGoroutineStack())
 		}
 	}()
 
@@ -72,7 +72,7 @@ func userDiscoverSelector(ch chan *model.Schedule) {
 func userWorker(ch chan *model.Schedule) {
 	defer func() {
 		if r := recover(); r != nil {
-			logrus.Errorln(r, "user worker crashed  => ", util.GetCurrentGoroutineStack())
+			logrus.Errorln("user worker panic", r, "user worker crashed  => ", util.GetCurrentGoroutineStack())
 		}
 	}()
 

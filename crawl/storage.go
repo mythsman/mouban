@@ -5,13 +5,13 @@ import (
 	"encoding/hex"
 	"errors"
 	"github.com/gabriel-vasile/mimetype"
+	"github.com/hashicorp/go-retryablehttp"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"golang.org/x/net/context"
 	"io"
-	"log"
 	"mouban/dao"
 	"mouban/model"
 	"net/http"
@@ -21,6 +21,8 @@ import (
 )
 
 var minioClient *minio.Client
+var retryClient *retryablehttp.Client
+
 var endpoint string
 var accessKeyID string
 var secretAccessKey string
@@ -47,11 +49,8 @@ func Storage(url string) string {
 
 	result := upload(file.Name(), md5Result+extension, mtype)
 
-	e := os.Remove(file.Name())
+	_ = os.Remove(file.Name())
 
-	if e != nil {
-		log.Fatal(e)
-	}
 	storage := &model.Storage{
 		Source: url,
 		Target: result,
@@ -67,19 +66,16 @@ func download(url string, referer string) *os.File {
 	// 创建一个文件用于保存
 	out, err := os.CreateTemp("/tmp", "mouban-")
 	if err != nil {
+		logrus.Fatalln("create tmp file failed")
 		panic(err)
 	}
 	defer out.Close()
 
-	client := http.Client{
-		Timeout: 30 * time.Second,
-	}
-
-	req, err := http.NewRequest("GET", url, nil)
+	req, err := retryablehttp.NewRequest("GET", url, nil)
 	req.Header.Set("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36")
 	req.Header.Set("Referer", referer)
 
-	resp, err := client.Do(req)
+	resp, err := retryClient.Do(req)
 
 	if err != nil {
 		panic(err)
@@ -90,6 +86,7 @@ func download(url string, referer string) *os.File {
 	// 然后将响应流和文件流对接起来
 	_, err = io.Copy(out, resp.Body)
 	if err != nil {
+		logrus.Fatalln("write file", url, "failed")
 		panic(err)
 	}
 	return out
@@ -116,12 +113,13 @@ func upload(file string, name string, mimeType string) string {
 	}
 	_, err := minioClient.FPutObject(context.Background(), bucketName, name, file, options)
 	if err != nil {
-		log.Fatalln(err)
+		logrus.Fatalln("minio put failed,", err)
 	}
 	return "https://" + endpoint + "/" + bucketName + "/" + name
 }
 
 func init() {
+	retryClient = initHttpClient()
 	endpoint = viper.GetString("minio.endpoint")
 	accessKeyID = viper.GetString("minio.id")
 	secretAccessKey = viper.GetString("minio.key")
@@ -133,17 +131,34 @@ func init() {
 		Creds:  credentials.NewStaticV4(accessKeyID, secretAccessKey, ""),
 		Secure: true,
 	})
+
 	if err != nil {
-		log.Fatalln(err)
+		panic(err)
 	}
 
 	err = minioClient.MakeBucket(context.Background(), bucketName, minio.MakeBucketOptions{})
 	if err != nil {
 		exists, errBucketExists := minioClient.BucketExists(context.Background(), bucketName)
 		if errBucketExists == nil && exists {
-			log.Printf("We already own %s\n", bucketName)
+			logrus.Println("We already own bucket", bucketName)
 		}
 	} else {
-		log.Printf("Successfully created %s\n", bucketName)
+		logrus.Println("Successfully created bucket", bucketName)
 	}
+}
+
+func initHttpClient() *retryablehttp.Client {
+	client := retryablehttp.NewClient()
+	client.RetryMax = viper.GetInt("http.retry_max")
+	client.Logger = nil
+	client.RetryWaitMin = time.Duration(1) * time.Second
+	client.RetryWaitMax = time.Duration(60) * time.Second
+	client.CheckRetry = func(ctx context.Context, resp *http.Response, err error) (bool, error) {
+		return retryablehttp.DefaultRetryPolicy(ctx, resp, err)
+	}
+
+	client.HTTPClient = &http.Client{
+		Timeout: time.Duration(viper.GetInt("http.timeout")) * time.Millisecond,
+	}
+	return client
 }

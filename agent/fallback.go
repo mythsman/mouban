@@ -12,7 +12,7 @@ import (
 func runFallback() {
 	defer func() {
 		if r := recover(); r != nil {
-			logrus.Errorln(r, "fallback agent crashed  => ", util.GetCurrentGoroutineStack())
+			logrus.Errorln("run fallback panic", r, "fallback agent crashed  => ", util.GetCurrentGoroutineStack())
 		}
 	}()
 
