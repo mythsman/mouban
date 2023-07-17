@@ -32,14 +32,14 @@ var bucketName string
 // Storage source url -> stored url
 func Storage(url string) string {
 
+	if strings.Contains(url, viper.GetString("minio.endpoint")) {
+		logrus.Infoln("storage ignore :", url)
+		return url
+	}
+
 	storageHit := dao.GetStorage(url)
 	if storageHit != nil {
 		logrus.Infoln("storage hit :", url, "->", storageHit.Target)
-		return storageHit.Target
-	}
-
-	if strings.Contains(url, viper.GetString("minio.endpoint")) {
-		logrus.Infoln("storage ignore :", url)
 		return storageHit.Target
 	}
 
