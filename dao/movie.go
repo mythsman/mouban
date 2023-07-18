@@ -12,6 +12,10 @@ func UpsertMovie(movie *model.Movie) {
 	common.Db.Where("douban_id = ? ", movie.DoubanId).Assign(movie).FirstOrCreate(data)
 }
 
+func UpdateMovieThumbnail(doubanId uint64, thumbnail string) {
+	common.Db.Model(&model.Movie{}).Where("douban_id = ?", doubanId).Update("thumbnail", thumbnail)
+}
+
 func CreateMovieNx(movie *model.Movie) bool {
 	data := &model.Movie{}
 	inserted := common.Db.Where("douban_id = ? ", movie.DoubanId).Attrs(movie).FirstOrCreate(data).RowsAffected > 0

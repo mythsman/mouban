@@ -12,6 +12,10 @@ func UpsertSong(song *model.Song) {
 	common.Db.Where("douban_id = ? ", song.DoubanId).Assign(song).FirstOrCreate(data)
 }
 
+func UpdateSongThumbnail(doubanId uint64, thumbnail string) {
+	common.Db.Model(&model.Song{}).Where("douban_id = ?", doubanId).Update("thumbnail", thumbnail)
+}
+
 func CreateSongNx(song *model.Song) bool {
 	data := &model.Song{}
 	inserted := common.Db.Where("douban_id = ? ", song.DoubanId).Attrs(song).FirstOrCreate(data).RowsAffected > 0
