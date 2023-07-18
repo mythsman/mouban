@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-func init() {
+func work() {
 	go func() {
 		defer func() {
 			if r := recover(); r != nil {

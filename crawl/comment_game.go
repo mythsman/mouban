@@ -3,6 +3,7 @@ package crawl
 import (
 	"fmt"
 	"github.com/antchfx/htmlquery"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"mouban/consts"
 	"mouban/model"
@@ -54,11 +55,18 @@ func scrollAllGame(doubanUid uint64, action consts.Action, forceSyncAfter time.T
 
 		if forceSyncAfter.Unix() > 0 && len(*comments) > 0 {
 			if (*comments)[len(*comments)-1].MarkDate.Before(forceSyncAfter) {
+				logrus.Infoln("scroll game", action.Name, "for", doubanUid, "end : incr sync end")
 				break
 			}
 		}
 
-		if next == "" || total >= viper.GetUint32("agent.item.max") {
+		if next == "" {
+			logrus.Infoln("scroll game", action.Name, "for", doubanUid, "end : next blank")
+			break
+		}
+
+		if total >= viper.GetUint32("agent.item.max") {
+			logrus.Infoln("scroll game", action.Name, "for", doubanUid, "end : total exceed max")
 			break
 		}
 	}

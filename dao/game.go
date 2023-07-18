@@ -12,6 +12,10 @@ func UpsertGame(game *model.Game) {
 	common.Db.Where("douban_id = ? ", game.DoubanId).Assign(game).FirstOrCreate(data)
 }
 
+func UpdateGameThumbnail(doubanId uint64, thumbnail string) {
+	common.Db.Model(&model.Game{}).Where("douban_id = ?", doubanId).Update("thumbnail", thumbnail)
+}
+
 func CreateGameNx(game *model.Game) bool {
 	data := &model.Game{}
 	inserted := common.Db.Where("douban_id = ? ", game.DoubanId).Attrs(game).FirstOrCreate(data).RowsAffected > 0

@@ -12,6 +12,10 @@ func UpsertBook(book *model.Book) {
 	common.Db.Where("douban_id = ? ", book.DoubanId).Assign(book).FirstOrCreate(data)
 }
 
+func UpdateBookThumbnail(doubanId uint64, thumbnail string) {
+	common.Db.Model(&model.Book{}).Where("douban_id = ?", doubanId).Update("thumbnail", thumbnail)
+}
+
 func CreateBookNx(book *model.Book) bool {
 	data := &model.Book{}
 	inserted := common.Db.Where("douban_id = ? ", book.DoubanId).Attrs(book).FirstOrCreate(data).RowsAffected > 0
