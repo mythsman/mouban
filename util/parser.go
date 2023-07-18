@@ -12,7 +12,7 @@ import (
 
 var doubanUidParser = regexp.MustCompile(`.*/icon/[a-z]+(\d+)(-.*)?\..*`)
 var dateParser = regexp.MustCompile(`.*(\d{4}-\d{2}(-\d{2})?).*`)
-var numberParser = regexp.MustCompile(`\D*(\d+).*`)
+var numberParser = regexp.MustCompile(`\D*(\d+)\D*$`)
 var floatParser = regexp.MustCompile(`([0-9]*\.?[0-9]+)`)
 var domainParser = regexp.MustCompile(`.*people/(.*)/`)
 var bookItemParser = regexp.MustCompile("https://book.douban.com/subject/[0-9]*")

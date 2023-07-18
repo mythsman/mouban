@@ -42,6 +42,8 @@ func TestParseNumber(t *testing.T) {
 		{"1", args{number: "25 本"}, 25},
 		{"2", args{number: "总共有 25 本"}, 25},
 		{"3", args{number: "21474836380 本"}, 21474836380},
+		{"4", args{number: "总共(123)"}, 123},
+		{"5", args{number: "总12共(123)"}, 123},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
