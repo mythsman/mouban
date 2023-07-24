@@ -92,7 +92,7 @@ func scrollSong(doubanUid uint64, url string, action consts.Action) (*[]model.Co
 	}
 	total := util.ParseNumber(htmlquery.InnerText(totalNode))
 
-	list := htmlquery.Find(doc, "//div[@class='item']")
+	list := htmlquery.Find(doc, "//div[@class='item']|//div[@class='item comment-item']")
 	var comments []model.Comment
 	var songs []model.Song
 

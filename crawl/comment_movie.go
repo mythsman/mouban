@@ -93,7 +93,7 @@ func scrollMovie(doubanUid uint64, url string, action consts.Action) (*[]model.C
 	}
 	total := util.ParseNumber(htmlquery.InnerText(totalNode))
 
-	list := htmlquery.Find(doc, "//div[@class='item']")
+	list := htmlquery.Find(doc, "//div[@class='item']|//div[@class='item comment-item']")
 	var comments []model.Comment
 	var movies []model.Movie
 
