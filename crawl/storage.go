@@ -39,7 +39,7 @@ func Storage(url string) string {
 
 	storageHit := dao.GetStorage(url)
 	if storageHit != nil {
-		logrus.Infoln("storage hit :", url, "->", storageHit.Target)
+		logrus.Infoln("storage hit")
 		return storageHit.Target
 	}
 
