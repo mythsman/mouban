@@ -37,6 +37,11 @@ func Storage(url string) string {
 		return url
 	}
 
+	if !strings.HasPrefix(url, "http") {
+		logrus.Infoln("storage bad :", url)
+		return ""
+	}
+
 	storageHit := dao.GetStorage(url)
 	if storageHit != nil {
 		logrus.Infoln("storage hit")
