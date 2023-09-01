@@ -93,7 +93,7 @@ func scrollGame(doubanUid uint64, url string, action consts.Action) (*[]model.Co
 	}
 	total := util.ParseNumber(htmlquery.InnerText(totalNode))
 
-	list := htmlquery.Find(doc, "//div[@class='common-item']")
+	list := htmlquery.Find(doc, "//div[contains(@class,'common-item')]")
 	var comments []model.Comment
 	var games []model.Game
 

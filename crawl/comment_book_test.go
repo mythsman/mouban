@@ -8,7 +8,7 @@ import (
 )
 
 func Test_scrollBook(t *testing.T) {
-	comments, books, total, next, err := scrollBook(162448367, "", consts.ActionCollect)
+	comments, books, total, next, err := scrollBook(214963638, "", consts.ActionCollect)
 	if err != nil {
 		return
 	}
