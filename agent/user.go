@@ -1,14 +1,15 @@
 package agent
 
 import (
-	"github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
 	"mouban/consts"
 	"mouban/dao"
 	"mouban/model"
 	"mouban/util"
 	"strconv"
 	"time"
+
+	"github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 )
 
 func userPendingSelector(ch chan *model.Schedule) {

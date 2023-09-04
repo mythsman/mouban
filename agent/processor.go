@@ -1,8 +1,6 @@
 package agent
 
 import (
-	"github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
 	"mouban/consts"
 	"mouban/crawl"
 	"mouban/dao"
@@ -10,6 +8,9 @@ import (
 	"mouban/util"
 	"strconv"
 	"time"
+
+	"github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 )
 
 func processItem(t uint8, doubanId uint64) {
