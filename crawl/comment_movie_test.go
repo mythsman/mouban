@@ -8,7 +8,7 @@ import (
 )
 
 func Test_scrollMovie(t *testing.T) {
-	comments, movies, total, next, err := scrollMovie(251106444, "", consts.ActionCollect)
+	comments, movies, total, next, err := scrollMovie(221941333, "", consts.ActionCollect)
 	if err != nil {
 		return
 	}

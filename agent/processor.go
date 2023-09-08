@@ -33,7 +33,7 @@ func processItem(t uint8, doubanId uint64) {
 func processBook(doubanId uint64) {
 	defer func() {
 		if r := recover(); r != nil {
-			logrus.Errorln("process book panic", r, "=>", util.GetCurrentGoroutineStack())
+			logrus.Errorln("process book panic", doubanId, r, "=>", util.GetCurrentGoroutineStack())
 		}
 	}()
 	book, rating, newUser, newItems, err := crawl.Book(doubanId)
@@ -56,7 +56,7 @@ func processBook(doubanId uint64) {
 func processMovie(doubanId uint64) {
 	defer func() {
 		if r := recover(); r != nil {
-			logrus.Errorln("process movie panic", r, "=>", util.GetCurrentGoroutineStack())
+			logrus.Errorln("process movie panic", doubanId, r, "=>", util.GetCurrentGoroutineStack())
 		}
 	}()
 	movie, rating, newUser, newItems, err := crawl.Movie(doubanId)
@@ -78,7 +78,7 @@ func processMovie(doubanId uint64) {
 func processGame(doubanId uint64) {
 	defer func() {
 		if r := recover(); r != nil {
-			logrus.Errorln("process game panic", r, "=>", util.GetCurrentGoroutineStack())
+			logrus.Errorln("process game panic", doubanId, r, "=>", util.GetCurrentGoroutineStack())
 		}
 	}()
 
@@ -101,7 +101,7 @@ func processGame(doubanId uint64) {
 func processSong(doubanId uint64) {
 	defer func() {
 		if r := recover(); r != nil {
-			logrus.Errorln("process song panic", r, "=>", util.GetCurrentGoroutineStack())
+			logrus.Errorln("process song panic", doubanId, r, "=>", util.GetCurrentGoroutineStack())
 		}
 	}()
 
@@ -192,7 +192,7 @@ func processDiscoverItem(newItems *[]uint64, t consts.Type) {
 func processUser(doubanUid uint64) {
 	defer func() {
 		if r := recover(); r != nil {
-			logrus.Errorln("process user panic", r, "=>", util.GetCurrentGoroutineStack())
+			logrus.Errorln("process user panic", doubanUid, r, "=>", util.GetCurrentGoroutineStack())
 		}
 	}()
 

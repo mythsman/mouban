@@ -123,7 +123,7 @@ func scrollBook(doubanUid uint64, url string, action consts.Action) (*[]model.Co
 		}
 
 		shortComment := ""
-		shortCommentNode := htmlquery.FindOne(list[i], "//div[@class='short-note']//p[@class='comment']")
+		shortCommentNode := htmlquery.FindOne(list[i], "//div[@class='short-note']//p[contains(@class,'comment')]")
 		if shortCommentNode != nil {
 			shortComment = util.TrimParagraph(htmlquery.InnerText(shortCommentNode))
 		}
