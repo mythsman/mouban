@@ -1,12 +1,13 @@
 package agent
 
 import (
-	"github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
 	"mouban/consts"
 	"mouban/crawl"
 	"mouban/util"
 	"time"
+
+	"github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 )
 
 func runLatest() {
@@ -37,7 +38,7 @@ func init() {
 	}
 
 	go func() {
-		for range time.NewTicker(time.Hour * 24).C {
+		for range time.NewTicker(time.Hour * 6).C {
 			runLatest()
 		}
 	}()
