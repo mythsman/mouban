@@ -37,9 +37,14 @@ func Storage(url string) string {
 		return url
 	}
 
+	if !strings.HasPrefix(url, "http") {
+		logrus.Infoln("storage bad :", url)
+		return ""
+	}
+
 	storageHit := dao.GetStorage(url)
 	if storageHit != nil {
-		logrus.Infoln("storage hit :", url, "->", storageHit.Target)
+		logrus.Infoln("storage hit")
 		return storageHit.Target
 	}
 
@@ -76,7 +81,7 @@ func Storage(url string) string {
 func download(url string, referer string) (o *os.File) {
 	defer func() {
 		if r := recover(); r != nil {
-			logrus.Errorln("download panic", r, "=>", util.GetCurrentGoroutineStack())
+			logrus.Errorln("download panic", url, r, "=>", util.GetCurrentGoroutineStack())
 			o = nil
 		}
 	}()

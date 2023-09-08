@@ -113,7 +113,7 @@ func UserPublish(doubanUid uint64) (time.Time, error) {
 func UserId(domain string) uint64 {
 	defer func() {
 		if r := recover(); r != nil {
-			logrus.Errorln("user id panic", r, "=>", util.GetCurrentGoroutineStack())
+			logrus.Errorln("user id panic", domain, r, "=>", util.GetCurrentGoroutineStack())
 		}
 	}()
 
