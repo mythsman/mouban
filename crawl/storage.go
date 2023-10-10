@@ -4,13 +4,6 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"errors"
-	"github.com/gabriel-vasile/mimetype"
-	"github.com/hashicorp/go-retryablehttp"
-	"github.com/minio/minio-go/v7"
-	"github.com/minio/minio-go/v7/pkg/credentials"
-	"github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
-	"golang.org/x/net/context"
 	"io"
 	"mouban/dao"
 	"mouban/model"
@@ -19,6 +12,14 @@ import (
 	"os"
 	"strings"
 	"time"
+
+	"github.com/gabriel-vasile/mimetype"
+	"github.com/hashicorp/go-retryablehttp"
+	"github.com/minio/minio-go/v7"
+	"github.com/minio/minio-go/v7/pkg/credentials"
+	"github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
+	"golang.org/x/net/context"
 )
 
 var minioClient *minio.Client
@@ -63,7 +64,14 @@ func Storage(url string) string {
 
 	md5Result := md5sum(file.Name())
 
-	result := upload(file.Name(), md5Result+extension, mtype)
+	result := ""
+	existingStorage := dao.GetStorageByMd5(md5Result)
+	if existingStorage != nil {
+		result = existingStorage.Target
+		logrus.Infoln("storage already uploaded for", md5Result)
+	} else {
+		result = upload(file.Name(), md5Result+extension, mtype)
+	}
 
 	_ = os.Remove(file.Name())
 
@@ -74,6 +82,10 @@ func Storage(url string) string {
 	}
 	dao.UpsertStorage(storage)
 	logrus.Infoln("storage add :", url, "->", result)
+
+	if strings.HasSuffix(storage.Target, ".txt") || strings.HasSuffix(storage.Target, ".html") {
+		logrus.Warnln("storage maybe invalid :", url, "->", result)
+	}
 
 	return result
 }

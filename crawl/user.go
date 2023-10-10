@@ -4,14 +4,15 @@ import (
 	"encoding/xml"
 	"errors"
 	"fmt"
-	"github.com/antchfx/htmlquery"
-	"github.com/sirupsen/logrus"
 	"mouban/consts"
 	"mouban/model"
 	"mouban/util"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/antchfx/htmlquery"
+	"github.com/sirupsen/logrus"
 )
 
 func UserOverview(doubanUid uint64) (*model.User, error) {
@@ -93,7 +94,7 @@ func UserPublish(doubanUid uint64) (time.Time, error) {
 
 	err = xml.Unmarshal(data, &rss)
 	if err != nil {
-		logrus.Infoln("rss parse failed for", doubanUid, body)
+		logrus.Infoln("rss parse failed for", doubanUid, *body)
 		return time.Unix(0, 0), nil
 	}
 
@@ -103,7 +104,7 @@ func UserPublish(doubanUid uint64) (time.Time, error) {
 
 	dateTime, err := time.ParseInLocation(time.RFC1123, rss.Channel.PubDate, time.Local)
 	if err != nil {
-		logrus.Infoln("parse pubDate failed for", doubanUid, body)
+		logrus.Infoln("parse pubDate failed for", doubanUid, *body)
 		return time.Unix(0, 0), nil
 	}
 

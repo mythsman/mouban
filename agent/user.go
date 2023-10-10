@@ -12,78 +12,68 @@ import (
 	"github.com/spf13/viper"
 )
 
-func userPendingSelector(ch chan *model.Schedule) {
+func userSelector(ch chan *model.Schedule, done chan bool) {
 	defer func() {
 		if r := recover(); r != nil {
-			logrus.Errorln("user pending selector panic", r, "user pending selector", "crashed  => ", util.GetCurrentGoroutineStack())
+			logrus.Errorln("user selector panic", r, util.GetCurrentGoroutineStack())
 		}
 	}()
 
-	schedule := dao.SearchScheduleByStatus(consts.TypeUser.Code, consts.ScheduleToCrawl.Code)
-	if schedule != nil {
-		logrus.Infoln("pending user found", schedule.DoubanId)
-		changed := dao.CasScheduleStatus(schedule.DoubanId, consts.TypeUser.Code, consts.ScheduleCrawling.Code, *schedule.Status)
-		if changed {
-			ch <- schedule
-		}
-	} else {
-		time.Sleep(10 * time.Second)
-	}
-}
+	<-done
 
-func userRetrySelector(ch chan *model.Schedule) {
-	defer func() {
-		if r := recover(); r != nil {
-			logrus.Errorln("user retry selector panic", r, "user retry selector", "crashed  => ", util.GetCurrentGoroutineStack())
+	for {
+		pendingSchedule := dao.SearchScheduleByStatus(consts.TypeUser.Code, consts.ScheduleToCrawl.Code)
+		if pendingSchedule != nil {
+			logrus.Infoln("pending user found", pendingSchedule.DoubanId)
+			changed := dao.CasScheduleStatus(pendingSchedule.DoubanId, consts.TypeUser.Code, consts.ScheduleCrawling.Code, *pendingSchedule.Status)
+			if changed {
+				ch <- pendingSchedule
+				return
+			}
 		}
-	}()
 
-	schedule := dao.SearchScheduleByAll(consts.TypeUser.Code, consts.ScheduleCrawled.Code, consts.ScheduleUnready.Code)
-	if schedule != nil {
-		logrus.Infoln("retry user found", schedule.DoubanId)
-		changed := dao.CasScheduleStatus(schedule.DoubanId, consts.TypeUser.Code, consts.ScheduleCrawling.Code, *schedule.Status)
-		if changed {
-			ch <- schedule
+		retrySchedule := dao.SearchScheduleByAll(consts.TypeUser.Code, consts.ScheduleCrawled.Code, consts.ScheduleUnready.Code)
+
+		if retrySchedule != nil {
+			logrus.Infoln("retry user found", retrySchedule.DoubanId)
+			changed := dao.CasScheduleStatus(retrySchedule.DoubanId, consts.TypeUser.Code, consts.ScheduleCrawling.Code, *retrySchedule.Status)
+			if changed {
+				ch <- retrySchedule
+				return
+			}
 		}
-	} else {
+
+		if viper.GetBool("agent.flow.discover") {
+			discoverSchedule := dao.SearchScheduleByStatus(consts.TypeUser.Code, consts.ScheduleCanCrawl.Code)
+			if discoverSchedule != nil {
+				logrus.Infoln("discover user found", discoverSchedule.DoubanId)
+				changed := dao.CasScheduleStatus(discoverSchedule.DoubanId, consts.TypeUser.Code, consts.ScheduleCrawling.Code, *discoverSchedule.Status)
+				if changed {
+					ch <- discoverSchedule
+					return
+				}
+			}
+		}
+
 		time.Sleep(time.Minute)
 	}
 }
 
-func userDiscoverSelector(ch chan *model.Schedule) {
+func userWorker(index int, ch chan *model.Schedule, done chan bool) {
 	defer func() {
 		if r := recover(); r != nil {
-			logrus.Errorln("user discover selector panic", r, "user discover selector", "crashed  => ", util.GetCurrentGoroutineStack())
+			logrus.Errorln("user worker panic", r, "user worker (", index, ") crashed  => ", util.GetCurrentGoroutineStack())
 		}
+		done <- true
 	}()
 
-	schedule := dao.SearchScheduleByStatus(consts.TypeUser.Code, consts.ScheduleCanCrawl.Code)
+	schedule := <-ch
 
-	if schedule != nil {
-		logrus.Infoln("discover user found", schedule.DoubanId)
-		changed := dao.CasScheduleStatus(schedule.DoubanId, consts.TypeUser.Code, consts.ScheduleCrawling.Code, *schedule.Status)
-		if changed {
-			ch <- schedule
-		}
-	} else {
-		time.Sleep(time.Minute)
-	}
-}
-
-func userWorker(ch chan *model.Schedule) {
-	defer func() {
-		if r := recover(); r != nil {
-			logrus.Errorln("user worker panic", r, "user worker crashed  => ", util.GetCurrentGoroutineStack())
-		}
-	}()
-
-	for schedule := range ch {
-		t := consts.ParseType(schedule.Type)
-		logrus.Infoln("start process user", strconv.FormatUint(schedule.DoubanId, 10))
-		processUser(schedule.DoubanId)
-		dao.CasScheduleStatus(schedule.DoubanId, t.Code, consts.ScheduleCrawled.Code, consts.ScheduleCrawling.Code)
-		logrus.Infoln("end process user", strconv.FormatUint(schedule.DoubanId, 10))
-	}
+	t := consts.ParseType(schedule.Type)
+	logrus.Infoln("user thread", index, "start", strconv.FormatUint(schedule.DoubanId, 10))
+	processUser(schedule.DoubanId)
+	dao.CasScheduleStatus(schedule.DoubanId, t.Code, consts.ScheduleCrawled.Code, consts.ScheduleCrawling.Code)
+	logrus.Infoln("user thread", index, "end", strconv.FormatUint(schedule.DoubanId, 10))
 }
 
 func init() {
@@ -92,39 +82,27 @@ func init() {
 		return
 	}
 
-	commonCh := make(chan *model.Schedule)
-	discoverCh := make(chan *model.Schedule)
+	concurrency := viper.GetInt("agent.user.concurrency")
+
+	ch := make(chan *model.Schedule, concurrency)
+	done := make(chan bool, concurrency)
 
 	go func() {
-		for range time.NewTicker(time.Second).C {
-			userPendingSelector(commonCh)
+		for {
+			userSelector(ch, done)
 		}
 	}()
 
-	go func() {
-		for range time.NewTicker(time.Second).C {
-			userRetrySelector(commonCh)
-		}
-	}()
-
-	go func() {
-		for range time.NewTicker(time.Second).C {
-			userWorker(commonCh)
-		}
-	}()
-
-	if viper.GetBool("agent.flow.discover") {
+	for i := 0; i < concurrency; i++ {
+		j := i + 1
 		go func() {
-			for range time.NewTicker(time.Second).C {
-				userDiscoverSelector(discoverCh)
+			for {
+				userWorker(j, ch, done)
 			}
 		}()
-		go func() {
-			for range time.NewTicker(time.Second).C {
-				userWorker(discoverCh)
-			}
-		}()
+		done <- true
 	}
 
-	logrus.Infoln("user agent enabled")
+	logrus.Infoln(concurrency, "user agent(s) enabled")
+
 }

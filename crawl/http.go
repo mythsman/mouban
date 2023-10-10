@@ -3,11 +3,6 @@ package crawl
 import (
 	"crypto/tls"
 	"errors"
-	"github.com/hashicorp/go-retryablehttp"
-	"github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
-	"golang.org/x/net/context"
-	"golang.org/x/time/rate"
 	"io/ioutil"
 	_ "mouban/common"
 	"net/http"
@@ -17,6 +12,12 @@ import (
 	"strings"
 	"sync/atomic"
 	"time"
+
+	"github.com/hashicorp/go-retryablehttp"
+	"github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
+	"golang.org/x/net/context"
+	"golang.org/x/time/rate"
 )
 
 var clients []*retryablehttp.Client
