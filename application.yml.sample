@@ -6,6 +6,8 @@ agent:
   enable: false
   flow:
     discover: false
+  user:
+    concurrency: 3
   item:
     concurrency: 3
     max: 3000

@@ -1,13 +1,14 @@
 package crawl
 
 import (
-	"github.com/antchfx/htmlquery"
-	"golang.org/x/net/html"
 	"mouban/consts"
 	"mouban/model"
 	"mouban/util"
 	"strconv"
 	"strings"
+
+	"github.com/antchfx/htmlquery"
+	"golang.org/x/net/html"
 )
 
 func Rating(interestSelect *html.Node) *model.Rating {
