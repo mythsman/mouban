@@ -1,10 +1,11 @@
 package dao
 
 import (
-	"github.com/sirupsen/logrus"
 	"mouban/common"
 	"mouban/consts"
 	"mouban/model"
+
+	"github.com/sirupsen/logrus"
 )
 
 func HideComment(doubanUid uint64, t uint8, doubanId uint64) {

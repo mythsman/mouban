@@ -1,15 +1,14 @@
 package common
 
 import (
+	"os"
+	"time"
+
 	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
 	"github.com/influxdata/influxdb-client-go/v2/api"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
-	"os"
-	"time"
 )
-
-
 
 func InitLogger() {
 	logrus.SetOutput(os.Stdout)

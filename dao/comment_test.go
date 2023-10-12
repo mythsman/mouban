@@ -1,11 +1,12 @@
 package dao
 
 import (
-	"github.com/sirupsen/logrus"
 	"mouban/consts"
 	"mouban/model"
 	"testing"
 	"time"
+
+	"github.com/sirupsen/logrus"
 )
 
 func TestUpsertComment(t *testing.T) {

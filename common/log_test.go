@@ -1,8 +1,9 @@
 package common
 
 import (
-	"github.com/sirupsen/logrus"
 	"testing"
+
+	"github.com/sirupsen/logrus"
 )
 
 func TestLog(t *testing.T) {

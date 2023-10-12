@@ -1,10 +1,11 @@
 package dao
 
 import (
-	"github.com/sirupsen/logrus"
 	"mouban/consts"
 	"mouban/util"
 	"testing"
+
+	"github.com/sirupsen/logrus"
 )
 
 func TestUpsertSchedule(t *testing.T) {

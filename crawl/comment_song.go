@@ -2,14 +2,15 @@ package crawl
 
 import (
 	"fmt"
-	"github.com/antchfx/htmlquery"
-	"github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
 	"mouban/consts"
 	"mouban/model"
 	"mouban/util"
 	"strings"
 	"time"
+
+	"github.com/antchfx/htmlquery"
+	"github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 )
 
 func CommentSong(user *model.User, forceSyncAfter time.Time) (*[]model.Comment, *[]model.Song, error) {
