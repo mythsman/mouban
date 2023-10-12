@@ -1,13 +1,14 @@
 package util
 
 import (
-	"github.com/antchfx/htmlquery"
-	"golang.org/x/net/html"
 	"mouban/consts"
 	"regexp"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/antchfx/htmlquery"
+	"golang.org/x/net/html"
 )
 
 var doubanUidParser = regexp.MustCompile(`.*/icon/[a-z]+(\d+)(-.*)?\..*`)
