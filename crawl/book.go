@@ -3,13 +3,14 @@ package crawl
 import (
 	"errors"
 	"fmt"
-	"github.com/antchfx/htmlquery"
-	"golang.org/x/net/html"
 	"mouban/consts"
 	"mouban/model"
 	"mouban/util"
 	"strconv"
 	"strings"
+
+	"github.com/antchfx/htmlquery"
+	"golang.org/x/net/html"
 )
 
 func Book(doubanId uint64) (*model.Book, *model.Rating, *[]string, *[]uint64, error) {

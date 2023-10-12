@@ -1,11 +1,12 @@
 package common
 
 import (
-	"github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 )
 
 func initFromYaml() {

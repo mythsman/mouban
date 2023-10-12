@@ -1,11 +1,12 @@
 package dao
 
 import (
-	"github.com/sirupsen/logrus"
 	"mouban/model"
 	"mouban/util"
 	"testing"
 	"time"
+
+	"github.com/sirupsen/logrus"
 )
 
 func TestUpsertUser(t *testing.T) {

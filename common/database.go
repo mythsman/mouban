@@ -3,15 +3,16 @@ package common
 import (
 	"database/sql"
 	"fmt"
+	"mouban/model"
+	"net/url"
+	"time"
+
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
-	"mouban/model"
-	"net/url"
-	"time"
 )
 
 var Db *gorm.DB

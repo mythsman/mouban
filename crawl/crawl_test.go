@@ -1,9 +1,10 @@
 package crawl
 
 import (
-	"github.com/sirupsen/logrus"
 	"mouban/util"
 	"testing"
+
+	"github.com/sirupsen/logrus"
 )
 
 func TestMovie(t *testing.T) {

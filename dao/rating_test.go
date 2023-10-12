@@ -1,11 +1,12 @@
 package dao
 
 import (
-	"github.com/sirupsen/logrus"
 	"mouban/consts"
 	"mouban/model"
 	"mouban/util"
 	"testing"
+
+	"github.com/sirupsen/logrus"
 )
 
 func TestUpsertRating(t *testing.T) {

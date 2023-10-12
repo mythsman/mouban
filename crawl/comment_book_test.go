@@ -1,10 +1,11 @@
 package crawl
 
 import (
-	"github.com/sirupsen/logrus"
 	"mouban/consts"
 	"mouban/util"
 	"testing"
+
+	"github.com/sirupsen/logrus"
 )
 
 func Test_scrollBook(t *testing.T) {

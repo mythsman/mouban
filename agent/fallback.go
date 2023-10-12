@@ -1,12 +1,13 @@
 package agent
 
 import (
-	"github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
 	"mouban/consts"
 	"mouban/dao"
 	"mouban/util"
 	"time"
+
+	"github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 )
 
 func runFallback() {

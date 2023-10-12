@@ -1,10 +1,11 @@
 package crawl
 
 import (
-	"github.com/antchfx/htmlquery"
 	"mouban/consts"
 	"mouban/util"
 	"strings"
+
+	"github.com/antchfx/htmlquery"
 )
 
 func LatestBook() *[]uint64 {

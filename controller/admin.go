@@ -3,14 +3,15 @@ package controller
 import (
 	"bufio"
 	"context"
-	"github.com/gin-gonic/gin"
-	"github.com/sirupsen/logrus"
-	"golang.org/x/sync/semaphore"
 	"mouban/consts"
 	"mouban/dao"
 	"mouban/util"
 	"net/http"
 	"os"
+
+	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
+	"golang.org/x/sync/semaphore"
 )
 
 func RefreshUser(ctx *gin.Context) {

@@ -3,12 +3,13 @@ package crawl
 import (
 	"errors"
 	"fmt"
-	"github.com/antchfx/htmlquery"
 	"mouban/consts"
 	"mouban/model"
 	"mouban/util"
 	"strconv"
 	"strings"
+
+	"github.com/antchfx/htmlquery"
 )
 
 func Game(doubanId uint64) (*model.Game, *model.Rating, *[]string, *[]uint64, error) {

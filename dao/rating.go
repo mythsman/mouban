@@ -1,9 +1,10 @@
 package dao
 
 import (
-	"github.com/sirupsen/logrus"
 	"mouban/common"
 	"mouban/model"
+
+	"github.com/sirupsen/logrus"
 )
 
 func UpsertRating(rating *model.Rating) {

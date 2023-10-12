@@ -1,10 +1,6 @@
 package main
 
 import (
-	"github.com/gin-gonic/gin"
-	"github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
-	"math/rand"
 	_ "mouban/agent"
 	_ "mouban/common"
 	"mouban/consts"
@@ -13,10 +9,13 @@ import (
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 )
 
 func main() {
-	rand.Seed(time.Now().UnixNano())
 
 	router := gin.New()
 
