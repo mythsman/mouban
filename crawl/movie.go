@@ -60,7 +60,7 @@ func Movie(doubanId uint64) (*model.Movie, *model.Rating, *[]string, *[]uint64, 
 	}
 	data := util.TrimInfo(htmlquery.OutputHTML(info, false))
 
-	director := strings.TrimSpace(data["编剧"])
+	director := strings.TrimSpace(data["导演"])
 	actor := strings.TrimSpace(data["主演"])
 	writer := strings.TrimSpace(data["编剧"])
 	site := strings.TrimSpace(data["官方网站"])
