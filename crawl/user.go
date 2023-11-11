@@ -118,9 +118,14 @@ func UserId(domain string) uint64 {
 		}
 	}()
 
-	body, _, err := Get(fmt.Sprintf(consts.BookOverviewForDomainUrl, domain), DiscoverLimiter)
+	body, code, err := Get(fmt.Sprintf(consts.BookOverviewForDomainUrl, domain), DiscoverLimiter)
 	if err != nil {
 		panic(err)
+	}
+
+	if code == 404 {
+		logrus.Infoln("user not found for", domain)
+		return 0
 	}
 
 	doc, err := htmlquery.Parse(strings.NewReader(*body))
