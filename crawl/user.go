@@ -142,9 +142,14 @@ func UserId(domain string) uint64 {
 }
 
 func bookOverview(doubanUid uint64) (*model.User, error) {
-	body, _, err := Get(fmt.Sprintf(consts.BookOverviewUrl, doubanUid), UserLimiter)
+	body, code, err := Get(fmt.Sprintf(consts.BookOverviewUrl, doubanUid), UserLimiter)
 	if err != nil {
 		panic(err)
+	}
+
+	if code == 404 {
+		logrus.Infoln("user not found for", doubanUid)
+		return nil, errors.New("用户不存在")
 	}
 
 	doc, err := htmlquery.Parse(strings.NewReader(*body))
