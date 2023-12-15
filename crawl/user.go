@@ -163,7 +163,7 @@ func bookOverview(doubanUid uint64) (*model.User, error) {
 		if strings.Contains(prompt, "已被永久停用") {
 			return nil, errors.New("account banned")
 		}
-		if strings.Contains(prompt, "已经主动注销帐号") {
+		if strings.Contains(prompt, "已经主动注销") {
 			return nil, errors.New("account canceled")
 		}
 	}
