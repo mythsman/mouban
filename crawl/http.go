@@ -3,7 +3,7 @@ package crawl
 import (
 	"crypto/tls"
 	"errors"
-	"io/ioutil"
+	"io"
 	_ "mouban/common"
 	"net/http"
 	"net/http/cookiejar"
@@ -124,7 +124,7 @@ func Get(url string, limiter *rate.Limiter) (*string, int, error) {
 	}
 
 	startTime := time.Now()
-	req, err := retryablehttp.NewRequest("GET", url, nil)
+	req, _ := retryablehttp.NewRequest("GET", url, nil)
 	req.Header.Set("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36")
 	req.Header.Set("Referer", "https://www.douban.com/")
 
@@ -142,7 +142,7 @@ func Get(url string, limiter *rate.Limiter) (*string, int, error) {
 		resp.Body.Close()
 	}()
 
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, 0, err
 	}

@@ -40,3 +40,8 @@ minio:
   id: some_id
   key: some_key
   bucket: douban
+s3:
+  endpoint: https://s3.mythsman.com
+  region: us-east-1
+  access_key: aaa
+  secret_key: bbb

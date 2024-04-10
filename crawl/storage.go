@@ -1,6 +1,7 @@
 package crawl
 
 import (
+	"bytes"
 	"crypto/md5"
 	"encoding/hex"
 	"errors"
@@ -8,10 +9,14 @@ import (
 	"mouban/dao"
 	"mouban/model"
 	"mouban/util"
-	"net/http" 
+	"net/http"
 	"os"
 	"strings"
 	"time"
+
+	"github.com/aws/aws-sdk-go-v2/aws"
+	aws_credentials "github.com/aws/aws-sdk-go-v2/credentials"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 
 	"github.com/gabriel-vasile/mimetype"
 	"github.com/hashicorp/go-retryablehttp"
@@ -24,6 +29,7 @@ import (
 
 var minioClient *minio.Client
 var retryClient *retryablehttp.Client
+var s3Client *s3.Client
 
 var endpoint string
 var accessKeyID string
@@ -105,11 +111,11 @@ func download(url string, referer string) (o *os.File) {
 	}
 	defer out.Close()
 
-	req, err := retryablehttp.NewRequest("GET", url, nil)
+	req, _ := retryablehttp.NewRequest("GET", url, nil)
 	req.Header.Set("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36")
 	req.Header.Set("Referer", referer)
 
-	resp, err := retryClient.Do(req)
+	resp, _ := retryClient.Do(req)
 
 	if err != nil {
 		panic(err)
@@ -149,7 +155,12 @@ func upload(file string, name string, mimeType string) string {
 	if err != nil {
 		logrus.Errorln("minio put failed,", err)
 	}
-	return "https://" + endpoint + "/" + bucketName + "/" + name
+	url := "https://" + endpoint + "/" + bucketName + "/" + name
+
+	restore(url, bucketName+"/"+name)
+
+	return url
+
 }
 
 func init() {
@@ -179,6 +190,8 @@ func init() {
 	} else {
 		logrus.Println("Successfully created bucket", bucketName)
 	}
+
+	initS3Client()
 }
 
 func initHttpClient() *retryablehttp.Client {
@@ -195,4 +208,44 @@ func initHttpClient() *retryablehttp.Client {
 		Timeout: time.Duration(viper.GetInt("http.timeout")) * time.Millisecond,
 	}
 	return client
+}
+
+func initS3Client() {
+	cfg := aws.NewConfig()
+	cfg.BaseEndpoint = aws.String(viper.GetString("s3.endpoint"))
+	cfg.Region = viper.GetString("s3.region")
+	cfg.Credentials = aws_credentials.StaticCredentialsProvider{
+		Value: aws.Credentials{
+			AccessKeyID:     viper.GetString("s3.access_key"),
+			SecretAccessKey: viper.GetString("s3.secret_key"),
+		},
+	}
+
+	s3Client = s3.NewFromConfig(*cfg)
+}
+
+func restore(url string, name string) {
+
+	resp, err := http.Get(url)
+	if err != nil {
+		logrus.Infoln("get failed for", url, name)
+	}
+	defer resp.Body.Close()
+
+	contentType := resp.Header["Content-Type"][0]
+
+	data, _ := io.ReadAll(resp.Body)
+
+	output, err := s3Client.PutObject(context.TODO(), &s3.PutObjectInput{
+		Bucket:      aws.String(""),
+		Key:         aws.String(name),
+		Body:        bytes.NewReader(data),
+		ContentType: aws.String(contentType),
+	})
+
+	if err != nil {
+		logrus.Warnln(name, "restore failed", err)
+	}
+	logrus.Println(name, "restore done", contentType, *output.ETag)
+
 }

@@ -17,16 +17,12 @@ func processItem(t uint8, doubanId uint64) {
 	switch t {
 	case consts.TypeBook.Code:
 		processBook(doubanId)
-		break
 	case consts.TypeMovie.Code:
 		processMovie(doubanId)
-		break
 	case consts.TypeGame.Code:
 		processGame(doubanId)
-		break
 	case consts.TypeSong.Code:
 		processSong(doubanId)
-		break
 	}
 }
 
