@@ -45,10 +45,6 @@ func Rating(interestSelect *html.Node) *model.Rating {
 	star1Str := strings.TrimSpace(htmlquery.InnerText(stars[4]))
 	star1, _ := strconv.ParseFloat(star1Str[0:len(star1Str)-1], 32)
 
-	if err != nil {
-		return nil
-	}
-
 	result := &model.Rating{
 		Total:  uint32(total),
 		Rating: rating,

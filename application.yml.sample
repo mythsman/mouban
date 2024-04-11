@@ -35,13 +35,9 @@ http:
     item: 4000
     discover: 4000
   auth: 42342343:rwedsf32,https://user:password@host:port;
-minio:
-  endpoint: minio.mythsman.com
-  id: some_id
-  key: some_key
-  bucket: douban
 s3:
-  endpoint: https://s3.mythsman.com
+  endpoint: https://minio.mythsman.com
   region: us-east-1
+  bucket: douban
   access_key: aaa
   secret_key: bbb

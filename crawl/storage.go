@@ -1,10 +1,8 @@
 package crawl
 
 import (
-	"bytes"
 	"crypto/md5"
 	"encoding/hex"
-	"errors"
 	"io"
 	"mouban/dao"
 	"mouban/model"
@@ -15,31 +13,23 @@ import (
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
-	aws_credentials "github.com/aws/aws-sdk-go-v2/credentials"
+	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 
 	"github.com/gabriel-vasile/mimetype"
 	"github.com/hashicorp/go-retryablehttp"
-	"github.com/minio/minio-go/v7"
-	"github.com/minio/minio-go/v7/pkg/credentials"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"golang.org/x/net/context"
 )
 
-var minioClient *minio.Client
 var retryClient *retryablehttp.Client
 var s3Client *s3.Client
-
-var endpoint string
-var accessKeyID string
-var secretAccessKey string
-var bucketName string
 
 // Storage source url -> stored url
 func Storage(url string) string {
 
-	if strings.Contains(url, viper.GetString("minio.endpoint")) {
+	if strings.Contains(url, viper.GetString("s3.endpoint")) {
 		logrus.Infoln("storage ignore :", url)
 		return url
 	}
@@ -115,7 +105,7 @@ func download(url string, referer string) (o *os.File) {
 	req.Header.Set("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36")
 	req.Header.Set("Referer", referer)
 
-	resp, _ := retryClient.Do(req)
+	resp, err := retryClient.Do(req)
 
 	if err != nil {
 		panic(err)
@@ -148,50 +138,29 @@ func md5sum(path string) string {
 }
 
 func upload(file string, name string, mimeType string) string {
-	options := minio.PutObjectOptions{
-		ContentType: mimeType,
-	}
-	_, err := minioClient.FPutObject(context.Background(), bucketName, name, file, options)
-	if err != nil {
-		logrus.Errorln("minio put failed,", err)
-	}
-	url := "https://" + endpoint + "/" + bucketName + "/" + name
+	f, _ := os.Open(file)
 
-	restore(url, bucketName+"/"+name)
+	_, err := s3Client.PutObject(context.TODO(), &s3.PutObjectInput{
+		Bucket:      aws.String(""),
+		Key:         aws.String(viper.GetString("s3.bucket") + "/" + name),
+		Body:        f,
+		ContentType: aws.String(mimeType),
+	})
+
+	if err != nil {
+		logrus.Warnln(name, "restore failed", err)
+	}
+
+	url := viper.GetString("s3.endpoint") + "/" + viper.GetString("s3.bucket") + "/" + name
+
+	logrus.Println("storage done", url)
 
 	return url
-
 }
 
 func init() {
 	retryClient = initHttpClient()
-	endpoint = viper.GetString("minio.endpoint")
-	accessKeyID = viper.GetString("minio.id")
-	secretAccessKey = viper.GetString("minio.key")
-	bucketName = viper.GetString("minio.bucket")
-
-	// Initialize minio client object.
-	err := errors.New("")
-	minioClient, err = minio.New(endpoint, &minio.Options{
-		Creds:  credentials.NewStaticV4(accessKeyID, secretAccessKey, ""),
-		Secure: true,
-	})
-
-	if err != nil {
-		panic(err)
-	}
-
-	err = minioClient.MakeBucket(context.Background(), bucketName, minio.MakeBucketOptions{})
-	if err != nil {
-		exists, errBucketExists := minioClient.BucketExists(context.Background(), bucketName)
-		if errBucketExists == nil && exists {
-			logrus.Println("We already own bucket", bucketName)
-		}
-	} else {
-		logrus.Println("Successfully created bucket", bucketName)
-	}
-
-	initS3Client()
+	s3Client = initS3Client()
 }
 
 func initHttpClient() *retryablehttp.Client {
@@ -210,42 +179,16 @@ func initHttpClient() *retryablehttp.Client {
 	return client
 }
 
-func initS3Client() {
+func initS3Client() *s3.Client {
 	cfg := aws.NewConfig()
 	cfg.BaseEndpoint = aws.String(viper.GetString("s3.endpoint"))
 	cfg.Region = viper.GetString("s3.region")
-	cfg.Credentials = aws_credentials.StaticCredentialsProvider{
+	cfg.Credentials = credentials.StaticCredentialsProvider{
 		Value: aws.Credentials{
 			AccessKeyID:     viper.GetString("s3.access_key"),
 			SecretAccessKey: viper.GetString("s3.secret_key"),
 		},
 	}
 
-	s3Client = s3.NewFromConfig(*cfg)
-}
-
-func restore(url string, name string) {
-
-	resp, err := http.Get(url)
-	if err != nil {
-		logrus.Infoln("get failed for", url, name)
-	}
-	defer resp.Body.Close()
-
-	contentType := resp.Header["Content-Type"][0]
-
-	data, _ := io.ReadAll(resp.Body)
-
-	output, err := s3Client.PutObject(context.TODO(), &s3.PutObjectInput{
-		Bucket:      aws.String(""),
-		Key:         aws.String(name),
-		Body:        bytes.NewReader(data),
-		ContentType: aws.String(contentType),
-	})
-
-	if err != nil {
-		logrus.Warnln(name, "restore failed", err)
-	}
-	logrus.Println(name, "restore done", contentType, *output.ETag)
-
+	return s3.NewFromConfig(*cfg)
 }
