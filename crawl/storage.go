@@ -153,8 +153,6 @@ func upload(file string, name string, mimeType string) string {
 
 	url := viper.GetString("s3.endpoint") + "/" + viper.GetString("s3.bucket") + "/" + name
 
-	logrus.Println("storage done", url)
-
 	return url
 }
 
