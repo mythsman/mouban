@@ -2,12 +2,8 @@ package common
 
 import (
 	"os"
-	"time"
 
-	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
-	"github.com/influxdata/influxdb-client-go/v2/api"
 	"github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
 )
 
 func InitLogger() {
@@ -19,41 +15,5 @@ func InitLogger() {
 		TimestampFormat: "2006-01-02 15:04:05",
 	})
 
-	influxdbUrl := viper.GetString("influxdb.url")
-	if influxdbUrl == "" {
-		return
-	}
-
-	client := influxdb2.NewClient(viper.GetString("influxdb.url"), viper.GetString("influxdb.token"))
-
-	writeApi = client.WriteAPI(viper.GetString("influxdb.org"), viper.GetString("influxdb.bucket"))
-
-	logrus.AddHook(&InfluxHooker{})
-
-	logrus.Infoln("influxdb init success")
-}
-
-type InfluxHooker struct {
-}
-
-var writeApi api.WriteAPI
-
-func (h *InfluxHooker) Levels() []logrus.Level {
-	return logrus.AllLevels
-}
-
-func (h *InfluxHooker) Fire(e *logrus.Entry) error {
-	if writeApi == nil {
-		return nil
-	}
-
-	// Create point using fluent style
-	p := influxdb2.NewPointWithMeasurement("log").
-		AddTag("level", e.Level.String()).
-		AddField("msg", e.Message).
-		SetTime(time.Now())
-
-	writeApi.WritePoint(p)
-
-	return nil
+	logrus.Infoln("logrus init success")
 }
