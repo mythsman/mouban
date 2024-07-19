@@ -8,7 +8,7 @@ import (
 )
 
 func UpsertBook(book *model.Book) {
-	logrus.WithField("ItemUpsert", "Book").Infoln("upsert book", book.DoubanId, book.Title)
+	logrus.WithField("upsert", "book").Infoln("upsert book", book.DoubanId, book.Title)
 	data := &model.Book{}
 	common.Db.Where("douban_id = ? ", book.DoubanId).Assign(book).FirstOrCreate(data)
 }

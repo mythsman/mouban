@@ -9,7 +9,7 @@ import (
 )
 
 func UpsertUser(user *model.User) {
-	logrus.WithField("UserUpsert", 1).Infoln("upsert user", user.DoubanUid, user.Name)
+	logrus.WithField("upsert", "user").Infoln("upsert user", user.DoubanUid, user.Name)
 	data := &model.User{}
 	common.Db.Where("douban_uid = ? ", user.DoubanUid).Assign(user).FirstOrCreate(data)
 }

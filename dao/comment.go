@@ -22,7 +22,7 @@ func GetCommentIds(doubanUid uint64, t uint8) *[]uint64 {
 }
 
 func UpsertComment(comment *model.Comment) {
-	logrus.WithField("CommentUpsert", comment.Type).Infoln("upsert comment", comment.DoubanId, comment.Type, "for", comment.DoubanUid)
+	logrus.WithField("upsert", "comment").Infoln("upsert comment", comment.DoubanId, comment.Type, "for", comment.DoubanUid)
 	data := &model.Comment{}
 	common.Db.Where("douban_id = ? AND douban_uid = ? AND type = ?", comment.DoubanId, comment.DoubanUid, comment.Type).Assign(comment).FirstOrCreate(data)
 }

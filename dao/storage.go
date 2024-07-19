@@ -8,7 +8,7 @@ import (
 )
 
 func UpsertStorage(storage *model.Storage) {
-	logrus.WithField("StorageUpsert", 1).Infoln("upsert storage", storage.Source, storage.Target)
+	logrus.WithField("upsert", "storage").Infoln("upsert storage", storage.Source, storage.Target)
 	data := &model.Storage{}
 	common.Db.Where("source = ? ", storage.Source).Assign(storage).FirstOrCreate(data)
 }
