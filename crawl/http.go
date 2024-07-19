@@ -138,7 +138,7 @@ func Get(url string, limiter *rate.Limiter) (*string, int, error) {
 
 	defer func() {
 		duration := time.Since(startTime).Milliseconds()
-		logrus.Infoln("code is", strconv.Itoa(resp.StatusCode), "in", duration, "ms", "at user", 1+clientIdx, "for", url)
+		logrus.WithField("Code", strconv.Itoa(resp.StatusCode)).Infoln("code is", strconv.Itoa(resp.StatusCode), "in", duration, "ms", "at user", 1+clientIdx, "for", url)
 		resp.Body.Close()
 	}()
 

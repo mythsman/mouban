@@ -8,7 +8,7 @@ import (
 )
 
 func UpsertGame(game *model.Game) {
-	logrus.Infoln("upsert game", game.DoubanId, game.Title)
+	logrus.WithField("ItemUpsert", "Game").Infoln("upsert game", game.DoubanId, game.Title)
 	data := &model.Game{}
 	common.Db.Where("douban_id = ? ", game.DoubanId).Assign(game).FirstOrCreate(data)
 }

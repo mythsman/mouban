@@ -1,14 +1,15 @@
 package dao
 
 import (
-	"github.com/sirupsen/logrus"
 	"mouban/common"
 	"mouban/model"
 	"time"
+
+	"github.com/sirupsen/logrus"
 )
 
 func UpsertUser(user *model.User) {
-	logrus.Infoln("upsert user", user.DoubanUid, user.Name)
+	logrus.WithField("UserUpsert", 1).Infoln("upsert user", user.DoubanUid, user.Name)
 	data := &model.User{}
 	common.Db.Where("douban_uid = ? ", user.DoubanUid).Assign(user).FirstOrCreate(data)
 }

@@ -1,13 +1,14 @@
 package dao
 
 import (
-	"github.com/sirupsen/logrus"
 	"mouban/common"
 	"mouban/model"
+
+	"github.com/sirupsen/logrus"
 )
 
 func UpsertBook(book *model.Book) {
-	logrus.Infoln("upsert book", book.DoubanId, book.Title)
+	logrus.WithField("ItemUpsert", "Book").Infoln("upsert book", book.DoubanId, book.Title)
 	data := &model.Book{}
 	common.Db.Where("douban_id = ? ", book.DoubanId).Assign(book).FirstOrCreate(data)
 }

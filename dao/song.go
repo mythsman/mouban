@@ -8,7 +8,7 @@ import (
 )
 
 func UpsertSong(song *model.Song) {
-	logrus.Infoln("upsert song", song.DoubanId, song.Title)
+	logrus.WithField("ItemUpsert", "Song").Infoln("upsert song", song.DoubanId, song.Title)
 	data := &model.Song{}
 	common.Db.Where("douban_id = ? ", song.DoubanId).Assign(song).FirstOrCreate(data)
 }

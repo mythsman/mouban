@@ -8,7 +8,7 @@ import (
 )
 
 func UpsertMovie(movie *model.Movie) {
-	logrus.Infoln("upsert movie", movie.DoubanId, movie.Title)
+	logrus.WithField("ItemUpsert", "Movie").Infoln("upsert movie", movie.DoubanId, movie.Title)
 	data := &model.Movie{}
 	common.Db.Where("douban_id = ? ", movie.DoubanId).Assign(movie).FirstOrCreate(data)
 }
