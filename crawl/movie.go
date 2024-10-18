@@ -35,6 +35,14 @@ func Movie(doubanId uint64) (*model.Movie, *model.Rating, *[]string, *[]uint64, 
 		return nil, nil, nil, nil, errors.New(strings.TrimSpace(t))
 	}
 
+	ttt := htmlquery.FindOne(doc, "//div[@id='exception']")
+	if ttt != nil {
+		exceptionInfo := htmlquery.InnerText(ttt)
+		if strings.Contains(exceptionInfo, "根据相关法律法规") {
+			return nil, nil, nil, nil, errors.New(exceptionInfo)
+		}
+	}
+
 	title := htmlquery.SelectAttr(htmlquery.FindOne(doc, "//meta[@property='og:title']"), "content")
 	thumbnailNode := htmlquery.FindOne(doc, "//a[@class='nbg']/img")
 	if thumbnailNode == nil {

@@ -37,6 +37,14 @@ func Book(doubanId uint64) (*model.Book, *model.Rating, *[]string, *[]uint64, er
 		return nil, nil, nil, nil, errors.New(strings.TrimSpace(t))
 	}
 
+	ttt := htmlquery.FindOne(doc, "//div[@id='exception']")
+	if ttt != nil {
+		exceptionInfo := htmlquery.InnerText(ttt)
+		if strings.Contains(exceptionInfo, "根据相关法律法规") {
+			return nil, nil, nil, nil, errors.New(exceptionInfo)
+		}
+	}
+
 	title := htmlquery.SelectAttr(htmlquery.FindOne(doc, "//meta[@property='og:title']"), "content")
 	thumbnail := htmlquery.SelectAttr(htmlquery.FindOne(doc, "//a[@class='nbg']/img"), "src")
 	intros := htmlquery.Find(doc, "//div[@class='intro']")

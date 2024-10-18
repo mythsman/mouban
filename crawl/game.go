@@ -35,6 +35,14 @@ func Game(doubanId uint64) (*model.Game, *model.Rating, *[]string, *[]uint64, er
 		return nil, nil, nil, nil, errors.New(strings.TrimSpace(t))
 	}
 
+	ttt := htmlquery.FindOne(doc, "//div[@id='exception']")
+	if ttt != nil {
+		exceptionInfo := htmlquery.InnerText(ttt)
+		if strings.Contains(exceptionInfo, "根据相关法律法规") {
+			return nil, nil, nil, nil, errors.New(exceptionInfo)
+		}
+	}
+
 	title := htmlquery.InnerText(htmlquery.FindOne(doc, "//div[@id='content']/h1"))
 	thumbnailNode := htmlquery.FindOne(doc, "//div[@class='pic']//img")
 	thumbnail := htmlquery.SelectAttr(thumbnailNode, "src")
