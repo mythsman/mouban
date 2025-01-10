@@ -14,6 +14,8 @@ import (
 	"time"
 
 	"github.com/hashicorp/go-retryablehttp"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"golang.org/x/net/context"
@@ -117,6 +119,14 @@ func initCookieJar(dbcl2 string) http.CookieJar {
 	return jar
 }
 
+var (
+	callOpsHistogram = promauto.NewHistogramVec(prometheus.HistogramOpts{
+		Name:    "mouban_call_ops_duration",
+		Help:    "Histogram of the duration of HTTP call requests",
+		Buckets: prometheus.DefBuckets,
+	}, []string{"code", "index"})
+)
+
 func Get(url string, limiter *rate.Limiter) (*string, int, error) {
 	err := limiter.Wait(context.Background())
 	if err != nil {
@@ -139,6 +149,7 @@ func Get(url string, limiter *rate.Limiter) (*string, int, error) {
 	defer func() {
 		duration := time.Since(startTime).Milliseconds()
 		logrus.WithField("code", strconv.Itoa(resp.StatusCode)).Infoln("code is", strconv.Itoa(resp.StatusCode), "in", duration, "ms", "at user", 1+clientIdx, "for", url)
+		callOpsHistogram.WithLabelValues(strconv.Itoa(resp.StatusCode), strconv.Itoa(clientIdx)).Observe(float64(duration))
 		resp.Body.Close()
 	}()
 

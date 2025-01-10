@@ -7,6 +7,12 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+func CountMovie() int64 {
+	var count int64
+	common.Db.Model(&model.Movie{}).Count(&count)
+	return count
+}
+
 func UpsertMovie(movie *model.Movie) {
 	logrus.WithField("upsert", "movie").Infoln("upsert movie", movie.DoubanId, movie.Title)
 	data := &model.Movie{}

@@ -5,6 +5,16 @@ import (
 	"mouban/consts"
 	"mouban/model"
 	"time"
+
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promauto"
+)
+
+var (
+	dataProcessTotal = promauto.NewCounterVec(prometheus.CounterOpts{
+		Name: "mouban_data_process_total",
+		Help: "Data processed counter",
+	}, []string{"type", "result"})
 )
 
 func GetSchedule(doubanId uint64, t uint8) *model.Schedule {
@@ -59,6 +69,8 @@ func CasScheduleStatus(doubanId uint64, t uint8, status uint8, rawStatus uint8) 
 
 // ChangeScheduleResult uk_schedule
 func ChangeScheduleResult(doubanId uint64, t uint8, result uint8) {
+	dataProcessTotal.WithLabelValues(consts.ParseType(t).Name, consts.ParseResult(result).Name).Inc()
+
 	common.Db.Model(&model.Schedule{}).
 		Where("douban_id = ? AND type = ?", doubanId, t).
 		Update("result", result)

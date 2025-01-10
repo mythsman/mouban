@@ -7,6 +7,12 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+func CountGame() int64 {
+	var count int64
+	common.Db.Model(&model.Game{}).Count(&count)
+	return count
+}
+
 func UpsertGame(game *model.Game) {
 	logrus.WithField("upsert", "game").Infoln("upsert game", game.DoubanId, game.Title)
 	data := &model.Game{}

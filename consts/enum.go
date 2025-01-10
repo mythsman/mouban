@@ -65,3 +65,16 @@ type ScheduleResult struct {
 var ScheduleUnready = ScheduleResult{0, "unready"}
 var ScheduleReady = ScheduleResult{1, "ready"}
 var ScheduleInvalid = ScheduleResult{2, "invalid"}
+
+func ParseResult(code uint8) ScheduleResult {
+	switch code {
+	case 0:
+		return ScheduleUnready
+	case 1:
+		return ScheduleReady
+	case 2:
+		return ScheduleInvalid
+	default:
+		return ScheduleUnready
+	}
+}

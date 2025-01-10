@@ -7,6 +7,12 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+func CountSong() int64 {
+	var count int64
+	common.Db.Model(&model.Song{}).Count(&count)
+	return count
+}
+
 func UpsertSong(song *model.Song) {
 	logrus.WithField("upsert", "song").Infoln("upsert song", song.DoubanId, song.Title)
 	data := &model.Song{}

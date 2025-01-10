@@ -8,6 +8,12 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+func CountUser() int64 {
+	var count int64
+	common.Db.Model(&model.User{}).Count(&count)
+	return count
+}
+
 func UpsertUser(user *model.User) {
 	logrus.WithField("upsert", "user").Infoln("upsert user", user.DoubanUid, user.Name)
 	data := &model.User{}

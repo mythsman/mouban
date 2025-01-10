@@ -11,8 +11,19 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promauto"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
+)
+
+var (
+	serviceOpsHistogram = promauto.NewHistogramVec(prometheus.HistogramOpts{
+		Name:    "mouban_service_ops_duration",
+		Help:    "Histogram of the duration of HTTP service requests",
+		Buckets: prometheus.DefBuckets,
+	}, []string{"method", "path", "referer"})
 )
 
 func main() {
@@ -22,10 +33,19 @@ func main() {
 	router.Use(handle)
 	router.Use(cors)
 	router.Use(logger)
+	router.Use(func(c *gin.Context) {
+		start := time.Now()
+		c.Next()
+		c.Request.Referer()
+		duration := time.Since(start).Seconds()
+		serviceOpsHistogram.WithLabelValues(c.Request.Method, c.Request.URL.Path, c.Request.Referer()).Observe(duration)
+	})
 
 	router.GET("/", func(ctx *gin.Context) {
 		ctx.String(http.StatusOK, "")
 	})
+
+	router.GET("/metrics", gin.WrapH(promhttp.Handler()))
 
 	adminGroup := router.Group("/admin")
 	{

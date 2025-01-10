@@ -7,6 +7,12 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+func CountBook() int64 {
+	var count int64
+	common.Db.Model(&model.Book{}).Count(&count)
+	return count
+}
+
 func UpsertBook(book *model.Book) {
 	logrus.WithField("upsert", "book").Infoln("upsert book", book.DoubanId, book.Title)
 	data := &model.Book{}
