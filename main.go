@@ -23,7 +23,7 @@ var (
 		Name:    "mouban_service_ops_duration",
 		Help:    "Histogram of the duration of HTTP service requests",
 		Buckets: prometheus.DefBuckets,
-	}, []string{"method", "path", "referer"})
+	}, []string{"method", "path", "ua", "referer"})
 )
 
 func main() {
@@ -37,8 +37,23 @@ func main() {
 		start := time.Now()
 		c.Next()
 		c.Request.Referer()
+
+		if c.Writer.Status() == 404 {
+			return
+		}
+
+		if c.Request.RequestURI == "/metrics" {
+			return
+		}
+
+		referer := c.Request.Referer()
+		if referer == "" {
+			referer = "-"
+		}
+
 		duration := time.Since(start).Seconds()
-		serviceOpsHistogram.WithLabelValues(c.Request.Method, c.Request.URL.Path, c.Request.Referer()).Observe(duration)
+		serviceOpsHistogram.WithLabelValues(c.Request.Method, c.Request.URL.Path, c.Request.UserAgent(), referer).Observe(duration)
+
 	})
 
 	router.GET("/", func(ctx *gin.Context) {
