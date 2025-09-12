@@ -128,7 +128,9 @@ func scrollSong(doubanUid uint64, url string, action consts.Action) (*[]model.Co
 			shortComment = util.TrimParagraph(htmlquery.InnerText(shortCommentNode))
 		} else {
 			shortCommentNode = htmlquery.FindOne(list[i], "//div//ul/li[4]")
-			shortComment = util.TrimParagraph(htmlquery.InnerText(shortCommentNode))
+			if shortCommentNode != nil {
+				shortComment = util.TrimParagraph(htmlquery.InnerText(shortCommentNode))
+			}
 		}
 
 		tags := ""
