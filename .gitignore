@@ -19,3 +19,4 @@ application.yml
 # vendor/
 main
 mouban
+.vscode/
