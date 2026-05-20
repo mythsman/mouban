@@ -2,257 +2,244 @@ import json
 import pymysql
 import asyncio
 import aiohttp
-from tqdm import tqdm
-from urllib.parse import urlparse, urlunparse
-import urllib3
-import time
-from collections import deque
 import hashlib
 import mimetypes
 import boto3
+import urllib3
+import time
+from urllib.parse import urlparse, urlunparse
+from collections import deque
+from tqdm import tqdm
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 
-def load_config(path="config.json"):
-    with open(path, "r", encoding="utf-8") as f:
+def load_config():
+    with open("config.json", "r", encoding="utf-8") as f:
         return json.load(f)
+
+
+def md5(data):
+    h = hashlib.md5()
+    h.update(data)
+    return h.hexdigest()
+
+
+def ext_from_type(ct):
+    if not ct:
+        return "jpg"
+    ext = mimetypes.guess_extension(ct.split(";")[0])
+    if ext:
+        return ext.lstrip(".")
+    return "jpg"
 
 
 def main():
     cfg = load_config()
 
-    host = cfg.get("host", "127.0.0.1")
-    port = int(cfg.get("port", 3306))
-    user = cfg["username"]
-    password = cfg["password"]
-    database = cfg["database"]
-    force_ip = cfg.get("force_ip", "127.0.0.1")
-
-    s3 = boto3.client(
-        "s3",
-        endpoint_url=cfg.get("s3_endpoint"),
-        region_name=cfg.get("s3_region"),
-        aws_access_key_id=cfg.get("s3_access_key"),
-        aws_secret_access_key=cfg.get("s3_secret_key"),
-    )
-
-    conn = pymysql.connect(
-        host=host,
-        port=port,
-        user=user,
-        password=password,
-        database=database,
+    db = pymysql.connect(
+        host=cfg["host"],
+        port=int(cfg["port"]),
+        user=cfg["username"],
+        password=cfg["password"],
+        database=cfg["database"],
         charset="utf8mb4",
         cursorclass=pymysql.cursors.DictCursor,
     )
 
-    with conn.cursor() as cursor:
-        cursor.execute("SELECT COUNT(*) AS cnt FROM storage")
-        total = cursor.fetchone()["cnt"]
+    with db.cursor() as c:
+        c.execute("SELECT COUNT(*) AS c FROM storage")
+        total = c.fetchone()["c"]
 
-    batch_size = 2000
-    last_id = 0
+    scan_q = asyncio.Queue(10000)
+    repair_q = asyncio.Queue(2000)
 
-    concurrency = 500
-    q = asyncio.Queue(maxsize=5000)
-    semaphore = asyncio.Semaphore(concurrency)
+    stats = {"scan": 0, "checked": 0, "bad": 0, "fixed": 0, "err": 0}
 
-    stats = {"200": 0, "non200": 0, "error": 0}
     timestamps = deque()
     window = 5
 
-    def calc_md5(data):
-        h = hashlib.md5()
-        h.update(data)
-        return h.hexdigest()
+    s3 = boto3.client(
+        "s3",
+        endpoint_url=cfg["s3_endpoint"],
+        region_name=cfg["s3_region"],
+        aws_access_key_id=cfg["s3_access_key"],
+        aws_secret_access_key=cfg["s3_secret_key"],
+    )
 
-    def ext_from_content_type(ct):
-        if not ct:
-            return "jpg"
-        ext = mimetypes.guess_extension(ct.split(";")[0])
-        if ext:
-            return ext.lstrip(".")
-        return "jpg"
-
-    async def repair_404(session, row):
-        rid = row["id"]
-
-        db = pymysql.connect(
-            host=host,
-            port=port,
-            user=user,
-            password=password,
-            database=database,
-            charset="utf8mb4",
-            cursorclass=pymysql.cursors.DictCursor,
-        )
-
+    async def scan_worker():
+        last = 0
+        batch = 2000
         with db.cursor() as c:
-            c.execute("SELECT source FROM storage WHERE id=%s", (rid,))
-            r = c.fetchone()
+            while True:
+                c.execute(
+                    "SELECT id,target FROM storage WHERE id>%s ORDER BY id LIMIT %s",
+                    (last, batch),
+                )
+                rows = c.fetchall()
+                if not rows:
+                    break
+                last = rows[-1]["id"]
+                for r in rows:
+                    await scan_q.put(r)
+                    stats["scan"] += 1
 
-        db.close()
+        for _ in range(300):
+            await scan_q.put(None)
 
-        if not r or not r.get("source"):
-            return
+    async def head_worker(session):
+        force_ip = cfg.get("force_ip")
+        while True:
+            row = await scan_q.get()
+            if row is None:
+                await repair_q.put(None)
+                break
 
-        source = r["source"]
-
-        try:
-            async with session.get(
-                source,
-                headers={
-                    "Referer": "https://www.douban.com",
-    	            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36"
-                },
-                
-                allow_redirects=True,
-            ) as resp:
-                if resp.status != 200:
-                    return
-                data = await resp.read()
-                ct = resp.headers.get("content-type")
-        except Exception:
-            return
-
-        md5 = calc_md5(data)
-        ext = ext_from_content_type(ct)
-        filename = f"{md5}.{ext}"
-
-        try:
-            s3.put_object(
-                Bucket="douban",
-                Key=filename,
-                Body=data,
-                ContentType=ct or "image/jpeg",
-            )
-        except Exception:
-            return
-
-        new_url = f"{cfg['s3_endpoint']}/douban/{filename}"
-
-        db = pymysql.connect(
-            host=host,
-            port=port,
-            user=user,
-            password=password,
-            database=database,
-            charset="utf8mb4",
-            cursorclass=pymysql.cursors.DictCursor,
-        )
-
-        with db.cursor() as c:
-            c.execute(
-                "UPDATE storage SET target=%s, md5=%s WHERE id=%s",
-                (new_url, md5, rid),
-            )
-            db.commit()
-
-        db.close()
-
-    async def check_row(session, row):
-        url = row["target"]
-
-        async with semaphore:
+            url = row["target"]
             parsed = urlparse(url)
 
-            forced_url = url
+            forced = url
             headers = None
 
             if force_ip and parsed.hostname:
-                new_netloc = force_ip
+                netloc = force_ip
                 if parsed.port:
-                    new_netloc += f":{parsed.port}"
-
-                forced_url = urlunparse(parsed._replace(netloc=new_netloc))
+                    netloc += f":{parsed.port}"
+                forced = urlunparse(parsed._replace(netloc=netloc))
                 headers = {"Host": parsed.hostname}
 
             try:
-                async with session.head(forced_url, headers=headers, allow_redirects=True) as resp:
-                    status = resp.status
+                async with session.head(forced, headers=headers, allow_redirects=True) as r:
+                    status = r.status
 
                 if status >= 400:
-                    async with session.get(forced_url, headers=headers, allow_redirects=True) as resp:
-                        status = resp.status
+                    async with session.get(forced, headers=headers, allow_redirects=True) as r:
+                        status = r.status
 
-            except Exception:
-                return row, "error"
+            except Exception as e:
+                stats["err"] += 1
+                print(f"[ERR][HEAD] id={row['id']} url={url} err={e}")
+                continue
 
-        return row, status
+            stats["checked"] += 1
 
-    async def producer():
-        nonlocal last_id
-        with conn.cursor() as cursor:
-            while True:
-                cursor.execute(
-                    "SELECT id,target FROM storage WHERE id > %s ORDER BY id ASC LIMIT %s",
-                    (last_id, batch_size),
-                )
-                rows = cursor.fetchall()
+            if status == 404:
+                stats["bad"] += 1
+                print(f"[BAD][404] id={row['id']} url={url}")
+                await repair_q.put(row)
 
-                if not rows:
-                    break
-
-                last_id = rows[-1]["id"]
-
-                for r in rows:
-                    await q.put(r)
-
-        for _ in range(concurrency):
-            await q.put(None)
-
-    async def worker(session, pbar):
+    async def repair_worker(session):
         while True:
-            row = await q.get()
+            row = await repair_q.get()
             if row is None:
                 break
 
-            r, status = await check_row(session, row)
+            rid = row["id"]
 
-            if status == 200:
-                stats["200"] += 1
-            elif isinstance(status, int):
-                stats["non200"] += 1
-                if status == 404:
-                    await repair_404(session, r)
-            else:
-                stats["error"] += 1
-
-            pbar.update(1)
-
-            now = time.time()
-            timestamps.append(now)
-
-            while timestamps and now - timestamps[0] > window:
-                timestamps.popleft()
-
-            recent_qps = len(timestamps) / window if timestamps else 0
-
-            processed = stats["200"] + stats["non200"] + stats["error"]
-            remaining = total - processed
-            eta = int(remaining / recent_qps) if recent_qps else 0
-
-            pbar.set_postfix(
-                {
-                    "200": stats["200"],
-                    "bad": stats["non200"],
-                    "err": stats["error"],
-                    "qps": int(recent_qps),
-                    "eta": f"{eta}s",
-                }
+            db2 = pymysql.connect(
+                host=cfg["host"],
+                port=int(cfg["port"]),
+                user=cfg["username"],
+                password=cfg["password"],
+                database=cfg["database"],
+                charset="utf8mb4",
+                cursorclass=pymysql.cursors.DictCursor,
             )
+
+            with db2.cursor() as c:
+                c.execute("SELECT source FROM storage WHERE id=%s", (rid,))
+                r = c.fetchone()
+
+            db2.close()
+
+            if not r or not r.get("source"):
+                print(f"[ERR][SOURCE] id={rid} source_missing")
+                continue
+
+            try:
+                async with session.get(
+                    r["source"],
+                    headers={"Referer": "https://www.douban.com"},
+                    allow_redirects=True,
+                ) as resp:
+                    if resp.status != 200:
+                        continue
+                    data = await resp.read()
+                    ct = resp.headers.get("content-type")
+            except Exception:
+                print(f"[ERR][DOWNLOAD] id={rid} source={r.get('source')}")
+                continue
+
+            name = f"{md5(data)}.{ext_from_type(ct)}"
+
+            try:
+                s3.put_object(
+                    Bucket="douban",
+                    Key=name,
+                    Body=data,
+                    ContentType=ct or "image/jpeg",
+                )
+            except Exception:
+                print(f"[ERR][UPLOAD] id={rid} file={name}")
+                continue
+
+            new_url = f"{cfg['s3_endpoint']}/douban/{name}"
+
+            db3 = pymysql.connect(
+                host=cfg["host"],
+                port=int(cfg["port"]),
+                user=cfg["username"],
+                password=cfg["password"],
+                database=cfg["database"],
+                charset="utf8mb4",
+                cursorclass=pymysql.cursors.DictCursor,
+            )
+
+            with db3.cursor() as c:
+                c.execute(
+                    "UPDATE storage SET target=%s, md5=%s WHERE id=%s",
+                    (new_url, name.split(".")[0], rid),
+                )
+                db3.commit()
+
+            db3.close()
+
+            stats["fixed"] += 1
+            print(f"[FIXED] id={rid} -> {new_url}")
 
     async def runner():
         timeout = aiohttp.ClientTimeout(total=6)
-        connector = aiohttp.TCPConnector(limit=concurrency, ssl=False)
+        conn = aiohttp.TCPConnector(limit=300, ssl=False)
 
-        async with aiohttp.ClientSession(timeout=timeout, connector=connector) as session:
-            with tqdm(total=total, desc="scan+repair", mininterval=0.5) as pbar:
-                prod = asyncio.create_task(producer())
-                workers = [asyncio.create_task(worker(session, pbar)) for _ in range(concurrency)]
-                await prod
-                await asyncio.gather(*workers)
+        async with aiohttp.ClientSession(timeout=timeout, connector=conn) as session:
+            with tqdm(total=total) as pbar:
+
+                scan = asyncio.create_task(scan_worker())
+                heads = [asyncio.create_task(head_worker(session)) for _ in range(300)]
+                repairs = [asyncio.create_task(repair_worker(session)) for _ in range(20)]
+
+                async def progress():
+                    last = 0
+                    while True:
+                        await asyncio.sleep(1)
+                        cur = stats["checked"]
+                        pbar.update(cur - last)
+                        last = cur
+
+                        pbar.set_postfix(
+                            scan=stats["scan"],
+                            checked=stats["checked"],
+                            bad=stats["bad"],
+                            fixed=stats["fixed"],
+                            err=stats["err"],
+                        )
+
+                prog = asyncio.create_task(progress())
+
+                await scan
+                await asyncio.gather(*heads)
+                await asyncio.gather(*repairs)
+                prog.cancel()
 
     asyncio.run(runner())
 
