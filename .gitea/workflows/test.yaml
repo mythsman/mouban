@@ -11,7 +11,7 @@ jobs:
         run: echo "👋 Hello, Gitea Actions!"
 
       - name: 打印当前时间
-        run: echo "🕐 当前时间: $(date)"
+        run: echo "🕐 当前时间 $(date)"
 
       - name: 打印系统信息
         run: |
