@@ -1,7 +1,7 @@
 name: 手动触发示例
 
 on:
-  workflow_dispatch:  # 允许在 Web 界面手动触发
+  workflow_dispatch:
 
 jobs:
   print-message:
@@ -36,4 +36,3 @@ jobs:
           echo ""
           echo "🌿 当前分支:"
           git branch --show-current
-
