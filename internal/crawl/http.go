@@ -83,9 +83,12 @@ func ensureClientsInitialized() error {
 	return clientInitErr
 }
 
-// Bootstrap initializes HTTP clients and rate limiters for crawler.
+// Bootstrap initializes crawler clients and dependencies.
 func Bootstrap() error {
-	return ensureClientsInitialized()
+	if err := ensureClientsInitialized(); err != nil {
+		return err
+	}
+	return ensureStorageInitialized()
 }
 
 func initClient(dbcl2 string, proxy *url.URL) *retryablehttp.Client {

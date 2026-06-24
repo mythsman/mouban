@@ -3,13 +3,16 @@ package crawl
 import (
 	"crypto/md5"
 	"encoding/hex"
+	"fmt"
 	"io"
 	"mouban/internal/dao"
 	"mouban/internal/model"
 	"mouban/internal/util"
 	"net/http"
+	"net/url"
 	"os"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -26,8 +29,40 @@ import (
 var retryClient *retryablehttp.Client
 var s3Client *s3.Client
 
+var storageInitOnce sync.Once
+var storageInitErr error
+
+func initStorageFromConfig() error {
+	endpoint := strings.TrimSpace(viper.GetString("s3.endpoint"))
+	bucket := strings.TrimSpace(viper.GetString("s3.bucket"))
+	region := strings.TrimSpace(viper.GetString("s3.region"))
+	accessKey := strings.TrimSpace(viper.GetString("s3.access_key"))
+	secretKey := strings.TrimSpace(viper.GetString("s3.secret_key"))
+
+	if endpoint == "" || bucket == "" || region == "" || accessKey == "" || secretKey == "" {
+		return fmt.Errorf("s3 config missing: require s3.endpoint/s3.bucket/s3.region/s3.access_key/s3.secret_key")
+	}
+	if _, err := url.ParseRequestURI(endpoint); err != nil {
+		return fmt.Errorf("invalid s3.endpoint: %w", err)
+	}
+
+	retryClient = initHttpClient()
+	s3Client = initS3Client()
+	return nil
+}
+
+func ensureStorageInitialized() error {
+	storageInitOnce.Do(func() {
+		storageInitErr = initStorageFromConfig()
+	})
+	return storageInitErr
+}
+
 // Storage source url -> stored url
 func Storage(url string) string {
+	if err := ensureStorageInitialized(); err != nil {
+		panic(err)
+	}
 
 	if strings.Contains(url, viper.GetString("s3.endpoint")) {
 		logrus.Infoln("storage ignore :", url)
@@ -139,10 +174,11 @@ func md5sum(path string) string {
 
 func upload(file string, name string, mimeType string) string {
 	f, _ := os.Open(file)
+	defer f.Close()
 
 	_, err := s3Client.PutObject(context.TODO(), &s3.PutObjectInput{
-		Bucket:      aws.String(""),
-		Key:         aws.String(viper.GetString("s3.bucket") + "/" + name),
+		Bucket:      aws.String(viper.GetString("s3.bucket")),
+		Key:         aws.String(name),
 		Body:        f,
 		ContentType: aws.String(mimeType),
 	})
@@ -154,11 +190,6 @@ func upload(file string, name string, mimeType string) string {
 	url := viper.GetString("s3.endpoint") + "/" + viper.GetString("s3.bucket") + "/" + name
 
 	return url
-}
-
-func init() {
-	retryClient = initHttpClient()
-	s3Client = initS3Client()
 }
 
 func initHttpClient() *retryablehttp.Client {
