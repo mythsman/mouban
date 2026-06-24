@@ -7,6 +7,10 @@ jobs:
   print-message:
     runs-on: ubuntu-latest
     steps:
+      # 🔥 关键修复：先检出代码
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: 打印 Hello World
         run: echo "👋 Hello, Gitea Actions!"
 
