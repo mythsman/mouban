@@ -18,7 +18,7 @@ const SongCommentUrl = "https://music.douban.com/people/%d/%s"
 const SongDetailUrl = "https://music.douban.com/subject/%d/"
 const SongLatestUrl = "https://music.douban.com/review/latest/"
 
-const GameOverviewUrl = "https://www.douban.com/people/%d/games/"
+const GameOverviewUrl = "https://www.douban.com/people/%d/games"
 const GameCommentUrl = "https://www.douban.com/people/%d/games?action=%s"
 const GameDetailUrl = "https://www.douban.com/game/%d/"
 
