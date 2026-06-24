@@ -52,7 +52,7 @@
 ，可以配置多个。需要注意的是，豆瓣对于未登录的账号有概率会投毒（[例子](https://movie.douban.com/subject/4881682/)），所以这里采用登陆态账号来处理。
 
 dbcl2需要在cookie中查看：
-![img.png](image/img.png)
+![img.png](docs/images/img.png)
 
 ## 接口
 
