@@ -27,6 +27,9 @@ jobs:
       - name: Build
         run: ./build.sh
 
-      - name: Show
-        run: ls -alh 
+      - name: Docker login
+        run: echo "${{ secrets.GITEA_TOKEN }}" | docker login -u "${{ secrets.GITEA_USERNAME }}" --password-stdin
+
+      - name: Docker push
+        run: docker push gitea.mythsman.com/${{ secrets.GITEA_USERNAME }}/mouban:latest
 
