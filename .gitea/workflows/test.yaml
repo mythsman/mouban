@@ -30,6 +30,9 @@ jobs:
       - name: Docker login
         run: echo "${{ secrets.REGISTRY_TOKEN }}" | docker login https://gitea.mythsman.com -u "${{ secrets.REGISTRY_USERNAME }}" --password-stdin
 
+      - name: Docker build
+        run: docker build -t gitea.mythsman.com/${{ secrets.REGISTRY_USER }}/mouban:latest .
+
       - name: Docker push
         run: docker push gitea.mythsman.com/${{ secrets.REGISTRY_USERNAME }}/mouban:latest
 
