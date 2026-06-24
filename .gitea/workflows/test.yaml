@@ -8,8 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     
     env:
-      RUNNER_TOOL_CACHE: /toolcache  # 指定缓存目录
-      GOPROXY: https://goproxy.cn,direct  # 使用国内代理加速依赖下载
+      GOPROXY: https://goproxy.cn,direct
       GO111MODULE: on
     
     steps:
