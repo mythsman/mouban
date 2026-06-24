@@ -30,9 +30,9 @@ func Song(doubanId uint64) (*model.Song, *model.Rating, *[]string, *[]uint64, er
 	if tt == nil {
 		panic("title is nil for " + strconv.FormatUint(doubanId, 10) + ", html: " + htmlquery.OutputHTML(doc, true))
 	}
-	t := htmlquery.InnerText(tt)
-	if strings.TrimSpace(t) == "页面不存在" || strings.TrimSpace(t) == "条目不存在" {
-		return nil, nil, nil, nil, errors.New(strings.TrimSpace(t))
+	t := strings.TrimSpace(htmlquery.InnerText(tt))
+	if t == "页面不存在" || t == "条目不存在" || strings.Contains(strings.ToLower(t), "page not found") || strings.Contains(strings.ToLower(*body), "no such subject") {
+		return nil, nil, nil, nil, errors.New("条目不存在")
 	}
 
 	ttt := htmlquery.FindOne(doc, "//div[@id='exception']")
