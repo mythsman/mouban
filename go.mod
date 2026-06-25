@@ -1,6 +1,6 @@
 module mouban
 
-go 1.21
+go 1.26
 
 require (
 	github.com/antchfx/htmlquery v1.3.1

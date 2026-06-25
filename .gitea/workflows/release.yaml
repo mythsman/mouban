@@ -2,6 +2,7 @@ name: Go Build
 
 on:
   workflow_dispatch:  # 支持手动触发
+  push:               # 支持 push 后自动触发
 
 jobs:
   build:
