@@ -11,7 +11,7 @@ import (
 func Test_scrollBook(t *testing.T) {
 	comments, books, total, next, err := scrollBook(214963638, "", consts.ActionCollect)
 	if err != nil {
-		return
+		t.Fatalf("scrollBook failed: %v", err)
 	}
 	logrus.Infoln(util.ToJson(*comments))
 	logrus.Infoln(util.ToJson(*books))

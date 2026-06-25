@@ -2,6 +2,7 @@ package crawl
 
 import (
 	"mouban/internal/util"
+	"strings"
 	"testing"
 
 	"github.com/sirupsen/logrus"
@@ -10,7 +11,7 @@ import (
 func TestMovie(t *testing.T) {
 	movie, rating, newUsers, newItems, err := Movie(6026035)
 	if err != nil {
-		return
+		t.Fatalf("Movie failed: %v", err)
 	}
 	logrus.Infoln(util.ToJson(movie))
 	logrus.Infoln(util.ToJson(rating))
@@ -22,7 +23,7 @@ func TestMovie(t *testing.T) {
 func TestGame(t *testing.T) {
 	game, rating, newUsers, newItems, err := Game(35447696)
 	if err != nil {
-		return
+		t.Fatalf("Game failed: %v", err)
 	}
 	logrus.Infoln(util.ToJson(game))
 	logrus.Infoln(util.ToJson(rating))
@@ -33,7 +34,7 @@ func TestGame(t *testing.T) {
 func TestBook(t *testing.T) {
 	book, rating, newUser, newItems, err := Book(35948443)
 	if err != nil {
-		return
+		t.Fatalf("Book failed: %v", err)
 	}
 	logrus.Infoln(util.ToJson(book))
 	logrus.Infoln(util.ToJson(rating))
@@ -42,11 +43,12 @@ func TestBook(t *testing.T) {
 }
 
 func TestSong(t *testing.T) {
-	//1748967 too many redirects
 	song, rating, newUser, newItems, err := Song(1748967)
 	if err != nil {
-		logrus.Infoln(err)
-		return
+		if strings.Contains(err.Error(), "too many redirects") {
+			t.Skipf("Song skipped due to douban redirect behavior: %v", err)
+		}
+		t.Fatalf("Song failed: %v", err)
 	}
 	logrus.Infoln(util.ToJson(song))
 	logrus.Infoln(util.ToJson(rating))
@@ -57,8 +59,7 @@ func TestSong(t *testing.T) {
 func TestUserPublish(t *testing.T) {
 	userPublish, err := UserPublish(227565842)
 	if err != nil {
-		t.Logf("UserPublish failed %s", err)
-		return
+		t.Fatalf("UserPublish failed: %v", err)
 	}
 	t.Logf("UserPublish is %s", userPublish)
 }
@@ -66,8 +67,7 @@ func TestUserPublish(t *testing.T) {
 func TestUserOverview(t *testing.T) {
 	overview, err := UserOverview(43001468)
 	if err != nil {
-		return
-
+		t.Fatalf("UserOverview failed: %v", err)
 	}
 	logrus.Infoln(util.ToJson(overview))
 }
