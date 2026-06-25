@@ -24,8 +24,12 @@ body {
 
 .candidate-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   gap: 1rem;
+}
+
+.candidate-card {
+  padding-bottom: 1rem;
 }
 
 .candidate-card header,
@@ -47,22 +51,79 @@ body {
   height: 64px;
 }
 
-.match-tags {
-  display: flex;
-  gap: 0.4rem;
-  flex-wrap: wrap;
+.stats-list {
+  margin: 0.75rem 0;
+  display: grid;
+  gap: 0.25rem;
+  font-size: 0.92rem;
 }
 
-.tag {
-  padding: 0.15rem 0.45rem;
-  border-radius: 999px;
-  background: #e5e7eb;
-  font-size: 0.75rem;
-}
-
-.stats {
-  margin-bottom: 0.25rem;
+.detail-link {
+  display: inline-block;
+  margin-top: 0.4rem;
   font-size: 0.9rem;
+  text-decoration: none;
+  color: #2563eb;
+}
+
+.detail-link:hover {
+  text-decoration: underline;
+}
+
+.back-link {
+  display: inline-block;
+  margin-bottom: 0.75rem;
+  text-decoration: none;
+  color: #2563eb;
+  font-size: 0.92rem;
+}
+
+.time-grid {
+  margin-top: 0.45rem;
+  display: grid;
+  gap: 0.2rem;
+  font-size: 0.9rem;
+}
+
+.tabs {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.75rem;
+}
+
+.tab-btn {
+  border: 1px solid #d1d5db;
+  background: #fff;
+  color: #374151;
+  border-radius: 999px;
+  padding: 0.35rem 0.8rem;
+  font-size: 0.88rem;
+  cursor: pointer;
+}
+
+.tab-btn.active {
+  background: #2563eb;
+  color: #fff;
+  border-color: #2563eb;
+}
+
+.tab-count {
+  margin-left: 0.35rem;
+  font-size: 0.78rem;
+  opacity: 0.9;
+}
+
+.tab-panel {
+  display: none;
+}
+
+.tab-panel.active {
+  display: block;
+}
+
+.tab-root.nested {
+  margin-top: 0.5rem;
 }
 
 .table-wrap {

@@ -11,6 +11,56 @@
 <body>
 <main class="container">
     <h1>用户信息查询</h1>
+
+    {{if .User}}
+    <section class="detail-page">
+        <a class="back-link" href="/?q={{.Query | urlquery}}">← 返回候选列表</a>
+
+        <article>
+            <header class="user-header">
+                <img class="avatar big" src="{{.User.Thumbnail}}" alt="avatar" loading="lazy" />
+                <div>
+                    <h3>{{.User.Name}}</h3>
+                    <div class="muted">ID：{{.User.ID}}{{if .User.Domain}} · Domain：{{.User.Domain}}{{end}}</div>
+                    <div class="time-grid">
+                        <span><strong>最近发布：</strong>{{.User.PublishAtText}}</span>
+                        <span><strong>最近同步：</strong>{{.User.SyncAtText}}</span>
+                        <span><strong>最近检查：</strong>{{.User.CheckAtText}}</span>
+                    </div>
+                </div>
+            </header>
+        </article>
+
+        <div class="tab-root">
+            <div class="tabs primary-tabs" role="tablist">
+                {{range $i, $section := .Sections}}
+                <button type="button" class="tab-btn {{if eq $i 0}}active{{end}}" data-target="type-{{$section.Key}}">
+                    {{$section.Name}}<span class="tab-count">{{$section.Total}}</span>
+                </button>
+                {{end}}
+            </div>
+
+            <div class="tab-panels">
+                {{range $i, $section := .Sections}}
+                <section id="type-{{$section.Key}}" class="tab-panel {{if eq $i 0}}active{{end}}">
+                    <div class="tab-root nested">
+                        <div class="tabs secondary-tabs" role="tablist">
+                            <button type="button" class="tab-btn active" data-target="{{$section.Key}}-wish">{{$section.WishLabel}}<span class="tab-count">{{len $section.Wish}}</span></button>
+                            <button type="button" class="tab-btn" data-target="{{$section.Key}}-do">{{$section.DoLabel}}<span class="tab-count">{{len $section.Do}}</span></button>
+                            <button type="button" class="tab-btn" data-target="{{$section.Key}}-collect">{{$section.CollectLabel}}<span class="tab-count">{{len $section.Collect}}</span></button>
+                        </div>
+                        <div class="tab-panels">
+                            <div id="{{$section.Key}}-wish" class="tab-panel active">{{template "comment_table" $section.Wish}}</div>
+                            <div id="{{$section.Key}}-do" class="tab-panel">{{template "comment_table" $section.Do}}</div>
+                            <div id="{{$section.Key}}-collect" class="tab-panel">{{template "comment_table" $section.Collect}}</div>
+                        </div>
+                    </div>
+                </section>
+                {{end}}
+            </div>
+        </div>
+    </section>
+    {{else}}
     <p class="muted">支持输入 Douban UID、domain、用户名（精确匹配）。</p>
 
     <form method="get" action="/" class="search-form">
@@ -38,59 +88,47 @@
                     <img class="avatar" src="{{.Thumbnail}}" alt="avatar" loading="lazy" />
                     <div>
                         <strong>{{.Name}}</strong>
-                        <div class="muted">ID: {{.ID}} · Domain: {{.Domain}}</div>
+                        <div class="muted">ID：{{.ID}}{{if .Domain}} · Domain：{{.Domain}}{{end}}</div>
                     </div>
                 </header>
-                <p class="match-tags">
-                    {{range .MatchBy}}<span class="tag">{{.}}</span>{{end}}
-                </p>
-                <p class="stats">书 {{.BookWish}}/{{.BookDo}}/{{.BookCollect}} · 影 {{.MovieWish}}/{{.MovieDo}}/{{.MovieCollect}}</p>
-                <p class="stats">游 {{.GameWish}}/{{.GameDo}}/{{.GameCollect}} · 音 {{.SongWish}}/{{.SongDo}}/{{.SongCollect}}</p>
-                <a role="button" class="secondary" href="/?q={{$.Query | urlquery}}&id={{.ID}}">查看完整信息</a>
+
+                <div class="stats-list">
+                    <div><strong>图书</strong>：想读 {{.BookWish}}，在读 {{.BookDo}}，读过 {{.BookCollect}}</div>
+                    <div><strong>电影</strong>：想看 {{.MovieWish}}，在看 {{.MovieDo}}，看过 {{.MovieCollect}}</div>
+                    <div><strong>游戏</strong>：想玩 {{.GameWish}}，在玩 {{.GameDo}}，玩过 {{.GameCollect}}</div>
+                    <div><strong>音乐</strong>：想听 {{.SongWish}}，在听 {{.SongDo}}，听过 {{.SongCollect}}</div>
+                </div>
+
+                <a class="detail-link" href="/?q={{$.Query | urlquery}}&id={{.ID}}">查看完整信息</a>
             </article>
             {{end}}
         </div>
         {{end}}
     </section>
     {{end}}
-
-    {{if .User}}
-    <section>
-        <h2>用户详情</h2>
-        <article>
-            <header class="user-header">
-                <img class="avatar big" src="{{.User.Thumbnail}}" alt="avatar" loading="lazy" />
-                <div>
-                    <h3>{{.User.Name}}</h3>
-                    <div class="muted">ID: {{.User.ID}} · Domain: {{.User.Domain}}</div>
-                    <div class="muted">publish_at: {{.User.PublishAt}} · sync_at: {{.User.SyncAt}} · check_at: {{.User.CheckAt}}</div>
-                </div>
-            </header>
-        </article>
-
-        {{range .Sections}}
-        <article id="section-{{.Key}}">
-            <h3>{{.Name}}（共 {{.Total}}）</h3>
-
-            <details open>
-                <summary>wish（{{len .Wish}}）</summary>
-                {{template "comment_table" .Wish}}
-            </details>
-
-            <details>
-                <summary>do（{{len .Do}}）</summary>
-                {{template "comment_table" .Do}}
-            </details>
-
-            <details>
-                <summary>collect（{{len .Collect}}）</summary>
-                {{template "comment_table" .Collect}}
-            </details>
-        </article>
-        {{end}}
-    </section>
     {{end}}
 </main>
+
+<script>
+(function () {
+  document.querySelectorAll('.tab-root').forEach(function (root) {
+    var buttons = root.querySelectorAll(':scope > .tabs .tab-btn');
+    var panels = root.querySelectorAll(':scope > .tab-panels > .tab-panel');
+    if (!buttons.length || !panels.length) return;
+
+    buttons.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var target = btn.getAttribute('data-target');
+        buttons.forEach(function (b) { b.classList.remove('active'); });
+        panels.forEach(function (p) { p.classList.remove('active'); });
+        btn.classList.add('active');
+        var panel = root.querySelector('#' + CSS.escape(target));
+        if (panel) panel.classList.add('active');
+      });
+    });
+  });
+})();
+</script>
 </body>
 </html>
 {{end}}
