@@ -42,15 +42,15 @@ func NewRouter() *gin.Engine {
 	}
 
 	router := gin.New()
+	router.LoadHTMLGlob("templates/*.tmpl")
+	router.Static("/static", "static")
 
 	router.Use(recoverMiddleware)
 	router.Use(corsMiddleware)
 	router.Use(accessLogMiddleware)
 	router.Use(metricsMiddleware)
 
-	router.GET("/", func(ctx *gin.Context) {
-		ctx.String(http.StatusOK, "")
-	})
+	router.GET("/", controller.UserExplorerPage)
 
 	router.GET("/metrics", gin.WrapH(promhttp.Handler()))
 
@@ -63,6 +63,7 @@ func NewRouter() *gin.Engine {
 
 	queryGroup := router.Group("/guest")
 	{
+		queryGroup.GET("/resolve_user", controller.ResolveUser)
 		queryGroup.GET("/check_user", controller.CheckUser)
 		queryGroup.GET("/user_book", func(ctx *gin.Context) {
 			controller.ListUserItem(ctx, consts.TypeBook.Code)
