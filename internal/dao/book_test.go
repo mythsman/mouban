@@ -33,7 +33,7 @@ func TestUpsertBook(t *testing.T) {
 
 func TestGetBookDetail(t *testing.T) {
 	detail := GetBookDetail(11)
-	t.Logf(util.ToJson(detail))
+	t.Log(util.ToJson(detail))
 }
 
 func TestListBookBrief(t *testing.T) {
