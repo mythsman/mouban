@@ -30,6 +30,17 @@ func RunHTTPServer() error {
 }
 
 func NewRouter() *gin.Engine {
+	mode := strings.ToLower(strings.TrimSpace(viper.GetString("server.mode")))
+	switch mode {
+	case "", gin.ReleaseMode:
+		gin.SetMode(gin.ReleaseMode)
+	case gin.DebugMode, gin.TestMode:
+		gin.SetMode(mode)
+	default:
+		logrus.Warnln("invalid server.mode:", mode, "fallback to release")
+		gin.SetMode(gin.ReleaseMode)
+	}
+
 	router := gin.New()
 
 	router.Use(recoverMiddleware)
@@ -84,13 +95,9 @@ func recoverMiddleware(ctx *gin.Context) {
 }
 
 func corsMiddleware(c *gin.Context) {
-	cors := viper.GetString("server.cors")
 	method := c.Request.Method
-	origin := c.Request.Header.Get("Origin")
-	if cors == "*" || strings.Contains(cors, origin) {
-		c.Header("Access-Control-Allow-Origin", origin)
-		c.Header("Access-Control-Allow-Methods", "*")
-	}
+	c.Header("Access-Control-Allow-Origin", "*")
+	c.Header("Access-Control-Allow-Methods", "*")
 
 	if method == "OPTIONS" {
 		c.AbortWithStatus(http.StatusNoContent)

@@ -52,7 +52,7 @@ func CheckUser(ctx *gin.Context) {
 	})
 
 	if *schedule.Status == consts.ScheduleCrawled.Code {
-		timeLimit, _ := time.ParseDuration("-" + viper.GetString("server.limit"))
+		timeLimit, _ := time.ParseDuration("-" + viper.GetString("user.recheck_interval"))
 		if user.CheckAt.Before(time.Now().Add(timeLimit)) {
 			dao.CasScheduleStatus(doubanUid, consts.TypeUser.Code, consts.ScheduleToCrawl.Code, consts.ScheduleCrawled.Code)
 		}
