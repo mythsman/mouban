@@ -3,9 +3,8 @@
 ## 1) 项目概览
 - 项目：`mouban`（Go 1.21）
 - 作用：为 `hexo-douban` 提供豆瓣用户书/影/音/游数据抓取与查询服务
-- 入口：`cmd/mouban/main.go`
+- 入口：`main.go`
 - 核心目录：
-  - `cmd/mouban/`：服务主入口
   - `internal/app/`：启动编排、HTTP 路由与中间件
   - `internal/controller/`：HTTP 接口处理（`/guest/*`、`/admin/*`）
   - `internal/crawl/`：抓取逻辑
@@ -22,7 +21,7 @@
 
 ### 本地启动
 ```bash
-go run ./cmd/mouban
+go run .
 ```
 
 ## 3) 开发约束（必须遵守）
