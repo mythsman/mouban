@@ -1,0 +1,137 @@
+{{define "user_explorer.tmpl"}}
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>用户信息查询 - mouban</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css" />
+    <link rel="stylesheet" href="/static/app.css" />
+</head>
+<body>
+<main class="container">
+    <h1>用户信息查询</h1>
+    <p class="muted">支持输入 Douban UID、domain、用户名（精确匹配）。</p>
+
+    <form method="get" action="/" class="search-form">
+        <label>
+            关键词
+            <input type="text" name="q" placeholder="例如：1000001 / ahbei / 阿北" value="{{.Query}}" required />
+        </label>
+        <button type="submit">查询用户</button>
+    </form>
+
+    {{if .Error}}
+    <article class="error-box">{{.Error}}</article>
+    {{end}}
+
+    {{if .Query}}
+    <section>
+        <h2>候选用户（{{len .Candidates}}）</h2>
+        {{if eq (len .Candidates) 0}}
+        <article class="muted-box">没有匹配到用户，请确认输入是否为精确值。</article>
+        {{else}}
+        <div class="candidate-grid">
+            {{range .Candidates}}
+            <article class="candidate-card">
+                <header>
+                    <img class="avatar" src="{{.Thumbnail}}" alt="avatar" loading="lazy" />
+                    <div>
+                        <strong>{{.Name}}</strong>
+                        <div class="muted">ID: {{.ID}} · Domain: {{.Domain}}</div>
+                    </div>
+                </header>
+                <p class="match-tags">
+                    {{range .MatchBy}}<span class="tag">{{.}}</span>{{end}}
+                </p>
+                <p class="stats">书 {{.BookWish}}/{{.BookDo}}/{{.BookCollect}} · 影 {{.MovieWish}}/{{.MovieDo}}/{{.MovieCollect}}</p>
+                <p class="stats">游 {{.GameWish}}/{{.GameDo}}/{{.GameCollect}} · 音 {{.SongWish}}/{{.SongDo}}/{{.SongCollect}}</p>
+                <a role="button" class="secondary" href="/?q={{$.Query | urlquery}}&id={{.ID}}">查看完整信息</a>
+            </article>
+            {{end}}
+        </div>
+        {{end}}
+    </section>
+    {{end}}
+
+    {{if .User}}
+    <section>
+        <h2>用户详情</h2>
+        <article>
+            <header class="user-header">
+                <img class="avatar big" src="{{.User.Thumbnail}}" alt="avatar" loading="lazy" />
+                <div>
+                    <h3>{{.User.Name}}</h3>
+                    <div class="muted">ID: {{.User.ID}} · Domain: {{.User.Domain}}</div>
+                    <div class="muted">publish_at: {{.User.PublishAt}} · sync_at: {{.User.SyncAt}} · check_at: {{.User.CheckAt}}</div>
+                </div>
+            </header>
+        </article>
+
+        {{range .Sections}}
+        <article id="section-{{.Key}}">
+            <h3>{{.Name}}（共 {{.Total}}）</h3>
+
+            <details open>
+                <summary>wish（{{len .Wish}}）</summary>
+                {{template "comment_table" .Wish}}
+            </details>
+
+            <details>
+                <summary>do（{{len .Do}}）</summary>
+                {{template "comment_table" .Do}}
+            </details>
+
+            <details>
+                <summary>collect（{{len .Collect}}）</summary>
+                {{template "comment_table" .Collect}}
+            </details>
+        </article>
+        {{end}}
+    </section>
+    {{end}}
+</main>
+</body>
+</html>
+{{end}}
+
+{{define "comment_table"}}
+{{if eq (len .) 0}}
+<p class="muted">暂无数据</p>
+{{else}}
+<div class="table-wrap">
+    <table>
+        <thead>
+        <tr>
+            <th>条目</th>
+            <th>评分</th>
+            <th>标签</th>
+            <th>评论</th>
+            <th>标注日期</th>
+        </tr>
+        </thead>
+        <tbody>
+        {{range .}}
+        <tr>
+            <td>
+                {{with .Item}}
+                <div class="item-cell">
+                    {{if .Thumbnail}}<img src="{{.Thumbnail}}" alt="thumb" loading="lazy" />{{end}}
+                    <div>
+                        <div><strong>{{.Title}}</strong></div>
+                        <small class="muted">DoubanID: {{.DoubanId}}</small>
+                    </div>
+                </div>
+                {{end}}
+            </td>
+            <td>{{.Rate}}</td>
+            <td>{{.Label}}</td>
+            <td class="comment">{{.Comment}}</td>
+            <td>{{.MarkDate}}</td>
+        </tr>
+        {{end}}
+        </tbody>
+    </table>
+</div>
+{{end}}
+{{end}}

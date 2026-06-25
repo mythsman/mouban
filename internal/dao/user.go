@@ -50,3 +50,21 @@ func GetUserByDomain(domain string) *model.User {
 	}
 	return user
 }
+
+func ListUserByDomain(domain string) *[]model.User {
+	users := []model.User{}
+	if domain == "" {
+		return &users
+	}
+	common.Db.Where("domain = ?", domain).Find(&users)
+	return &users
+}
+
+func ListUserByName(name string) *[]model.User {
+	users := []model.User{}
+	if name == "" {
+		return &users
+	}
+	common.Db.Where("name = ?", name).Find(&users)
+	return &users
+}

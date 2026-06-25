@@ -58,6 +58,14 @@ dbcl2需要在cookie中查看：
 
 ### 常用接口
 
+#### 页面入口（后端渲染）
+
+`http://localhost:8080/`
+
+#### 用户解析（通过ID/domain/name精确匹配）
+
+`http://localhost:8080/guest/resolve_user?q={id_or_domain_or_name}`
+
 #### 用户录入/更新
 
 `http://localhost:8080/guest/check_user?id={your_douban_id}`
