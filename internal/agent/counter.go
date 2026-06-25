@@ -12,7 +12,7 @@ import (
 )
 
 var (
-	dataCountGuage = promauto.NewGaugeVec(prometheus.GaugeOpts{
+	dataCountGauge = promauto.NewGaugeVec(prometheus.GaugeOpts{
 		Name: "mouban_data_count",
 		Help: "Diff data count",
 	}, []string{"type"})
@@ -25,11 +25,11 @@ func runCounter() {
 		}
 	}()
 
-	dataCountGuage.WithLabelValues(consts.TypeBook.Name).Set(float64(dao.CountBook()))
-	dataCountGuage.WithLabelValues(consts.TypeMovie.Name).Set(float64(dao.CountMovie()))
-	dataCountGuage.WithLabelValues(consts.TypeGame.Name).Set(float64(dao.CountGame()))
-	dataCountGuage.WithLabelValues(consts.TypeSong.Name).Set(float64(dao.CountSong()))
-	dataCountGuage.WithLabelValues(consts.TypeUser.Name).Set(float64(dao.CountUser()))
+	dataCountGauge.WithLabelValues(consts.TypeBook.Name).Set(float64(dao.CountBook()))
+	dataCountGauge.WithLabelValues(consts.TypeMovie.Name).Set(float64(dao.CountMovie()))
+	dataCountGauge.WithLabelValues(consts.TypeGame.Name).Set(float64(dao.CountGame()))
+	dataCountGauge.WithLabelValues(consts.TypeSong.Name).Set(float64(dao.CountSong()))
+	dataCountGauge.WithLabelValues(consts.TypeUser.Name).Set(float64(dao.CountUser()))
 }
 
 func startCounterAgent() {
