@@ -37,11 +37,14 @@ func initDefaults() {
 	viper.SetDefault("http.interval.discover", 4000)
 }
 
-func loadDotEnv() {
+// LoadDotEnv loads environment variables from the first existing .env file.
+// Search order: current working directory, parent, grandparent.
+func LoadDotEnv() {
 	workDir, _ := os.Getwd()
 	candidates := []string{
 		filepath.Join(workDir, ".env"),
 		filepath.Join(workDir, "../.env"),
+		filepath.Join(workDir, "../../.env"),
 	}
 
 	for _, filePath := range candidates {
@@ -86,7 +89,8 @@ func parseAndSetEnv(path string) error {
 	return scanner.Err()
 }
 
-func initFromEnv() {
+// BindEnv binds MOUBAN_* environment variables to viper dot-keys.
+func BindEnv() {
 	viper.SetEnvPrefix("MOUBAN")
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 	viper.AutomaticEnv()
@@ -132,10 +136,16 @@ func ValidateConfig() error {
 	return nil
 }
 
-func InitConfig() {
+// InitConfigBase loads defaults + .env + environment variables without validation.
+// Useful for tests that only need partial config domains.
+func InitConfigBase() {
 	initDefaults()
-	loadDotEnv()
-	initFromEnv()
+	LoadDotEnv()
+	BindEnv()
+}
+
+func InitConfig() {
+	InitConfigBase()
 
 	if err := ValidateConfig(); err != nil {
 		panic(err)
