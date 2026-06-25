@@ -1,6 +1,6 @@
 .git/
 .idea/
-application.yml
+.env
 
 # Binaries for programs and plugins
 *.exe

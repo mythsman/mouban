@@ -85,10 +85,25 @@ func ensureClientsInitialized() error {
 
 // Bootstrap initializes crawler clients and dependencies.
 func Bootstrap() error {
-	if err := ensureClientsInitialized(); err != nil {
-		return err
+	if isCrawlEnabled() {
+		if err := ensureClientsInitialized(); err != nil {
+			return err
+		}
+		logrus.Infoln("crawl client enabled")
+	} else {
+		logrus.Infoln("crawl client disabled")
 	}
-	return ensureStorageInitialized()
+
+	if viper.GetBool("storage.enable") {
+		if err := ensureStorageInitialized(); err != nil {
+			return err
+		}
+		logrus.Infoln("storage enabled")
+	} else {
+		logrus.Infoln("storage disabled")
+	}
+
+	return nil
 }
 
 func initClient(dbcl2 string, proxy *url.URL) *retryablehttp.Client {
@@ -167,6 +182,10 @@ var (
 )
 
 func Get(url string, limiter *rate.Limiter) (*string, int, error) {
+	if !isCrawlEnabled() {
+		return nil, 0, fmt.Errorf("crawl is disabled")
+	}
+
 	if err := ensureClientsInitialized(); err != nil {
 		return nil, 0, err
 	}

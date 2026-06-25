@@ -14,9 +14,9 @@
   - `internal/agent/`：后台任务与调度流程
 
 ## 2) 配置与运行
-- 配置文件：`application.yml`（本地开发可由 `application.yml.sample` 复制）
-- 环境变量覆盖规则：将配置键中的 `.` 替换为 `__`
-  - 例如：`datasource.host` -> `datasource__host`
+- 配置文件：`.env`（本地开发可由 `.env.sample` 复制）
+- 环境变量规则：统一使用 `MOUBAN_` 前缀、全大写、单下划线
+  - 例如：`datasource.host` -> `MOUBAN_DATASOURCE_HOST`
 - 启动由 `app.Bootstrap()` 显式执行（不再依赖包 `init()` 自动连接数据库）
 
 ### 本地启动
@@ -30,7 +30,7 @@ go run .
 - 修改后执行至少与改动相关的测试/验证
 - 保持 Go 代码可通过 `gofmt`
 - 新增配置时，同步更新：
-  - `application.yml.sample`
+  - `.env.sample`
   - 相关 README 说明（如影响使用方式）
 
 ### Don’t
@@ -86,7 +86,7 @@ go test ./...
 - [ ] 代码已格式化（gofmt）
 - [ ] 已执行相关测试并记录结果
 - [ ] 未引入敏感信息
-- [ ] 需要时更新 `README.md` / `application.yml.sample`
+- [ ] 需要时更新 `README.md` / `.env.sample`
 - [ ] 变更说明包含：改了什么、为什么、风险点
 
 ## 7) 建议的提交信息模板

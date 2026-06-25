@@ -60,6 +60,10 @@ func ensureStorageInitialized() error {
 
 // Storage source url -> stored url
 func Storage(url string) string {
+	if !isStorageEnabled() {
+		return url
+	}
+
 	if err := ensureStorageInitialized(); err != nil {
 		panic(err)
 	}

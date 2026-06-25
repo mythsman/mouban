@@ -18,7 +18,7 @@
 
 ## 部署
 
-可以使用 docker-compose 进行快速部署，环境变量与 application.yml.sample 中的配置对应：
+可以使用 docker-compose 进行快速部署，环境变量与 `.env.sample` 中的配置对应（全部采用 `MOUBAN_` 前缀 + 大写命名）：
 
 ```yaml
     mouban:
@@ -28,25 +28,25 @@
       expose:
         - "8080"
       environment:
-        - GIN_MODE=release
-        - agent__enable=true
-        - agent__flow__discover=false
-        - agent__discover__level=1
-        - agent__item__concurrency=5
-        - agent__item__max=10000
-        - http__timeout=30000
-        - http__retry_max=20
-        - http__interval__user=5000
-        - http__interval__item=2000
-        - http__auth=11111:ABCDEFG,http://user:pass@ip:port;
-        - server__cors=https://yourdomain.com
-        - server__limit=30m
-        - datasource__host=host for mysql
-        - datasource__username=user name for mysql
-        - datasource__password=passwd for mysql
+        - MOUBAN_AGENT_ENABLE=true
+        - MOUBAN_AGENT_DISCOVER_LEVEL=1
+        - MOUBAN_AGENT_ITEM_CONCURRENCY=5
+        - MOUBAN_AGENT_ITEM_MAX=10000
+        - MOUBAN_CRAWL_ENABLE=true
+        - MOUBAN_STORAGE_ENABLE=true
+        - MOUBAN_HTTP_TIMEOUT=30000
+        - MOUBAN_HTTP_RETRY_MAX=20
+        - MOUBAN_HTTP_INTERVAL_USER=5000
+        - MOUBAN_HTTP_INTERVAL_ITEM=2000
+        - MOUBAN_HTTP_AUTH=11111:ABCDEFG,http://user:pass@ip:port;
+        - MOUBAN_USER_RECHECK_INTERVAL=30m
+        - MOUBAN_SERVER_MODE=release
+        - MOUBAN_DATASOURCE_HOST=host for mysql
+        - MOUBAN_DATASOURCE_USERNAME=user name for mysql
+        - MOUBAN_DATASOURCE_PASSWORD=passwd for mysql
 ```
 
-其中最重要的是 http__auth 参数，用于配置登陆态的用户信息和走的http代理，格式为 `<dbcl2>,http://<user>:<password>@<proxyIp>:<proxyPort>;`
+其中最重要的是 `MOUBAN_HTTP_AUTH` 参数，用于配置登陆态的用户信息和走的http代理，格式为 `<dbcl2>,http://<user>:<password>@<proxyIp>:<proxyPort>;`
 ，可以配置多个。需要注意的是，豆瓣对于未登录的账号有概率会投毒（[例子](https://movie.douban.com/subject/4881682/)），所以这里采用登陆态账号来处理。
 
 dbcl2需要在cookie中查看：

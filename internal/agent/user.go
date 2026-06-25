@@ -43,7 +43,7 @@ func userSelector(ch chan *model.Schedule, done chan bool) {
 			}
 		}
 
-		if viper.GetBool("agent.flow.discover") {
+		if viper.GetInt("agent.discover.level") > 0 {
 			discoverSchedule := dao.SearchScheduleByStatus(consts.TypeUser.Code, consts.ScheduleCanCrawl.Code)
 			if discoverSchedule != nil {
 				logrus.Infoln("discover user found", discoverSchedule.DoubanId)
