@@ -44,12 +44,24 @@ type QueueRunningTaskView struct {
 	RunningForSeconds int64  `json:"running_for_seconds"`
 }
 
+type QueueCompletedTaskView struct {
+	DoubanID      uint64 `json:"douban_id"`
+	TypeCode      uint8  `json:"type_code"`
+	TypeName      string `json:"type"`
+	TypeLabel     string `json:"type_label"`
+	Status        string `json:"status"`
+	Result        string `json:"result"`
+	UpdatedAtUnix int64  `json:"updated_at_unix"`
+	UpdatedAtText string `json:"updated_at_text"`
+}
+
 type QueueOverviewResult struct {
-	GeneratedAt     int64                  `json:"generated_at"`
-	GeneratedAtText string                 `json:"generated_at_text"`
-	Types           []QueueTypeOverview    `json:"types"`
-	Pools           []QueuePoolOverview    `json:"pools"`
-	Running         []QueueRunningTaskView `json:"running"`
+	GeneratedAt     int64                    `json:"generated_at"`
+	GeneratedAtText string                   `json:"generated_at_text"`
+	Types           []QueueTypeOverview      `json:"types"`
+	Pools           []QueuePoolOverview      `json:"pools"`
+	Running         []QueueRunningTaskView   `json:"running"`
+	Completed       []QueueCompletedTaskView `json:"completed"`
 }
 
 type QueuePageData struct {
@@ -160,6 +172,37 @@ func buildQueueOverview() QueueOverviewResult {
 		runningSchedules = runningSchedules[:100]
 	}
 
+	completedSchedules := make([]QueueCompletedTaskView, 0)
+	for _, t := range types {
+		rows := dao.ListRecentScheduleByTypeAndStatus(t.Code, consts.ScheduleCrawled.Code, 20)
+		for _, row := range rows {
+			statusCode := consts.ScheduleCrawled.Code
+			if row.Status != nil {
+				statusCode = *row.Status
+			}
+			resultCode := consts.ScheduleUnready.Code
+			if row.Result != nil {
+				resultCode = *row.Result
+			}
+			completedSchedules = append(completedSchedules, QueueCompletedTaskView{
+				DoubanID:      row.DoubanId,
+				TypeCode:      row.Type,
+				TypeName:      consts.ParseType(row.Type).Name,
+				TypeLabel:     typeLabel(row.Type),
+				Status:        consts.ParseScheduleStatus(statusCode).Name,
+				Result:        consts.ParseResult(resultCode).Name,
+				UpdatedAtUnix: row.UpdatedAt.Unix(),
+				UpdatedAtText: formatTimeCN(row.UpdatedAt),
+			})
+		}
+	}
+	sort.Slice(completedSchedules, func(i, j int) bool {
+		return completedSchedules[i].UpdatedAtUnix > completedSchedules[j].UpdatedAtUnix
+	})
+	if len(completedSchedules) > 50 {
+		completedSchedules = completedSchedules[:50]
+	}
+
 	userConcurrency := viper.GetInt("agent.user.concurrency")
 	itemConcurrency := viper.GetInt("agent.item.concurrency")
 	userRunning := typeMap[consts.TypeUser.Code].Crawling
@@ -191,6 +234,7 @@ func buildQueueOverview() QueueOverviewResult {
 		Types:           ordered,
 		Pools:           pools,
 		Running:         runningSchedules,
+		Completed:       completedSchedules,
 	}
 }
 

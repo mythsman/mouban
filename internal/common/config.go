@@ -21,6 +21,7 @@ func initDefaults() {
 	viper.SetDefault("agent.item.concurrency", 3)
 	viper.SetDefault("agent.item.max", 3000)
 	viper.SetDefault("agent.discover.level", 0)
+	viper.SetDefault("agent.orphan_expire", "6h")
 
 	viper.SetDefault("crawl.enable", true)
 	viper.SetDefault("storage.enable", true)

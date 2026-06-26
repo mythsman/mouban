@@ -61,6 +61,26 @@
         </div>
     </section>
 
+    <section>
+        <h2>最近完成（最新 50 条）</h2>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                <tr>
+                    <th>完成时间</th>
+                    <th>类型</th>
+                    <th>DoubanID</th>
+                    <th>状态</th>
+                    <th>结果</th>
+                </tr>
+                </thead>
+                <tbody id="completed-table-body">
+                <tr><td colspan="5" class="muted">加载中...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
     <p class="muted" id="generated-at">最近更新时间：-</p>
 </main>
 
@@ -134,6 +154,26 @@
     }).join('');
   }
 
+  function renderCompleted(rows) {
+    var body = document.getElementById('completed-table-body');
+    if (!body) return;
+    if (!rows || !rows.length) {
+      body.innerHTML = '<tr><td colspan="5" class="muted">暂无完成记录</td></tr>';
+      return;
+    }
+
+    body.innerHTML = rows.map(function (r) {
+      return '' +
+        '<tr>' +
+        '  <td>' + r.updated_at_text + '</td>' +
+        '  <td>' + r.type_label + '</td>' +
+        '  <td>' + r.douban_id + '</td>' +
+        '  <td>' + r.status + '</td>' +
+        '  <td>' + r.result + '</td>' +
+        '</tr>';
+    }).join('');
+  }
+
   function renderGeneratedAt(text) {
     var el = document.getElementById('generated-at');
     if (el) el.textContent = '最近更新时间：' + (text || '-');
@@ -148,6 +188,7 @@
         renderPools(result.pools || []);
         renderTypes(result.types || []);
         renderRunning(result.running || []);
+        renderCompleted(result.completed || []);
         renderGeneratedAt(result.generated_at_text || '-');
       })
       .catch(function () {
