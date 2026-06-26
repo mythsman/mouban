@@ -185,3 +185,15 @@ func ListScheduleByTypeAndStatus(t uint8, status uint8, limit int) []model.Sched
 		Find(&rows)
 	return rows
 }
+
+func ListRecentScheduleByTypeAndStatus(t uint8, status uint8, limit int) []model.Schedule {
+	if limit <= 0 {
+		limit = 50
+	}
+	rows := make([]model.Schedule, 0)
+	common.Db.Where("type = ? AND status = ?", t, status).
+		Order("updated_at desc").
+		Limit(limit).
+		Find(&rows)
+	return rows
+}
