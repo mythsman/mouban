@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	"mouban/internal/consts"
 	"mouban/internal/dao"
@@ -13,17 +14,19 @@ import (
 )
 
 type ItemDetailPageData struct {
-	Type      string
-	TypeName  string
-	ItemID    uint64
-	BackURL   string
-	DoubanURL string
-	Rating    *model.Rating
-	Book      *model.Book
-	Movie     *model.Movie
-	Game      *model.Game
-	Song      *model.Song
-	Error     string
+	Type            string
+	TypeName        string
+	ItemID          uint64
+	BackURL         string
+	DoubanURL       string
+	CrawledAtText   string
+	DataUpdatedText string
+	Rating          *model.Rating
+	Book            *model.Book
+	Movie           *model.Movie
+	Game            *model.Game
+	Song            *model.Song
+	Error           string
 }
 
 func ItemDetailPage(ctx *gin.Context) {
@@ -75,8 +78,46 @@ func ItemDetailPage(ctx *gin.Context) {
 	}
 
 	data.Rating = dao.GetRating(itemID, t)
+
+	schedule := dao.GetSchedule(itemID, t)
+	if schedule != nil {
+		data.CrawledAtText = formatTimeCN(schedule.UpdatedAt)
+	}
+	if data.CrawledAtText == "" {
+		data.CrawledAtText = "暂无"
+	}
+
+	switch t {
+	case consts.TypeBook.Code:
+		if data.Book != nil {
+			data.DataUpdatedText = formatTimeCN(data.Book.UpdatedAt)
+		}
+	case consts.TypeMovie.Code:
+		if data.Movie != nil {
+			data.DataUpdatedText = formatTimeCN(data.Movie.UpdatedAt)
+		}
+	case consts.TypeGame.Code:
+		if data.Game != nil {
+			data.DataUpdatedText = formatTimeCN(data.Game.UpdatedAt)
+		}
+	case consts.TypeSong.Code:
+		if data.Song != nil {
+			data.DataUpdatedText = formatTimeCN(data.Song.UpdatedAt)
+		}
+	}
+	if data.DataUpdatedText == "" {
+		data.DataUpdatedText = "暂无"
+	}
+
 	logAccess(ctx, 0)
 	ctx.HTML(http.StatusOK, "item_detail.tmpl", data)
+}
+
+func formatTimeCN(t time.Time) string {
+	if t.IsZero() {
+		return ""
+	}
+	return t.In(time.Local).Format("2006-01-02 15:04:05")
 }
 
 func parseItemType(typeName string) (uint8, string, string, string) {
