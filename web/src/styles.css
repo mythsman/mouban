@@ -1,0 +1,7 @@
+body {
+  margin: 0;
+}
+
+.nowrap-table .ant-table-thead > tr > th {
+  white-space: nowrap;
+}
