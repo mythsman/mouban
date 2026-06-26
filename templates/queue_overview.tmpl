@@ -10,16 +10,18 @@
 </head>
 <body>
 <main class="container">
-    <nav class="site-nav">
-        <a href="/">首页</a>
-        <a href="/explore">功能入口</a>
-        <a href="/explore/users">用户查询</a>
-        <a href="/explore/queue" class="active">调度队列</a>
-    </nav>
+    <header class="topbar">
+        <a class="brand" href="/">mouban</a>
+        <nav class="topbar-nav">
+            <a href="/">首页</a>
+            <a href="/explore">功能入口</a>
+            <a href="/explore/users">用户查询</a>
+            <a href="/explore/queue" class="active">调度队列</a>
+        </nav>
+    </header>
 
     <h1>调度队列看板</h1>
     <p class="muted">自动刷新：{{.RefreshSeconds}} 秒（服务端有 20 秒缓存）</p>
-    <p><a class="back-link" href="/explore">← 返回功能入口</a></p>
 
     <section>
         <h2>Worker 池利用率</h2>

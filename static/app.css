@@ -15,30 +15,52 @@ body {
   color: var(--text-main);
 }
 
-.site-nav {
+.topbar {
   display: flex;
-  gap: 0.5rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
   flex-wrap: wrap;
   margin-bottom: 1rem;
+  background: #fff;
+  border: 1px solid var(--line-soft);
+  border-radius: 10px;
+  padding: 0.55rem 0.75rem;
 }
 
-.site-nav a {
+.brand {
+  font-weight: 700;
+  color: var(--text-main);
+  text-decoration: none;
+}
+
+.topbar-nav {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.topbar-nav a {
   text-decoration: none;
   border: 1px solid var(--line);
   border-radius: 999px;
-  padding: 0.2rem 0.65rem;
+  padding: 0.16rem 0.62rem;
   color: #374151;
   background: #fff;
-  font-size: 0.84rem;
+  font-size: 0.82rem;
 }
 
-.site-nav a.active {
+.topbar-nav a.active {
   color: #fff;
   background: var(--brand);
   border-color: var(--brand);
 }
 
-.hero {
+.intro-card {
+  background: #fff;
+  border: 1px solid var(--line-soft);
+  border-radius: 10px;
+  padding: 1rem;
   margin-bottom: 1rem;
 }
 
