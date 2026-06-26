@@ -39,13 +39,37 @@ func runFallback() {
 	logrus.Infoln(cnt, "orphan songs reset")
 }
 
+func runFallbackOnStartup() {
+	defer func() {
+		if r := recover(); r != nil {
+			logrus.Errorln("run startup fallback panic", r, "=>", util.GetCurrentGoroutineStack())
+		}
+	}()
+
+	// single-node mode startup recovery: reset all crawling schedules back to to_crawl.
+	cnt := dao.CasOrphanSchedule(consts.TypeUser.Code, 0)
+	logrus.Infoln(cnt, "startup orphan users reset")
+
+	cnt = dao.CasOrphanSchedule(consts.TypeBook.Code, 0)
+	logrus.Infoln(cnt, "startup orphan books reset")
+
+	cnt = dao.CasOrphanSchedule(consts.TypeMovie.Code, 0)
+	logrus.Infoln(cnt, "startup orphan movies reset")
+
+	cnt = dao.CasOrphanSchedule(consts.TypeGame.Code, 0)
+	logrus.Infoln(cnt, "startup orphan games reset")
+
+	cnt = dao.CasOrphanSchedule(consts.TypeSong.Code, 0)
+	logrus.Infoln(cnt, "startup orphan songs reset")
+}
+
 func startFallbackAgent() {
 	if !viper.GetBool("agent.enable") {
 		logrus.Infoln("fallback agent disabled")
 		return
 	}
 
-	runFallback()
+	runFallbackOnStartup()
 
 	go func() {
 		for range time.NewTicker(time.Hour).C {
