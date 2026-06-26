@@ -144,3 +144,44 @@ func MinScheduleUpdatedAtByType(status uint8) []ScheduleTypeOldestUpdated {
 		Scan(&rows)
 	return rows
 }
+
+func CountScheduleByTypeAndStatus(t uint8, status uint8) int64 {
+	var count int64
+	common.Db.Model(&model.Schedule{}).
+		Where("type = ? AND status = ?", t, status).
+		Count(&count)
+	return count
+}
+
+func CountScheduleByTypeAndResult(t uint8, result uint8) int64 {
+	var count int64
+	common.Db.Model(&model.Schedule{}).
+		Where("type = ? AND result = ?", t, result).
+		Count(&count)
+	return count
+}
+
+func FindOldestUpdatedAtByTypeAndStatus(t uint8, status uint8) *time.Time {
+	row := &model.Schedule{}
+	common.Db.Where("type = ? AND status = ?", t, status).
+		Order("updated_at asc").
+		Limit(1).
+		Find(row)
+	if row.ID == 0 {
+		return nil
+	}
+	updated := row.UpdatedAt
+	return &updated
+}
+
+func ListScheduleByTypeAndStatus(t uint8, status uint8, limit int) []model.Schedule {
+	if limit <= 0 {
+		limit = 50
+	}
+	rows := make([]model.Schedule, 0)
+	common.Db.Where("type = ? AND status = ?", t, status).
+		Order("updated_at asc").
+		Limit(limit).
+		Find(&rows)
+	return rows
+}
