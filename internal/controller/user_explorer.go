@@ -15,9 +15,10 @@ import (
 )
 
 type CommentTableView struct {
-	ItemBaseURL string
-	BackURL     string
-	Comments    []model.CommentVO
+	ItemBaseURL   string
+	DoubanBaseURL string
+	BackURL       string
+	Comments      []model.CommentVO
 }
 
 type UserTypeSection struct {
@@ -153,15 +154,16 @@ func buildUserTypeSection(doubanUid uint64, t uint8, key string, name string, wi
 	collect := buildUserCommentsVO(doubanUid, t, consts.ActionCollect.Code, 0)
 
 	itemBaseURL := itemBaseURLByType(t)
+	doubanBaseURL := doubanItemBaseURLByType(t)
 	return UserTypeSection{
 		Key:          key,
 		Name:         name,
 		WishLabel:    wishLabel,
 		DoLabel:      doLabel,
 		CollectLabel: collectLabel,
-		WishTable:    CommentTableView{ItemBaseURL: itemBaseURL, BackURL: backURL, Comments: wish},
-		DoTable:      CommentTableView{ItemBaseURL: itemBaseURL, BackURL: backURL, Comments: doItems},
-		CollectTable: CommentTableView{ItemBaseURL: itemBaseURL, BackURL: backURL, Comments: collect},
+		WishTable:    CommentTableView{ItemBaseURL: itemBaseURL, DoubanBaseURL: doubanBaseURL, BackURL: backURL, Comments: wish},
+		DoTable:      CommentTableView{ItemBaseURL: itemBaseURL, DoubanBaseURL: doubanBaseURL, BackURL: backURL, Comments: doItems},
+		CollectTable: CommentTableView{ItemBaseURL: itemBaseURL, DoubanBaseURL: doubanBaseURL, BackURL: backURL, Comments: collect},
 		Total:        len(wish) + len(doItems) + len(collect),
 	}
 }
@@ -172,6 +174,21 @@ func buildUserProfileURL(id uint64, domain string) string {
 		target = strconv.FormatUint(id, 10)
 	}
 	return "https://www.douban.com/people/" + target + "/"
+}
+
+func doubanItemBaseURLByType(t uint8) string {
+	switch t {
+	case consts.TypeBook.Code:
+		return "https://book.douban.com/subject/"
+	case consts.TypeMovie.Code:
+		return "https://movie.douban.com/subject/"
+	case consts.TypeGame.Code:
+		return "https://www.douban.com/game/"
+	case consts.TypeSong.Code:
+		return "https://music.douban.com/subject/"
+	default:
+		return "https://www.douban.com/"
+	}
 }
 
 func itemBaseURLByType(t uint8) string {

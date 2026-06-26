@@ -18,11 +18,12 @@
 
         <article>
             <header class="user-header">
-                <a href="{{.User.ProfileURL}}" target="_blank" rel="noopener noreferrer">
-                    <img class="avatar big" src="{{.User.Thumbnail}}" alt="avatar" loading="lazy" />
-                </a>
+                <img class="avatar big" src="{{.User.Thumbnail}}" alt="avatar" loading="lazy" />
                 <div>
-                    <h3><a href="{{.User.ProfileURL}}" target="_blank" rel="noopener noreferrer">{{.User.Name}}</a></h3>
+                    <h3 class="title-line">
+                        <span>{{.User.Name}}</span>
+                        <a class="douban-link" href="{{.User.ProfileURL}}" target="_blank" rel="noopener noreferrer" title="在豆瓣打开" aria-label="在豆瓣打开"><span>豆</span></a>
+                    </h3>
                     <div class="muted">ID：{{.User.ID}}{{if .User.Domain}} · Domain：{{.User.Domain}}{{end}}</div>
                     <div class="time-grid">
                         <span><strong>最近发布：</strong>{{.User.PublishAtText}}</span>
@@ -88,11 +89,12 @@
                 {{range .Candidates}}
                 <article class="candidate-card">
                     <header>
-                        <a href="{{.ProfileURL}}" target="_blank" rel="noopener noreferrer">
-                            <img class="avatar" src="{{.Thumbnail}}" alt="avatar" loading="lazy" />
-                        </a>
+                        <img class="avatar" src="{{.Thumbnail}}" alt="avatar" loading="lazy" />
                         <div>
-                            <strong><a href="{{.ProfileURL}}" target="_blank" rel="noopener noreferrer">{{.Name}}</a></strong>
+                            <div class="title-line">
+                                <strong>{{.Name}}</strong>
+                                <a class="douban-link" href="{{.ProfileURL}}" target="_blank" rel="noopener noreferrer" title="在豆瓣打开" aria-label="在豆瓣打开"><span>豆</span></a>
+                            </div>
                             <div class="muted">ID：{{.ID}}{{if .Domain}} · Domain：{{.Domain}}{{end}}</div>
                         </div>
                     </header>
@@ -259,7 +261,10 @@
                         {{if .Thumbnail}}<img src="{{.Thumbnail}}" alt="thumb" loading="lazy" />{{end}}
                     </a>
                     <div>
-                        <div><strong><a href="{{$.ItemBaseURL}}{{.DoubanId}}{{if $.BackURL}}?back={{$.BackURL | urlquery}}{{end}}">{{.Title}}</a></strong></div>
+                        <div class="title-line">
+                            <strong><a href="{{$.ItemBaseURL}}{{.DoubanId}}{{if $.BackURL}}?back={{$.BackURL | urlquery}}{{end}}">{{.Title}}</a></strong>
+                            <a class="douban-link" href="{{$.DoubanBaseURL}}{{.DoubanId}}/" target="_blank" rel="noopener noreferrer" title="在豆瓣打开" aria-label="在豆瓣打开"><span>豆</span></a>
+                        </div>
                         <small class="muted">DoubanID: {{.DoubanId}}</small>
                     </div>
                 </div>
