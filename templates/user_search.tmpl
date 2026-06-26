@@ -1,0 +1,159 @@
+{{define "user_search.tmpl"}}
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>用户查询 - mouban</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css" />
+    <link rel="stylesheet" href="/static/app.css" />
+</head>
+<body>
+<main class="container">
+    <nav class="site-nav">
+        <a href="/">首页</a>
+        <a href="/explore">功能入口</a>
+        <a href="/explore/users" class="active">用户查询</a>
+        <a href="/explore/queue">调度队列</a>
+    </nav>
+
+    <h1>用户查询</h1>
+    <p class="muted">支持输入 Douban UID、domain、用户名（精确匹配）。</p>
+
+    <form method="get" action="/explore/users" class="search-form">
+        <label>
+            关键词
+            <input type="text" name="q" placeholder="例如：1000001 / ahbei / 阿北" value="{{.Query}}" required />
+        </label>
+        <button type="submit">查询用户</button>
+    </form>
+
+    {{if .Error}}
+    <article class="error-box">{{.Error}}</article>
+    {{end}}
+
+    {{if .Query}}
+    <section>
+        <h2>候选用户（{{len .Candidates}}）</h2>
+        {{if eq (len .Candidates) 0}}
+        <article class="muted-box">没有匹配到用户，请确认输入是否为精确值。</article>
+        {{else}}
+        <div class="paged-list" data-item-selector=".candidate-card">
+            <div class="candidate-grid">
+                {{range .Candidates}}
+                <article class="candidate-card">
+                    <header>
+                        <img class="avatar" src="{{.Thumbnail}}" alt="avatar" loading="lazy" />
+                        <div>
+                            <div class="title-line">
+                                <strong>{{.Name}}</strong>
+                                <a class="douban-link" href="{{.ProfileURL}}" target="_blank" rel="noopener noreferrer" title="在豆瓣打开" aria-label="在豆瓣打开"><span>豆</span></a>
+                            </div>
+                            <div class="muted">ID：{{.ID}}{{if .Domain}} · Domain：{{.Domain}}{{end}}</div>
+                        </div>
+                    </header>
+
+                    <div class="stats-list">
+                        <div class="stats-row"><strong>图书</strong><span>想读 {{.BookWish}}</span><span>在读 {{.BookDo}}</span><span>读过 {{.BookCollect}}</span></div>
+                        <div class="stats-row"><strong>电影</strong><span>想看 {{.MovieWish}}</span><span>在看 {{.MovieDo}}</span><span>看过 {{.MovieCollect}}</span></div>
+                        <div class="stats-row"><strong>游戏</strong><span>想玩 {{.GameWish}}</span><span>在玩 {{.GameDo}}</span><span>玩过 {{.GameCollect}}</span></div>
+                        <div class="stats-row"><strong>音乐</strong><span>想听 {{.SongWish}}</span><span>在听 {{.SongDo}}</span><span>听过 {{.SongCollect}}</span></div>
+                    </div>
+
+                    <a class="detail-link" href="/user/{{.ID}}{{if $.Query}}?q={{$.Query | urlquery}}{{end}}">查看完整信息</a>
+                </article>
+                {{end}}
+            </div>
+        </div>
+        {{end}}
+    </section>
+    {{end}}
+</main>
+
+<script>
+(function () {
+  function initPagination(root) {
+    var selector = root.getAttribute('data-item-selector');
+    if (!selector) return;
+
+    var items = Array.prototype.slice.call(root.querySelectorAll(selector));
+    if (!items.length) return;
+
+    var pageSize = 10;
+    var currentPage = 1;
+
+    var controls = document.createElement('div');
+    controls.className = 'pager-controls';
+    controls.innerHTML = '' +
+      '<span class="pager-info"></span>' +
+      '<button type="button" class="pager-btn first">首页</button>' +
+      '<button type="button" class="pager-btn prev">上一页</button>' +
+      '<button type="button" class="pager-btn next">下一页</button>' +
+      '<button type="button" class="pager-btn last">末页</button>' +
+      '<select class="pager-size" aria-label="分页大小">' +
+      '  <option value="10" selected>10 / 页</option>' +
+      '  <option value="50">50 / 页</option>' +
+      '  <option value="100">100 / 页</option>' +
+      '</select>';
+
+    root.appendChild(controls);
+
+    var sizeSelect = controls.querySelector('.pager-size');
+    var firstBtn = controls.querySelector('.first');
+    var prevBtn = controls.querySelector('.prev');
+    var nextBtn = controls.querySelector('.next');
+    var lastBtn = controls.querySelector('.last');
+    var info = controls.querySelector('.pager-info');
+
+    function render() {
+      var totalPages = Math.max(1, Math.ceil(items.length / pageSize));
+      if (currentPage > totalPages) currentPage = totalPages;
+      if (currentPage < 1) currentPage = 1;
+
+      items.forEach(function (item, idx) {
+        var page = Math.floor(idx / pageSize) + 1;
+        item.style.display = page === currentPage ? '' : 'none';
+      });
+
+      firstBtn.disabled = currentPage <= 1;
+      prevBtn.disabled = currentPage <= 1;
+      nextBtn.disabled = currentPage >= totalPages;
+      lastBtn.disabled = currentPage >= totalPages;
+      info.textContent = '第 ' + currentPage + ' / ' + totalPages + ' 页，共 ' + items.length + ' 条';
+    }
+
+    sizeSelect.addEventListener('change', function () {
+      pageSize = parseInt(sizeSelect.value, 10) || 10;
+      currentPage = 1;
+      render();
+    });
+
+    firstBtn.addEventListener('click', function () {
+      currentPage = 1;
+      render();
+    });
+
+    prevBtn.addEventListener('click', function () {
+      currentPage -= 1;
+      render();
+    });
+
+    nextBtn.addEventListener('click', function () {
+      currentPage += 1;
+      render();
+    });
+
+    lastBtn.addEventListener('click', function () {
+      currentPage = Math.max(1, Math.ceil(items.length / pageSize));
+      render();
+    });
+
+    render();
+  }
+
+  document.querySelectorAll('.paged-list').forEach(initPagination);
+})();
+</script>
+</body>
+</html>
+{{end}}

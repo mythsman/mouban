@@ -15,6 +15,45 @@ body {
   color: var(--text-main);
 }
 
+.site-nav {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.site-nav a {
+  text-decoration: none;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.2rem 0.65rem;
+  color: #374151;
+  background: #fff;
+  font-size: 0.84rem;
+}
+
+.site-nav a.active {
+  color: #fff;
+  background: var(--brand);
+  border-color: var(--brand);
+}
+
+.hero {
+  margin-bottom: 1rem;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 0.8rem;
+}
+
 .muted {
   color: var(--text-muted);
 }

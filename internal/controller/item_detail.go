@@ -34,7 +34,7 @@ func ItemDetailPage(ctx *gin.Context) {
 	idStr := strings.TrimSpace(ctx.Param("id"))
 	backURL := strings.TrimSpace(ctx.Query("back"))
 	if backURL == "" {
-		backURL = "/"
+		backURL = "/explore/users"
 	}
 
 	data := ItemDetailPageData{

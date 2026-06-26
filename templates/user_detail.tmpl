@@ -1,0 +1,242 @@
+{{define "user_detail.tmpl"}}
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{{if .User}}{{.User.Name}} - 用户详情{{else}}用户详情{{end}} - mouban</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css" />
+    <link rel="stylesheet" href="/static/app.css" />
+</head>
+<body>
+<main class="container">
+    <nav class="site-nav">
+        <a href="/">首页</a>
+        <a href="/explore">功能入口</a>
+        <a href="/explore/users" class="active">用户查询</a>
+        <a href="/explore/queue">调度队列</a>
+    </nav>
+
+    <a class="back-link" href="{{if .Query}}/explore/users?q={{.Query | urlquery}}{{else}}/explore/users{{end}}">← 返回用户查询</a>
+
+    {{if .Error}}
+    <article class="error-box">{{.Error}}</article>
+    {{else if .User}}
+    <section class="detail-page">
+        <article>
+            <header class="user-header">
+                <img class="avatar big" src="{{.User.Thumbnail}}" alt="avatar" loading="lazy" />
+                <div>
+                    <h3 class="title-line">
+                        <span>{{.User.Name}}</span>
+                        <a class="douban-link" href="{{.User.ProfileURL}}" target="_blank" rel="noopener noreferrer" title="在豆瓣打开" aria-label="在豆瓣打开"><span>豆</span></a>
+                    </h3>
+                    <div class="muted">ID：{{.User.ID}}{{if .User.Domain}} · Domain：{{.User.Domain}}{{end}}</div>
+                    <div class="time-grid">
+                        <span><strong>最近发布：</strong>{{.User.PublishAtText}}</span>
+                        <span><strong>最近同步：</strong>{{.User.SyncAtText}}</span>
+                        <span><strong>最近检查：</strong>{{.User.CheckAtText}}</span>
+                    </div>
+                </div>
+            </header>
+        </article>
+
+        <div class="tab-root">
+            <div class="tabs primary-tabs" role="tablist">
+                {{range $i, $section := .Sections}}
+                <button type="button" class="tab-btn {{if eq $i 0}}active{{end}}" data-target="type-{{$section.Key}}">
+                    {{$section.Name}}<span class="tab-count">{{$section.Total}}</span>
+                </button>
+                {{end}}
+            </div>
+
+            <div class="tab-panels">
+                {{range $i, $section := .Sections}}
+                <section id="type-{{$section.Key}}" class="tab-panel {{if eq $i 0}}active{{end}}">
+                    <div class="tab-root nested">
+                        <div class="tabs secondary-tabs" role="tablist">
+                            <button type="button" class="tab-btn active" data-target="{{$section.Key}}-collect">{{$section.CollectLabel}}<span class="tab-count">{{len $section.CollectTable.Comments}}</span></button>
+                            <button type="button" class="tab-btn" data-target="{{$section.Key}}-do">{{$section.DoLabel}}<span class="tab-count">{{len $section.DoTable.Comments}}</span></button>
+                            <button type="button" class="tab-btn" data-target="{{$section.Key}}-wish">{{$section.WishLabel}}<span class="tab-count">{{len $section.WishTable.Comments}}</span></button>
+                        </div>
+                        <div class="tab-panels">
+                            <div id="{{$section.Key}}-collect" class="tab-panel active">{{template "comment_table" $section.CollectTable}}</div>
+                            <div id="{{$section.Key}}-do" class="tab-panel">{{template "comment_table" $section.DoTable}}</div>
+                            <div id="{{$section.Key}}-wish" class="tab-panel">{{template "comment_table" $section.WishTable}}</div>
+                        </div>
+                    </div>
+                </section>
+                {{end}}
+            </div>
+        </div>
+    </section>
+    {{else}}
+    <article class="muted-box">暂无用户数据</article>
+    {{end}}
+</main>
+
+<script>
+(function () {
+  document.querySelectorAll('.tab-root').forEach(function (root) {
+    var buttons = root.querySelectorAll(':scope > .tabs .tab-btn');
+    var panels = root.querySelectorAll(':scope > .tab-panels > .tab-panel');
+    if (!buttons.length || !panels.length) return;
+
+    buttons.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var target = btn.getAttribute('data-target');
+        buttons.forEach(function (b) { b.classList.remove('active'); });
+        panels.forEach(function (p) { p.classList.remove('active'); });
+        btn.classList.add('active');
+        var panel = root.querySelector('#' + CSS.escape(target));
+        if (panel) panel.classList.add('active');
+      });
+    });
+  });
+
+  function initPagination(root) {
+    var selector = root.getAttribute('data-item-selector');
+    if (!selector) return;
+
+    var items = Array.prototype.slice.call(root.querySelectorAll(selector));
+    if (!items.length) return;
+
+    var pageSize = 10;
+    var currentPage = 1;
+
+    var controls = document.createElement('div');
+    controls.className = 'pager-controls';
+    controls.innerHTML = '' +
+      '<span class="pager-info"></span>' +
+      '<button type="button" class="pager-btn first">首页</button>' +
+      '<button type="button" class="pager-btn prev">上一页</button>' +
+      '<button type="button" class="pager-btn next">下一页</button>' +
+      '<button type="button" class="pager-btn last">末页</button>' +
+      '<select class="pager-size" aria-label="分页大小">' +
+      '  <option value="10" selected>10 / 页</option>' +
+      '  <option value="50">50 / 页</option>' +
+      '  <option value="100">100 / 页</option>' +
+      '</select>';
+
+    root.appendChild(controls);
+
+    var sizeSelect = controls.querySelector('.pager-size');
+    var firstBtn = controls.querySelector('.first');
+    var prevBtn = controls.querySelector('.prev');
+    var nextBtn = controls.querySelector('.next');
+    var lastBtn = controls.querySelector('.last');
+    var info = controls.querySelector('.pager-info');
+
+    function render() {
+      var totalPages = Math.max(1, Math.ceil(items.length / pageSize));
+      if (currentPage > totalPages) currentPage = totalPages;
+      if (currentPage < 1) currentPage = 1;
+
+      items.forEach(function (item, idx) {
+        var page = Math.floor(idx / pageSize) + 1;
+        item.style.display = page === currentPage ? '' : 'none';
+      });
+
+      firstBtn.disabled = currentPage <= 1;
+      prevBtn.disabled = currentPage <= 1;
+      nextBtn.disabled = currentPage >= totalPages;
+      lastBtn.disabled = currentPage >= totalPages;
+      info.textContent = '第 ' + currentPage + ' / ' + totalPages + ' 页，共 ' + items.length + ' 条';
+    }
+
+    sizeSelect.addEventListener('change', function () {
+      pageSize = parseInt(sizeSelect.value, 10) || 10;
+      currentPage = 1;
+      render();
+    });
+
+    firstBtn.addEventListener('click', function () {
+      currentPage = 1;
+      render();
+    });
+
+    prevBtn.addEventListener('click', function () {
+      currentPage -= 1;
+      render();
+    });
+
+    nextBtn.addEventListener('click', function () {
+      currentPage += 1;
+      render();
+    });
+
+    lastBtn.addEventListener('click', function () {
+      currentPage = Math.max(1, Math.ceil(items.length / pageSize));
+      render();
+    });
+
+    render();
+  }
+
+  function toStars(rate) {
+    var n = parseInt(rate, 10);
+    if (!n || n <= 0) return '—';
+    if (n > 5) n = 5;
+    return '⭐️'.repeat(n);
+  }
+
+  document.querySelectorAll('.rate-stars').forEach(function (el) {
+    var rate = el.getAttribute('data-rate') || '0';
+    el.textContent = toStars(rate);
+    el.title = '评分：' + rate;
+  });
+
+  document.querySelectorAll('.paged-list').forEach(initPagination);
+})();
+</script>
+</body>
+</html>
+{{end}}
+
+{{define "comment_table"}}
+{{if eq (len .Comments) 0}}
+<p class="muted">暂无数据</p>
+{{else}}
+<div class="paged-list" data-item-selector="tbody tr">
+    <div class="table-wrap">
+        <table>
+        <thead>
+        <tr>
+            <th>条目</th>
+            <th>评分</th>
+            <th>标签</th>
+            <th>评论</th>
+            <th>标注日期</th>
+        </tr>
+        </thead>
+        <tbody>
+        {{range .Comments}}
+        <tr>
+            <td>
+                {{with .Item}}
+                <div class="item-cell">
+                    <a href="{{$.ItemBaseURL}}{{.DoubanId}}{{if $.BackURL}}?back={{$.BackURL | urlquery}}{{end}}">
+                        {{if .Thumbnail}}<img src="{{.Thumbnail}}" alt="thumb" loading="lazy" />{{end}}
+                    </a>
+                    <div>
+                        <div class="title-line">
+                            <strong><a href="{{$.ItemBaseURL}}{{.DoubanId}}{{if $.BackURL}}?back={{$.BackURL | urlquery}}{{end}}">{{.Title}}</a></strong>
+                            <a class="douban-link" href="{{$.DoubanBaseURL}}{{.DoubanId}}/" target="_blank" rel="noopener noreferrer" title="在豆瓣打开" aria-label="在豆瓣打开"><span>豆</span></a>
+                        </div>
+                        <small class="muted">DoubanID: {{.DoubanId}}</small>
+                    </div>
+                </div>
+                {{end}}
+            </td>
+            <td><span class="rate-stars" data-rate="{{.Rate}}">{{.Rate}}</span></td>
+            <td>{{.Label}}</td>
+            <td class="comment">{{.Comment}}</td>
+            <td>{{.MarkDate}}</td>
+        </tr>
+        {{end}}
+        </tbody>
+        </table>
+    </div>
+</div>
+{{end}}
+{{end}}

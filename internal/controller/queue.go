@@ -3,6 +3,7 @@ package controller
 import (
 	"net/http"
 	"sort"
+	"strconv"
 	"sync"
 	"time"
 
@@ -51,6 +52,7 @@ type QueueCompletedTaskView struct {
 	TypeLabel     string `json:"type_label"`
 	Status        string `json:"status"`
 	Result        string `json:"result"`
+	DetailURL     string `json:"detail_url"`
 	UpdatedAtUnix int64  `json:"updated_at_unix"`
 	UpdatedAtText string `json:"updated_at_text"`
 }
@@ -191,6 +193,7 @@ func buildQueueOverview() QueueOverviewResult {
 				TypeLabel:     typeLabel(row.Type),
 				Status:        consts.ParseScheduleStatus(statusCode).Name,
 				Result:        consts.ParseResult(resultCode).Name,
+				DetailURL:     buildScheduleDetailURL(row.Type, row.DoubanId),
 				UpdatedAtUnix: row.UpdatedAt.Unix(),
 				UpdatedAtText: formatTimeCN(row.UpdatedAt),
 			})
@@ -259,5 +262,23 @@ func typeLabel(code uint8) string {
 		return "音乐"
 	default:
 		return "未知"
+	}
+}
+
+func buildScheduleDetailURL(t uint8, doubanID uint64) string {
+	id := strconv.FormatUint(doubanID, 10)
+	switch t {
+	case consts.TypeUser.Code:
+		return "/user/" + id
+	case consts.TypeBook.Code:
+		return "/item/book/" + id
+	case consts.TypeMovie.Code:
+		return "/item/movie/" + id
+	case consts.TypeGame.Code:
+		return "/item/game/" + id
+	case consts.TypeSong.Code:
+		return "/item/song/" + id
+	default:
+		return "#"
 	}
 }

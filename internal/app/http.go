@@ -50,15 +50,18 @@ func NewRouter() *gin.Engine {
 	router.Use(accessLogMiddleware)
 	router.Use(metricsMiddleware)
 
-	router.GET("/", controller.UserExplorerPage)
+	router.GET("/", controller.HomePage)
+	router.GET("/explore", controller.ExplorePage)
+	router.GET("/explore/users", controller.UserSearchPage)
+	router.GET("/user/:id", controller.UserDetailPage)
 	router.GET("/item/:type/:id", controller.ItemDetailPage)
+	router.GET("/explore/queue", controller.QueueOverviewPage)
+	router.GET("/explore/queue_overview", controller.QueueOverview)
 
 	router.GET("/metrics", gin.WrapH(promhttp.Handler()))
 
 	adminGroup := router.Group("/admin")
 	{
-		adminGroup.GET("/queue", controller.QueueOverviewPage)
-		adminGroup.GET("/queue_overview", controller.QueueOverview)
 		adminGroup.GET("/refresh_item", controller.RefreshItem)
 		adminGroup.GET("/refresh_user", controller.RefreshUser)
 	}
