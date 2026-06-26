@@ -56,7 +56,6 @@ func NewRouter() *gin.Engine {
 
 	adminGroup := router.Group("/admin")
 	{
-		adminGroup.GET("/load_data", controller.LoadData)
 		adminGroup.GET("/refresh_item", controller.RefreshItem)
 		adminGroup.GET("/refresh_user", controller.RefreshUser)
 	}

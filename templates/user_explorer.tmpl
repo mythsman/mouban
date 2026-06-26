@@ -18,9 +18,11 @@
 
         <article>
             <header class="user-header">
-                <img class="avatar big" src="{{.User.Thumbnail}}" alt="avatar" loading="lazy" />
+                <a href="{{.User.ProfileURL}}" target="_blank" rel="noopener noreferrer">
+                    <img class="avatar big" src="{{.User.Thumbnail}}" alt="avatar" loading="lazy" />
+                </a>
                 <div>
-                    <h3>{{.User.Name}}</h3>
+                    <h3><a href="{{.User.ProfileURL}}" target="_blank" rel="noopener noreferrer">{{.User.Name}}</a></h3>
                     <div class="muted">ID：{{.User.ID}}{{if .User.Domain}} · Domain：{{.User.Domain}}{{end}}</div>
                     <div class="time-grid">
                         <span><strong>最近发布：</strong>{{.User.PublishAtText}}</span>
@@ -45,14 +47,14 @@
                 <section id="type-{{$section.Key}}" class="tab-panel {{if eq $i 0}}active{{end}}">
                     <div class="tab-root nested">
                         <div class="tabs secondary-tabs" role="tablist">
-                            <button type="button" class="tab-btn active" data-target="{{$section.Key}}-wish">{{$section.WishLabel}}<span class="tab-count">{{len $section.Wish}}</span></button>
-                            <button type="button" class="tab-btn" data-target="{{$section.Key}}-do">{{$section.DoLabel}}<span class="tab-count">{{len $section.Do}}</span></button>
-                            <button type="button" class="tab-btn" data-target="{{$section.Key}}-collect">{{$section.CollectLabel}}<span class="tab-count">{{len $section.Collect}}</span></button>
+                            <button type="button" class="tab-btn active" data-target="{{$section.Key}}-collect">{{$section.CollectLabel}}<span class="tab-count">{{len $section.CollectTable.Comments}}</span></button>
+                            <button type="button" class="tab-btn" data-target="{{$section.Key}}-do">{{$section.DoLabel}}<span class="tab-count">{{len $section.DoTable.Comments}}</span></button>
+                            <button type="button" class="tab-btn" data-target="{{$section.Key}}-wish">{{$section.WishLabel}}<span class="tab-count">{{len $section.WishTable.Comments}}</span></button>
                         </div>
                         <div class="tab-panels">
-                            <div id="{{$section.Key}}-wish" class="tab-panel active">{{template "comment_table" $section.Wish}}</div>
-                            <div id="{{$section.Key}}-do" class="tab-panel">{{template "comment_table" $section.Do}}</div>
-                            <div id="{{$section.Key}}-collect" class="tab-panel">{{template "comment_table" $section.Collect}}</div>
+                            <div id="{{$section.Key}}-collect" class="tab-panel active">{{template "comment_table" $section.CollectTable}}</div>
+                            <div id="{{$section.Key}}-do" class="tab-panel">{{template "comment_table" $section.DoTable}}</div>
+                            <div id="{{$section.Key}}-wish" class="tab-panel">{{template "comment_table" $section.WishTable}}</div>
                         </div>
                     </div>
                 </section>
@@ -81,27 +83,31 @@
         {{if eq (len .Candidates) 0}}
         <article class="muted-box">没有匹配到用户，请确认输入是否为精确值。</article>
         {{else}}
-        <div class="candidate-grid">
-            {{range .Candidates}}
-            <article class="candidate-card">
-                <header>
-                    <img class="avatar" src="{{.Thumbnail}}" alt="avatar" loading="lazy" />
-                    <div>
-                        <strong>{{.Name}}</strong>
-                        <div class="muted">ID：{{.ID}}{{if .Domain}} · Domain：{{.Domain}}{{end}}</div>
+        <div class="paged-list" data-item-selector=".candidate-card">
+            <div class="candidate-grid">
+                {{range .Candidates}}
+                <article class="candidate-card">
+                    <header>
+                        <a href="{{.ProfileURL}}" target="_blank" rel="noopener noreferrer">
+                            <img class="avatar" src="{{.Thumbnail}}" alt="avatar" loading="lazy" />
+                        </a>
+                        <div>
+                            <strong><a href="{{.ProfileURL}}" target="_blank" rel="noopener noreferrer">{{.Name}}</a></strong>
+                            <div class="muted">ID：{{.ID}}{{if .Domain}} · Domain：{{.Domain}}{{end}}</div>
+                        </div>
+                    </header>
+
+                    <div class="stats-list">
+                        <div><strong>图书</strong>：想读 {{.BookWish}}，在读 {{.BookDo}}，读过 {{.BookCollect}}</div>
+                        <div><strong>电影</strong>：想看 {{.MovieWish}}，在看 {{.MovieDo}}，看过 {{.MovieCollect}}</div>
+                        <div><strong>游戏</strong>：想玩 {{.GameWish}}，在玩 {{.GameDo}}，玩过 {{.GameCollect}}</div>
+                        <div><strong>音乐</strong>：想听 {{.SongWish}}，在听 {{.SongDo}}，听过 {{.SongCollect}}</div>
                     </div>
-                </header>
 
-                <div class="stats-list">
-                    <div><strong>图书</strong>：想读 {{.BookWish}}，在读 {{.BookDo}}，读过 {{.BookCollect}}</div>
-                    <div><strong>电影</strong>：想看 {{.MovieWish}}，在看 {{.MovieDo}}，看过 {{.MovieCollect}}</div>
-                    <div><strong>游戏</strong>：想玩 {{.GameWish}}，在玩 {{.GameDo}}，玩过 {{.GameCollect}}</div>
-                    <div><strong>音乐</strong>：想听 {{.SongWish}}，在听 {{.SongDo}}，听过 {{.SongCollect}}</div>
-                </div>
-
-                <a class="detail-link" href="/?q={{$.Query | urlquery}}&id={{.ID}}">查看完整信息</a>
-            </article>
-            {{end}}
+                    <a class="detail-link" href="/?q={{$.Query | urlquery}}&id={{.ID}}">查看完整信息</a>
+                </article>
+                {{end}}
+            </div>
         </div>
         {{end}}
     </section>
@@ -127,6 +133,72 @@
       });
     });
   });
+
+  function initPagination(root) {
+    var selector = root.getAttribute('data-item-selector');
+    if (!selector) return;
+
+    var items = Array.prototype.slice.call(root.querySelectorAll(selector));
+    if (!items.length) return;
+
+    var pageSize = 10;
+    var currentPage = 1;
+
+    var controls = document.createElement('div');
+    controls.className = 'pager-controls';
+    controls.innerHTML = '' +
+      '<label class="pager-label">每页</label>' +
+      '<select class="pager-size">' +
+      '  <option value="10" selected>10</option>' +
+      '  <option value="50">50</option>' +
+      '  <option value="100">100</option>' +
+      '</select>' +
+      '<button type="button" class="pager-btn prev">上一页</button>' +
+      '<button type="button" class="pager-btn next">下一页</button>' +
+      '<span class="pager-info"></span>';
+
+    root.insertBefore(controls, root.firstChild);
+
+    var sizeSelect = controls.querySelector('.pager-size');
+    var prevBtn = controls.querySelector('.prev');
+    var nextBtn = controls.querySelector('.next');
+    var info = controls.querySelector('.pager-info');
+
+    function render() {
+      var totalPages = Math.max(1, Math.ceil(items.length / pageSize));
+      if (currentPage > totalPages) currentPage = totalPages;
+      if (currentPage < 1) currentPage = 1;
+
+      items.forEach(function (item, idx) {
+        var page = Math.floor(idx / pageSize) + 1;
+        item.style.display = page === currentPage ? '' : 'none';
+      });
+
+      prevBtn.disabled = currentPage <= 1;
+      nextBtn.disabled = currentPage >= totalPages;
+      info.textContent = '第 ' + currentPage + ' / ' + totalPages + ' 页，共 ' + items.length + ' 条';
+    }
+
+    sizeSelect.addEventListener('change', function () {
+      pageSize = parseInt(sizeSelect.value, 10) || 10;
+      currentPage = 1;
+      render();
+    });
+
+    prevBtn.addEventListener('click', function () {
+      currentPage -= 1;
+      render();
+    });
+
+    nextBtn.addEventListener('click', function () {
+      currentPage += 1;
+      render();
+    });
+
+    render();
+  }
+
+  document.querySelectorAll('.paged-list').forEach(initPagination);
 })();
 </script>
 </body>
@@ -134,11 +206,12 @@
 {{end}}
 
 {{define "comment_table"}}
-{{if eq (len .) 0}}
+{{if eq (len .Comments) 0}}
 <p class="muted">暂无数据</p>
 {{else}}
-<div class="table-wrap">
-    <table>
+<div class="paged-list" data-item-selector="tbody tr">
+    <div class="table-wrap">
+        <table>
         <thead>
         <tr>
             <th>条目</th>
@@ -149,14 +222,16 @@
         </tr>
         </thead>
         <tbody>
-        {{range .}}
+        {{range .Comments}}
         <tr>
             <td>
                 {{with .Item}}
                 <div class="item-cell">
-                    {{if .Thumbnail}}<img src="{{.Thumbnail}}" alt="thumb" loading="lazy" />{{end}}
+                    <a href="{{$.ItemBaseURL}}{{.DoubanId}}/" target="_blank" rel="noopener noreferrer">
+                        {{if .Thumbnail}}<img src="{{.Thumbnail}}" alt="thumb" loading="lazy" />{{end}}
+                    </a>
                     <div>
-                        <div><strong>{{.Title}}</strong></div>
+                        <div><strong><a href="{{$.ItemBaseURL}}{{.DoubanId}}/" target="_blank" rel="noopener noreferrer">{{.Title}}</a></strong></div>
                         <small class="muted">DoubanID: {{.DoubanId}}</small>
                     </div>
                 </div>
@@ -169,7 +244,8 @@
         </tr>
         {{end}}
         </tbody>
-    </table>
+        </table>
+    </div>
 </div>
 {{end}}
 {{end}}
