@@ -11,7 +11,7 @@
 <body>
 <main class="container">
     <h1>调度队列看板</h1>
-    <p class="muted">自动刷新：{{.RefreshSeconds}} 秒</p>
+    <p class="muted">自动刷新：{{.RefreshSeconds}} 秒（服务端有 20 秒缓存）</p>
     <p><a class="back-link" href="/">← 返回首页</a></p>
 
     <section>
@@ -20,7 +20,7 @@
     </section>
 
     <section>
-        <h2>按类型统计</h2>
+        <h2>按类型统计（队列视角）</h2>
         <div class="table-wrap">
             <table>
                 <thead>
@@ -28,16 +28,14 @@
                     <th>类型</th>
                     <th>to_crawl</th>
                     <th>crawling</th>
-                    <th>crawled</th>
                     <th>can_crawl</th>
                     <th>unready</th>
-                    <th>ready</th>
                     <th>invalid</th>
                     <th>最老等待(秒)</th>
                 </tr>
                 </thead>
                 <tbody id="type-table-body">
-                <tr><td colspan="9" class="muted">加载中...</td></tr>
+                <tr><td colspan="7" class="muted">加载中...</td></tr>
                 </tbody>
             </table>
         </div>
@@ -98,7 +96,7 @@
     var body = document.getElementById('type-table-body');
     if (!body) return;
     if (!types || !types.length) {
-      body.innerHTML = '<tr><td colspan="9" class="muted">暂无数据</td></tr>';
+      body.innerHTML = '<tr><td colspan="7" class="muted">暂无数据</td></tr>';
       return;
     }
 
@@ -108,10 +106,8 @@
         '  <td>' + t.type_label + '</td>' +
         '  <td>' + t.to_crawl + '</td>' +
         '  <td>' + t.crawling + '</td>' +
-        '  <td>' + t.crawled + '</td>' +
         '  <td>' + t.can_crawl + '</td>' +
         '  <td>' + t.unready + '</td>' +
-        '  <td>' + t.ready + '</td>' +
         '  <td>' + t.invalid + '</td>' +
         '  <td>' + t.oldest_wait_seconds + '</td>' +
         '</tr>';
@@ -160,7 +156,7 @@
   }
 
   load();
-  setInterval(load, Math.max(3, refreshSeconds) * 1000);
+  setInterval(load, Math.max(5, refreshSeconds) * 1000);
 })();
 </script>
 </body>
