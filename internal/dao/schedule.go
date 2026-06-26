@@ -10,6 +10,23 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promauto"
 )
 
+type ScheduleTypeStatusCount struct {
+	Type   uint8
+	Status uint8
+	Count  int64
+}
+
+type ScheduleTypeResultCount struct {
+	Type   uint8
+	Result uint8
+	Count  int64
+}
+
+type ScheduleTypeOldestUpdated struct {
+	Type      uint8
+	UpdatedAt time.Time
+}
+
 var (
 	dataProcessTotal = promauto.NewCounterVec(prometheus.CounterOpts{
 		Name: "mouban_data_process_total",
@@ -86,4 +103,44 @@ func CreateScheduleNx(doubanId uint64, t uint8, status uint8, result uint8) bool
 	}
 	row := common.Db.Where("douban_id = ? AND type = ? ", doubanId, t).Attrs(insert).FirstOrCreate(data).RowsAffected
 	return row > 0
+}
+
+func CountScheduleByTypeStatus() []ScheduleTypeStatusCount {
+	rows := make([]ScheduleTypeStatusCount, 0)
+	common.Db.Model(&model.Schedule{}).
+		Select("type, status, COUNT(*) as count").
+		Group("type, status").
+		Scan(&rows)
+	return rows
+}
+
+func CountScheduleByTypeResult() []ScheduleTypeResultCount {
+	rows := make([]ScheduleTypeResultCount, 0)
+	common.Db.Model(&model.Schedule{}).
+		Select("type, result, COUNT(*) as count").
+		Group("type, result").
+		Scan(&rows)
+	return rows
+}
+
+func ListScheduleByStatus(status uint8, limit int) []model.Schedule {
+	if limit <= 0 {
+		limit = 50
+	}
+	rows := make([]model.Schedule, 0)
+	common.Db.Where("status = ?", status).
+		Order("updated_at asc").
+		Limit(limit).
+		Find(&rows)
+	return rows
+}
+
+func MinScheduleUpdatedAtByType(status uint8) []ScheduleTypeOldestUpdated {
+	rows := make([]ScheduleTypeOldestUpdated, 0)
+	common.Db.Model(&model.Schedule{}).
+		Select("type, MIN(updated_at) as updated_at").
+		Where("status = ?", status).
+		Group("type").
+		Scan(&rows)
+	return rows
 }

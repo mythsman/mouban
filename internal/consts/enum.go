@@ -57,6 +57,21 @@ var ScheduleCrawling = ScheduleStatus{1, "crawling"}
 var ScheduleCrawled = ScheduleStatus{2, "crawled"}
 var ScheduleCanCrawl = ScheduleStatus{3, "can crawl"}
 
+func ParseScheduleStatus(code uint8) ScheduleStatus {
+	switch code {
+	case 0:
+		return ScheduleToCrawl
+	case 1:
+		return ScheduleCrawling
+	case 2:
+		return ScheduleCrawled
+	case 3:
+		return ScheduleCanCrawl
+	default:
+		return ScheduleToCrawl
+	}
+}
+
 type ScheduleResult struct {
 	Code uint8
 	Name string
