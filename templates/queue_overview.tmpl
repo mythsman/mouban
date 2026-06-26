@@ -1,0 +1,168 @@
+{{define "queue_overview.tmpl"}}
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>队列看板 - mouban</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css" />
+    <link rel="stylesheet" href="/static/app.css" />
+</head>
+<body>
+<main class="container">
+    <h1>调度队列看板</h1>
+    <p class="muted">自动刷新：{{.RefreshSeconds}} 秒</p>
+    <p><a class="back-link" href="/">← 返回首页</a></p>
+
+    <section>
+        <h2>Worker 池利用率</h2>
+        <div id="pool-cards" class="queue-cards"></div>
+    </section>
+
+    <section>
+        <h2>按类型统计</h2>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                <tr>
+                    <th>类型</th>
+                    <th>to_crawl</th>
+                    <th>crawling</th>
+                    <th>crawled</th>
+                    <th>can_crawl</th>
+                    <th>unready</th>
+                    <th>ready</th>
+                    <th>invalid</th>
+                    <th>最老等待(秒)</th>
+                </tr>
+                </thead>
+                <tbody id="type-table-body">
+                <tr><td colspan="9" class="muted">加载中...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section>
+        <h2>当前执行中（crawling）</h2>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                <tr>
+                    <th>类型</th>
+                    <th>DoubanID</th>
+                    <th>状态</th>
+                    <th>开始时间</th>
+                    <th>运行时长(秒)</th>
+                </tr>
+                </thead>
+                <tbody id="running-table-body">
+                <tr><td colspan="5" class="muted">加载中...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <p class="muted" id="generated-at">最近更新时间：-</p>
+</main>
+
+<script>
+(function () {
+  var refreshSeconds = {{.RefreshSeconds}};
+
+  function pct(v) {
+    if (!isFinite(v)) return '0.0%';
+    return (v * 100).toFixed(1) + '%';
+  }
+
+  function renderPools(pools) {
+    var root = document.getElementById('pool-cards');
+    if (!root) return;
+    if (!pools || !pools.length) {
+      root.innerHTML = '<article class="muted-box">暂无数据</article>';
+      return;
+    }
+
+    root.innerHTML = pools.map(function (p) {
+      return '' +
+        '<article class="queue-card">' +
+        '  <header><strong>' + p.pool_label + '</strong></header>' +
+        '  <div class="muted">并发上限：' + p.concurrency + '</div>' +
+        '  <div class="muted">运行中：' + p.running + '</div>' +
+        '  <div><strong>利用率：</strong>' + pct(p.utilization) + '</div>' +
+        '</article>';
+    }).join('');
+  }
+
+  function renderTypes(types) {
+    var body = document.getElementById('type-table-body');
+    if (!body) return;
+    if (!types || !types.length) {
+      body.innerHTML = '<tr><td colspan="9" class="muted">暂无数据</td></tr>';
+      return;
+    }
+
+    body.innerHTML = types.map(function (t) {
+      return '' +
+        '<tr>' +
+        '  <td>' + t.type_label + '</td>' +
+        '  <td>' + t.to_crawl + '</td>' +
+        '  <td>' + t.crawling + '</td>' +
+        '  <td>' + t.crawled + '</td>' +
+        '  <td>' + t.can_crawl + '</td>' +
+        '  <td>' + t.unready + '</td>' +
+        '  <td>' + t.ready + '</td>' +
+        '  <td>' + t.invalid + '</td>' +
+        '  <td>' + t.oldest_wait_seconds + '</td>' +
+        '</tr>';
+    }).join('');
+  }
+
+  function renderRunning(rows) {
+    var body = document.getElementById('running-table-body');
+    if (!body) return;
+    if (!rows || !rows.length) {
+      body.innerHTML = '<tr><td colspan="5" class="muted">当前无执行中任务</td></tr>';
+      return;
+    }
+
+    body.innerHTML = rows.map(function (r) {
+      return '' +
+        '<tr>' +
+        '  <td>' + r.type_label + '</td>' +
+        '  <td>' + r.douban_id + '</td>' +
+        '  <td>' + r.status + '</td>' +
+        '  <td>' + r.updated_at_text + '</td>' +
+        '  <td>' + r.running_for_seconds + '</td>' +
+        '</tr>';
+    }).join('');
+  }
+
+  function renderGeneratedAt(text) {
+    var el = document.getElementById('generated-at');
+    if (el) el.textContent = '最近更新时间：' + (text || '-');
+  }
+
+  function load() {
+    fetch('/admin/queue_overview', { cache: 'no-store' })
+      .then(function (res) { return res.json(); })
+      .then(function (data) {
+        if (!data || !data.success || !data.result) return;
+        var result = data.result;
+        renderPools(result.pools || []);
+        renderTypes(result.types || []);
+        renderRunning(result.running || []);
+        renderGeneratedAt(result.generated_at_text || '-');
+      })
+      .catch(function () {
+        renderGeneratedAt('加载失败');
+      });
+  }
+
+  load();
+  setInterval(load, Math.max(3, refreshSeconds) * 1000);
+})();
+</script>
+</body>
+</html>
+{{end}}

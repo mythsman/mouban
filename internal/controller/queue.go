@@ -1,0 +1,208 @@
+package controller
+
+import (
+	"net/http"
+	"time"
+
+	"mouban/internal/consts"
+	"mouban/internal/dao"
+
+	"github.com/gin-gonic/gin"
+	"github.com/spf13/viper"
+)
+
+type QueueTypeOverview struct {
+	TypeCode          uint8  `json:"type_code"`
+	TypeName          string `json:"type"`
+	TypeLabel         string `json:"type_label"`
+	ToCrawl           int64  `json:"to_crawl"`
+	Crawling          int64  `json:"crawling"`
+	Crawled           int64  `json:"crawled"`
+	CanCrawl          int64  `json:"can_crawl"`
+	Unready           int64  `json:"unready"`
+	Ready             int64  `json:"ready"`
+	Invalid           int64  `json:"invalid"`
+	OldestWaitSeconds int64  `json:"oldest_wait_seconds"`
+}
+
+type QueuePoolOverview struct {
+	Pool        string  `json:"pool"`
+	PoolLabel   string  `json:"pool_label"`
+	Concurrency int     `json:"concurrency"`
+	Running     int64   `json:"running"`
+	Utilization float64 `json:"utilization"`
+}
+
+type QueueRunningTaskView struct {
+	DoubanID          uint64 `json:"douban_id"`
+	TypeCode          uint8  `json:"type_code"`
+	TypeName          string `json:"type"`
+	TypeLabel         string `json:"type_label"`
+	Status            string `json:"status"`
+	UpdatedAtUnix     int64  `json:"updated_at_unix"`
+	UpdatedAtText     string `json:"updated_at_text"`
+	RunningForSeconds int64  `json:"running_for_seconds"`
+}
+
+type QueueOverviewResult struct {
+	GeneratedAt     int64                  `json:"generated_at"`
+	GeneratedAtText string                 `json:"generated_at_text"`
+	Types           []QueueTypeOverview    `json:"types"`
+	Pools           []QueuePoolOverview    `json:"pools"`
+	Running         []QueueRunningTaskView `json:"running"`
+}
+
+type QueuePageData struct {
+	RefreshSeconds int
+}
+
+func QueueOverviewPage(ctx *gin.Context) {
+	ctx.HTML(http.StatusOK, "queue_overview.tmpl", QueuePageData{RefreshSeconds: 8})
+}
+
+func QueueOverview(ctx *gin.Context) {
+	logAccess(ctx, 0)
+	ctx.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"result":  buildQueueOverview(),
+	})
+}
+
+func buildQueueOverview() QueueOverviewResult {
+	now := time.Now()
+	types := []consts.Type{consts.TypeUser, consts.TypeBook, consts.TypeMovie, consts.TypeGame, consts.TypeSong}
+	typeMap := map[uint8]*QueueTypeOverview{}
+	ordered := make([]QueueTypeOverview, len(types))
+	for i, t := range types {
+		ordered[i] = QueueTypeOverview{
+			TypeCode:  t.Code,
+			TypeName:  t.Name,
+			TypeLabel: typeLabel(t.Code),
+		}
+		typeMap[t.Code] = &ordered[i]
+	}
+
+	for _, row := range dao.CountScheduleByTypeStatus() {
+		item := typeMap[row.Type]
+		if item == nil {
+			continue
+		}
+		switch row.Status {
+		case consts.ScheduleToCrawl.Code:
+			item.ToCrawl = row.Count
+		case consts.ScheduleCrawling.Code:
+			item.Crawling = row.Count
+		case consts.ScheduleCrawled.Code:
+			item.Crawled = row.Count
+		case consts.ScheduleCanCrawl.Code:
+			item.CanCrawl = row.Count
+		}
+	}
+
+	for _, row := range dao.CountScheduleByTypeResult() {
+		item := typeMap[row.Type]
+		if item == nil {
+			continue
+		}
+		switch row.Result {
+		case consts.ScheduleUnready.Code:
+			item.Unready = row.Count
+		case consts.ScheduleReady.Code:
+			item.Ready = row.Count
+		case consts.ScheduleInvalid.Code:
+			item.Invalid = row.Count
+		}
+	}
+
+	for _, row := range dao.MinScheduleUpdatedAtByType(consts.ScheduleToCrawl.Code) {
+		item := typeMap[row.Type]
+		if item == nil || row.UpdatedAt.IsZero() {
+			continue
+		}
+		waitSeconds := int64(now.Sub(row.UpdatedAt).Seconds())
+		if waitSeconds < 0 {
+			waitSeconds = 0
+		}
+		item.OldestWaitSeconds = waitSeconds
+	}
+
+	runningRows := dao.ListScheduleByStatus(consts.ScheduleCrawling.Code, 100)
+	running := make([]QueueRunningTaskView, 0, len(runningRows))
+	for _, row := range runningRows {
+		runningSeconds := int64(now.Sub(row.UpdatedAt).Seconds())
+		if runningSeconds < 0 {
+			runningSeconds = 0
+		}
+		statusCode := consts.ScheduleCrawling.Code
+		if row.Status != nil {
+			statusCode = *row.Status
+		}
+		running = append(running, QueueRunningTaskView{
+			DoubanID:          row.DoubanId,
+			TypeCode:          row.Type,
+			TypeName:          consts.ParseType(row.Type).Name,
+			TypeLabel:         typeLabel(row.Type),
+			Status:            consts.ParseScheduleStatus(statusCode).Name,
+			UpdatedAtUnix:     row.UpdatedAt.Unix(),
+			UpdatedAtText:     formatTimeCN(row.UpdatedAt),
+			RunningForSeconds: runningSeconds,
+		})
+	}
+
+	userConcurrency := viper.GetInt("agent.user.concurrency")
+	itemConcurrency := viper.GetInt("agent.item.concurrency")
+	userRunning := typeMap[consts.TypeUser.Code].Crawling
+	itemRunning := int64(0)
+	for _, t := range []consts.Type{consts.TypeBook, consts.TypeMovie, consts.TypeGame, consts.TypeSong} {
+		itemRunning += typeMap[t.Code].Crawling
+	}
+
+	pools := []QueuePoolOverview{
+		{
+			Pool:        "user",
+			PoolLabel:   "用户队列",
+			Concurrency: userConcurrency,
+			Running:     userRunning,
+			Utilization: calcUtilization(userRunning, userConcurrency),
+		},
+		{
+			Pool:        "item",
+			PoolLabel:   "条目队列（book/movie/game/song 共享）",
+			Concurrency: itemConcurrency,
+			Running:     itemRunning,
+			Utilization: calcUtilization(itemRunning, itemConcurrency),
+		},
+	}
+
+	return QueueOverviewResult{
+		GeneratedAt:     now.Unix(),
+		GeneratedAtText: now.Format("2006-01-02 15:04:05"),
+		Types:           ordered,
+		Pools:           pools,
+		Running:         running,
+	}
+}
+
+func calcUtilization(running int64, concurrency int) float64 {
+	if concurrency <= 0 {
+		return 0
+	}
+	return float64(running) / float64(concurrency)
+}
+
+func typeLabel(code uint8) string {
+	switch code {
+	case consts.TypeUser.Code:
+		return "用户"
+	case consts.TypeBook.Code:
+		return "图书"
+	case consts.TypeMovie.Code:
+		return "电影"
+	case consts.TypeGame.Code:
+		return "游戏"
+	case consts.TypeSong.Code:
+		return "音乐"
+	default:
+		return "未知"
+	}
+}
