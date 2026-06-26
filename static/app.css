@@ -230,3 +230,39 @@ body {
   max-width: 480px;
   white-space: pre-wrap;
 }
+
+.item-page .item-head h2 {
+  margin-bottom: 0.25rem;
+}
+
+.item-body {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.detail-thumb {
+  width: 140px;
+  border-radius: 6px;
+}
+
+.detail-fields {
+  min-width: 260px;
+  flex: 1;
+}
+
+.detail-fields p {
+  margin-bottom: 0.35rem;
+}
+
+.rating-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.35rem;
+  font-size: 0.92rem;
+}
+
+.pre-wrap {
+  white-space: pre-wrap;
+}

@@ -255,11 +255,11 @@
             <td>
                 {{with .Item}}
                 <div class="item-cell">
-                    <a href="{{$.ItemBaseURL}}{{.DoubanId}}/" target="_blank" rel="noopener noreferrer">
+                    <a href="{{$.ItemBaseURL}}{{.DoubanId}}{{if $.BackURL}}?back={{$.BackURL | urlquery}}{{end}}">
                         {{if .Thumbnail}}<img src="{{.Thumbnail}}" alt="thumb" loading="lazy" />{{end}}
                     </a>
                     <div>
-                        <div><strong><a href="{{$.ItemBaseURL}}{{.DoubanId}}/" target="_blank" rel="noopener noreferrer">{{.Title}}</a></strong></div>
+                        <div><strong><a href="{{$.ItemBaseURL}}{{.DoubanId}}{{if $.BackURL}}?back={{$.BackURL | urlquery}}{{end}}">{{.Title}}</a></strong></div>
                         <small class="muted">DoubanID: {{.DoubanId}}</small>
                     </div>
                 </div>

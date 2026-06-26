@@ -2,6 +2,7 @@ package controller
 
 import (
 	"net/http"
+	"net/url"
 	"strconv"
 	"strings"
 	"time"
@@ -15,6 +16,7 @@ import (
 
 type CommentTableView struct {
 	ItemBaseURL string
+	BackURL     string
 	Comments    []model.CommentVO
 }
 
@@ -130,11 +132,12 @@ func UserExplorerPage(ctx *gin.Context) {
 					SyncAtText:    formatUnixCN(vo.SyncAt),
 					CheckAtText:   formatUnixCN(vo.CheckAt),
 				}
+				backURL := buildUserPageURL(q, vo.ID)
 				data.Sections = []UserTypeSection{
-					buildUserTypeSection(doubanUid, consts.TypeBook.Code, "book", "图书", "想读", "在读", "读过"),
-					buildUserTypeSection(doubanUid, consts.TypeMovie.Code, "movie", "电影", "想看", "在看", "看过"),
-					buildUserTypeSection(doubanUid, consts.TypeGame.Code, "game", "游戏", "想玩", "在玩", "玩过"),
-					buildUserTypeSection(doubanUid, consts.TypeSong.Code, "song", "音乐", "想听", "在听", "听过"),
+					buildUserTypeSection(doubanUid, consts.TypeBook.Code, "book", "图书", "想读", "在读", "读过", backURL),
+					buildUserTypeSection(doubanUid, consts.TypeMovie.Code, "movie", "电影", "想看", "在看", "看过", backURL),
+					buildUserTypeSection(doubanUid, consts.TypeGame.Code, "game", "游戏", "想玩", "在玩", "玩过", backURL),
+					buildUserTypeSection(doubanUid, consts.TypeSong.Code, "song", "音乐", "想听", "在听", "听过", backURL),
 				}
 			}
 		}
@@ -144,7 +147,7 @@ func UserExplorerPage(ctx *gin.Context) {
 	ctx.HTML(http.StatusOK, "user_explorer.tmpl", data)
 }
 
-func buildUserTypeSection(doubanUid uint64, t uint8, key string, name string, wishLabel string, doLabel string, collectLabel string) UserTypeSection {
+func buildUserTypeSection(doubanUid uint64, t uint8, key string, name string, wishLabel string, doLabel string, collectLabel string, backURL string) UserTypeSection {
 	wish := buildUserCommentsVO(doubanUid, t, consts.ActionWish.Code, 0)
 	doItems := buildUserCommentsVO(doubanUid, t, consts.ActionDo.Code, 0)
 	collect := buildUserCommentsVO(doubanUid, t, consts.ActionCollect.Code, 0)
@@ -156,9 +159,9 @@ func buildUserTypeSection(doubanUid uint64, t uint8, key string, name string, wi
 		WishLabel:    wishLabel,
 		DoLabel:      doLabel,
 		CollectLabel: collectLabel,
-		WishTable:    CommentTableView{ItemBaseURL: itemBaseURL, Comments: wish},
-		DoTable:      CommentTableView{ItemBaseURL: itemBaseURL, Comments: doItems},
-		CollectTable: CommentTableView{ItemBaseURL: itemBaseURL, Comments: collect},
+		WishTable:    CommentTableView{ItemBaseURL: itemBaseURL, BackURL: backURL, Comments: wish},
+		DoTable:      CommentTableView{ItemBaseURL: itemBaseURL, BackURL: backURL, Comments: doItems},
+		CollectTable: CommentTableView{ItemBaseURL: itemBaseURL, BackURL: backURL, Comments: collect},
 		Total:        len(wish) + len(doItems) + len(collect),
 	}
 }
@@ -174,16 +177,24 @@ func buildUserProfileURL(id uint64, domain string) string {
 func itemBaseURLByType(t uint8) string {
 	switch t {
 	case consts.TypeBook.Code:
-		return "https://book.douban.com/subject/"
+		return "/item/book/"
 	case consts.TypeMovie.Code:
-		return "https://movie.douban.com/subject/"
+		return "/item/movie/"
 	case consts.TypeGame.Code:
-		return "https://www.douban.com/game/"
+		return "/item/game/"
 	case consts.TypeSong.Code:
-		return "https://music.douban.com/subject/"
+		return "/item/song/"
 	default:
-		return "https://www.douban.com/"
+		return "/"
 	}
+}
+
+func buildUserPageURL(q string, id uint64) string {
+	pageURL := "/?id=" + strconv.FormatUint(id, 10)
+	if strings.TrimSpace(q) != "" {
+		pageURL += "&q=" + url.QueryEscape(q)
+	}
+	return pageURL
 }
 
 func formatUnixCN(ts int64) string {
