@@ -66,18 +66,10 @@ type QueueOverviewResult struct {
 	Completed       []QueueCompletedTaskView `json:"completed"`
 }
 
-type QueuePageData struct {
-	RefreshSeconds int
-}
-
 var queueOverviewCache struct {
 	mu       sync.RWMutex
 	expireAt time.Time
 	data     QueueOverviewResult
-}
-
-func QueueOverviewPage(ctx *gin.Context) {
-	ctx.HTML(http.StatusOK, "queue_overview.tmpl", QueuePageData{RefreshSeconds: 20})
 }
 
 func QueueOverview(ctx *gin.Context) {

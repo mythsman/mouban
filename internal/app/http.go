@@ -5,6 +5,7 @@ import (
 	"mouban/internal/controller"
 	"mouban/internal/util"
 	"net/http"
+	"path"
 	"strings"
 	"time"
 
@@ -42,21 +43,13 @@ func NewRouter() *gin.Engine {
 	}
 
 	router := gin.New()
-	router.LoadHTMLGlob("templates/*.tmpl")
-	router.Static("/static", "static")
+	router.Static("/assets", "build/assets")
+	router.StaticFile("/favicon.ico", "build/favicon.ico")
 
 	router.Use(recoverMiddleware)
 	router.Use(corsMiddleware)
 	router.Use(accessLogMiddleware)
 	router.Use(metricsMiddleware)
-
-	router.GET("/", controller.HomePage)
-	router.GET("/explore", controller.ExplorePage)
-	router.GET("/explore/users", controller.UserSearchPage)
-	router.GET("/user/:id", controller.UserDetailPage)
-	router.GET("/item/:type/:id", controller.ItemDetailPage)
-	router.GET("/explore/queue", controller.QueueOverviewPage)
-	router.GET("/explore/queue_overview", controller.QueueOverview)
 
 	router.GET("/metrics", gin.WrapH(promhttp.Handler()))
 
@@ -70,6 +63,7 @@ func NewRouter() *gin.Engine {
 	{
 		queryGroup.GET("/resolve_user", controller.ResolveUser)
 		queryGroup.GET("/check_user", controller.CheckUser)
+		queryGroup.GET("/item_detail", controller.GuestItemDetail)
 		queryGroup.GET("/user_book", func(ctx *gin.Context) {
 			controller.ListUserItem(ctx, consts.TypeBook.Code)
 		})
@@ -84,7 +78,36 @@ func NewRouter() *gin.Engine {
 		})
 	}
 
+	router.GET("/explore/queue_overview", controller.QueueOverview)
+
+	registerSPAFallback(router)
+
 	return router
+}
+
+func registerSPAFallback(router *gin.Engine) {
+	router.NoRoute(func(ctx *gin.Context) {
+		if ctx.Request.Method != http.MethodGet {
+			ctx.JSON(http.StatusNotFound, gin.H{"success": false, "msg": "not found"})
+			return
+		}
+
+		requestPath := ctx.Request.URL.Path
+		if strings.HasPrefix(requestPath, "/guest/") ||
+			strings.HasPrefix(requestPath, "/admin/") ||
+			requestPath == "/metrics" ||
+			requestPath == "/explore/queue_overview" {
+			ctx.JSON(http.StatusNotFound, gin.H{"success": false, "msg": "not found"})
+			return
+		}
+
+		if strings.Contains(path.Base(requestPath), ".") {
+			ctx.Status(http.StatusNotFound)
+			return
+		}
+
+		ctx.File("build/index.html")
+	})
 }
 
 func recoverMiddleware(ctx *gin.Context) {

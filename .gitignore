@@ -18,3 +18,10 @@
 # Dependency directories (remove the comment below to include it)
 # vendor/
 .vscode/
+
+# frontend
+web/node_modules/
+web/*.tsbuildinfo
+web/vite.config.js
+web/vite.config.d.ts
+build/
