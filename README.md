@@ -60,15 +60,21 @@ dbcl2需要在cookie中查看：
 
 #### 页面入口（后端渲染）
 
-`http://localhost:8080/`
+`https://mouban.mythsman.com/`
+
+页面说明：
+
+- 这是项目默认的前端页面入口（SSR），直接访问即可使用。
+- 支持输入 Douban UID / domain / 用户名（精确匹配）查询候选用户。
+- 选中用户后可查看该用户当前收录的书、影、游、音全部信息（wish/do/collect）。
 
 #### 用户解析（通过ID/domain/name精确匹配）
 
-`http://localhost:8080/guest/resolve_user?q={id_or_domain_or_name}`
+`https://mouban.mythsman.com/guest/resolve_user?q={id_or_domain_or_name}`
 
 #### 用户录入/更新
 
-`http://localhost:8080/guest/check_user?id={your_douban_id}`
+`https://mouban.mythsman.com/guest/check_user?id={your_douban_id}`
 
 ```json
 {
@@ -105,52 +111,37 @@ dbcl2需要在cookie中查看：
 
 #### 查询用户的读书评论
 
-`http://localhost:8080/guest/user_book?id={your_douban_id}&action=wish`
+`https://mouban.mythsman.com/guest/user_book?id={your_douban_id}&action=wish`
 
-`http://localhost:8080/guest/user_book?id={your_douban_id}&action=do`
+`https://mouban.mythsman.com/guest/user_book?id={your_douban_id}&action=do`
 
-`http://localhost:8080/guest/user_book?id={your_douban_id}&action=collect`
+`https://mouban.mythsman.com/guest/user_book?id={your_douban_id}&action=collect`
 
 #### 查询用户的电影评论
 
-`http://localhost:8080/guest/user_movie?id={your_douban_id}&action=wish`
+`https://mouban.mythsman.com/guest/user_movie?id={your_douban_id}&action=wish`
 
-`http://localhost:8080/guest/user_movie?id={your_douban_id}&action=do`
+`https://mouban.mythsman.com/guest/user_movie?id={your_douban_id}&action=do`
 
-`http://localhost:8080/guest/user_movie?id={your_douban_id}&action=collect`
+`https://mouban.mythsman.com/guest/user_movie?id={your_douban_id}&action=collect`
 
 #### 查询用户的游戏评论
 
-`http://localhost:8080/guest/user_game?id={your_douban_id}&action=wish`
+`https://mouban.mythsman.com/guest/user_game?id={your_douban_id}&action=wish`
 
-`http://localhost:8080/guest/user_game?id={your_douban_id}&action=do`
+`https://mouban.mythsman.com/guest/user_game?id={your_douban_id}&action=do`
 
-`http://localhost:8080/guest/user_game?id={your_douban_id}&action=collect`
+`https://mouban.mythsman.com/guest/user_game?id={your_douban_id}&action=collect`
 
 #### 查询用户的音乐评论
 
-`http://localhost:8080/guest/user_song?id={your_douban_id}&action=wish`
+`https://mouban.mythsman.com/guest/user_song?id={your_douban_id}&action=wish`
 
-`http://localhost:8080/guest/user_song?id={your_douban_id}&action=do`
+`https://mouban.mythsman.com/guest/user_song?id={your_douban_id}&action=do`
 
-`http://localhost:8080/guest/user_song?id={your_douban_id}&action=collect`
+`https://mouban.mythsman.com/guest/user_song?id={your_douban_id}&action=collect`
 
 ### 后台接口
-
-#### 加载 sitemap 数据
-
-豆瓣在他的[robots.txt](https://www.douban.com/robots.txt)中分享了他的
-sitemap，并且一直持续更新。因此我们可以通过 [sitemap_index](https://www.douban.com/sitemap_index.xml)
-和 [sitemap_updated_index](https://www.douban.com/sitemap_updated_index.xml) 将存量数据离线下载下来，解压后按类型 grep
-条目后直接一次性导入，节省了对存量数据的爬虫搜索逻辑。
-
-加载离线 sitemap 数据。数据需要事先下载，并挂载到 docker 进程的指定路径下。
-
-`http://localhost:8080/admin/load_data?path={path_to_local_sitemap_file}`
-
-需要注意的是，sitemap 的数据并不全。除了举反例证明外，还有一个明显的例子，就是在 sitemap
-中，书籍的条目数从 [五年前](https://www.zhihu.com/question/19583157/answer/140028235) 左右开始就是 3088633 条，但是最近一次更新时，发现 sitemap
-中记录的书籍数还是这么多（即使 sitemap 本身也在更新）。因此增量更新始终是必要的。
 
 #### 强制更新条目
 
@@ -158,7 +149,7 @@ sitemap，并且一直持续更新。因此我们可以通过 [sitemap_index](ht
 
 item_type 取: 1-book 2-movie 3-game 4-song
 
-`http://localhost:8080/admin/refresh_item?type={item_type}&id={item_douban_id}`
+`https://mouban.mythsman.com/admin/refresh_item?type={item_type}&id={item_douban_id}`
 
 #### 强制更新用户
 
@@ -166,4 +157,4 @@ item_type 取: 1-book 2-movie 3-game 4-song
 
 如有更新的要求，目前暂时需要手动强制更新一下。（谨慎使用，会对系统造成较大压力）
 
-`http://localhost:8080/admin/refresh_user?id={douban_uid}`
+`https://mouban.mythsman.com/admin/refresh_user?id={douban_uid}`

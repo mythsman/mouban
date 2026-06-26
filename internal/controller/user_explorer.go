@@ -13,16 +13,41 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type CommentTableView struct {
+	ItemBaseURL string
+	Comments    []model.CommentVO
+}
+
 type UserTypeSection struct {
 	Key          string
 	Name         string
 	WishLabel    string
 	DoLabel      string
 	CollectLabel string
-	Wish         []model.CommentVO
-	Do           []model.CommentVO
-	Collect      []model.CommentVO
+	WishTable    CommentTableView
+	DoTable      CommentTableView
+	CollectTable CommentTableView
 	Total        int
+}
+
+type UserCandidateView struct {
+	ID           uint64
+	Name         string
+	Domain       string
+	Thumbnail    string
+	ProfileURL   string
+	BookWish     uint32
+	BookDo       uint32
+	BookCollect  uint32
+	GameWish     uint32
+	GameDo       uint32
+	GameCollect  uint32
+	MovieWish    uint32
+	MovieDo      uint32
+	MovieCollect uint32
+	SongWish     uint32
+	SongDo       uint32
+	SongCollect  uint32
 }
 
 type UserProfileView struct {
@@ -30,6 +55,7 @@ type UserProfileView struct {
 	Name          string
 	Domain        string
 	Thumbnail     string
+	ProfileURL    string
 	PublishAtText string
 	SyncAtText    string
 	CheckAtText   string
@@ -38,7 +64,7 @@ type UserProfileView struct {
 type UserExplorerPageData struct {
 	Query      string
 	SelectedID string
-	Candidates []ResolveUserVO
+	Candidates []UserCandidateView
 	User       *UserProfileView
 	Sections   []UserTypeSection
 	Error      string
@@ -51,14 +77,36 @@ func UserExplorerPage(ctx *gin.Context) {
 	data := UserExplorerPageData{
 		Query:      q,
 		SelectedID: id,
-		Candidates: []ResolveUserVO{},
+		Candidates: []UserCandidateView{},
 		Sections:   []UserTypeSection{},
 	}
 
 	loggedUserID := uint64(0)
 
 	if id == "" && q != "" {
-		data.Candidates = resolveUsers(q)
+		resolved := resolveUsers(q)
+		for i := range resolved {
+			u := resolved[i]
+			data.Candidates = append(data.Candidates, UserCandidateView{
+				ID:           u.ID,
+				Name:         u.Name,
+				Domain:       u.Domain,
+				Thumbnail:    u.Thumbnail,
+				ProfileURL:   buildUserProfileURL(u.ID, u.Domain),
+				BookWish:     u.BookWish,
+				BookDo:       u.BookDo,
+				BookCollect:  u.BookCollect,
+				GameWish:     u.GameWish,
+				GameDo:       u.GameDo,
+				GameCollect:  u.GameCollect,
+				MovieWish:    u.MovieWish,
+				MovieDo:      u.MovieDo,
+				MovieCollect: u.MovieCollect,
+				SongWish:     u.SongWish,
+				SongDo:       u.SongDo,
+				SongCollect:  u.SongCollect,
+			})
+		}
 	}
 
 	if id != "" {
@@ -77,6 +125,7 @@ func UserExplorerPage(ctx *gin.Context) {
 					Name:          vo.Name,
 					Domain:        vo.Domain,
 					Thumbnail:     vo.Thumbnail,
+					ProfileURL:    buildUserProfileURL(vo.ID, vo.Domain),
 					PublishAtText: formatUnixCN(vo.PublishAt),
 					SyncAtText:    formatUnixCN(vo.SyncAt),
 					CheckAtText:   formatUnixCN(vo.CheckAt),
@@ -100,16 +149,40 @@ func buildUserTypeSection(doubanUid uint64, t uint8, key string, name string, wi
 	doItems := buildUserCommentsVO(doubanUid, t, consts.ActionDo.Code, 0)
 	collect := buildUserCommentsVO(doubanUid, t, consts.ActionCollect.Code, 0)
 
+	itemBaseURL := itemBaseURLByType(t)
 	return UserTypeSection{
 		Key:          key,
 		Name:         name,
 		WishLabel:    wishLabel,
 		DoLabel:      doLabel,
 		CollectLabel: collectLabel,
-		Wish:         wish,
-		Do:           doItems,
-		Collect:      collect,
+		WishTable:    CommentTableView{ItemBaseURL: itemBaseURL, Comments: wish},
+		DoTable:      CommentTableView{ItemBaseURL: itemBaseURL, Comments: doItems},
+		CollectTable: CommentTableView{ItemBaseURL: itemBaseURL, Comments: collect},
 		Total:        len(wish) + len(doItems) + len(collect),
+	}
+}
+
+func buildUserProfileURL(id uint64, domain string) string {
+	target := strings.TrimSpace(domain)
+	if target == "" {
+		target = strconv.FormatUint(id, 10)
+	}
+	return "https://www.douban.com/people/" + target + "/"
+}
+
+func itemBaseURLByType(t uint8) string {
+	switch t {
+	case consts.TypeBook.Code:
+		return "https://book.douban.com/subject/"
+	case consts.TypeMovie.Code:
+		return "https://movie.douban.com/subject/"
+	case consts.TypeGame.Code:
+		return "https://www.douban.com/game/"
+	case consts.TypeSong.Code:
+		return "https://music.douban.com/subject/"
+	default:
+		return "https://www.douban.com/"
 	}
 }
 
