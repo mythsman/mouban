@@ -147,21 +147,24 @@
     var controls = document.createElement('div');
     controls.className = 'pager-controls';
     controls.innerHTML = '' +
-      '<label class="pager-label">每页</label>' +
-      '<select class="pager-size">' +
-      '  <option value="10" selected>10</option>' +
-      '  <option value="50">50</option>' +
-      '  <option value="100">100</option>' +
-      '</select>' +
+      '<span class="pager-info"></span>' +
+      '<button type="button" class="pager-btn first">首页</button>' +
       '<button type="button" class="pager-btn prev">上一页</button>' +
       '<button type="button" class="pager-btn next">下一页</button>' +
-      '<span class="pager-info"></span>';
+      '<button type="button" class="pager-btn last">末页</button>' +
+      '<select class="pager-size" aria-label="分页大小">' +
+      '  <option value="10" selected>10 / 页</option>' +
+      '  <option value="50">50 / 页</option>' +
+      '  <option value="100">100 / 页</option>' +
+      '</select>';
 
-    root.insertBefore(controls, root.firstChild);
+    root.appendChild(controls);
 
     var sizeSelect = controls.querySelector('.pager-size');
+    var firstBtn = controls.querySelector('.first');
     var prevBtn = controls.querySelector('.prev');
     var nextBtn = controls.querySelector('.next');
+    var lastBtn = controls.querySelector('.last');
     var info = controls.querySelector('.pager-info');
 
     function render() {
@@ -174,13 +177,20 @@
         item.style.display = page === currentPage ? '' : 'none';
       });
 
+      firstBtn.disabled = currentPage <= 1;
       prevBtn.disabled = currentPage <= 1;
       nextBtn.disabled = currentPage >= totalPages;
+      lastBtn.disabled = currentPage >= totalPages;
       info.textContent = '第 ' + currentPage + ' / ' + totalPages + ' 页，共 ' + items.length + ' 条';
     }
 
     sizeSelect.addEventListener('change', function () {
       pageSize = parseInt(sizeSelect.value, 10) || 10;
+      currentPage = 1;
+      render();
+    });
+
+    firstBtn.addEventListener('click', function () {
       currentPage = 1;
       render();
     });
@@ -195,8 +205,26 @@
       render();
     });
 
+    lastBtn.addEventListener('click', function () {
+      currentPage = Math.max(1, Math.ceil(items.length / pageSize));
+      render();
+    });
+
     render();
   }
+
+  function toStars(rate) {
+    var n = parseInt(rate, 10);
+    if (!n || n <= 0) return '—';
+    if (n > 5) n = 5;
+    return '⭐️'.repeat(n) + '☆'.repeat(5 - n);
+  }
+
+  document.querySelectorAll('.rate-stars').forEach(function (el) {
+    var rate = el.getAttribute('data-rate') || '0';
+    el.textContent = toStars(rate);
+    el.title = '评分：' + rate;
+  });
 
   document.querySelectorAll('.paged-list').forEach(initPagination);
 })();
@@ -237,7 +265,7 @@
                 </div>
                 {{end}}
             </td>
-            <td>{{.Rate}}</td>
+            <td><span class="rate-stars" data-rate="{{.Rate}}">{{.Rate}}</span></td>
             <td>{{.Label}}</td>
             <td class="comment">{{.Comment}}</td>
             <td>{{.MarkDate}}</td>
