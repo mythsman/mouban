@@ -51,6 +51,7 @@ func NewRouter() *gin.Engine {
 	router.Use(metricsMiddleware)
 
 	router.GET("/", controller.UserExplorerPage)
+	router.GET("/item/:type/:id", controller.ItemDetailPage)
 
 	router.GET("/metrics", gin.WrapH(promhttp.Handler()))
 

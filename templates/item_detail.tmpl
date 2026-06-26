@@ -1,0 +1,123 @@
+{{define "item_detail.tmpl"}}
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{{if .TypeName}}{{.TypeName}}详情{{else}}条目详情{{end}} - mouban</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css" />
+    <link rel="stylesheet" href="/static/app.css" />
+</head>
+<body>
+<main class="container item-page">
+    <a class="back-link" href="{{.BackURL}}">← 返回</a>
+
+    {{if .Error}}
+    <article class="error-box">{{.Error}}</article>
+    {{if .DoubanURL}}
+    <p><a href="{{.DoubanURL}}" target="_blank" rel="noopener noreferrer">去豆瓣查看原页面</a></p>
+    {{end}}
+    {{else}}
+    <article>
+        <header class="item-head">
+            <div>
+                <h2>{{if .Book}}{{.Book.Title}}{{end}}{{if .Movie}}{{.Movie.Title}}{{end}}{{if .Game}}{{.Game.Title}}{{end}}{{if .Song}}{{.Song.Title}}{{end}}</h2>
+                <div class="muted">{{.TypeName}} · DoubanID: {{.ItemID}}</div>
+                <p><a href="{{.DoubanURL}}" target="_blank" rel="noopener noreferrer">去豆瓣查看原页面</a></p>
+            </div>
+        </header>
+    </article>
+
+    {{if .Rating}}
+    <article>
+        <h3>评分信息</h3>
+        <div class="rating-grid">
+            <div><strong>均分：</strong>{{printf "%.1f" .Rating.Rating}}</div>
+            <div><strong>人数：</strong>{{.Rating.Total}}</div>
+            <div><strong>五星：</strong>{{printf "%.1f" .Rating.Star5}}%</div>
+            <div><strong>四星：</strong>{{printf "%.1f" .Rating.Star4}}%</div>
+            <div><strong>三星：</strong>{{printf "%.1f" .Rating.Star3}}%</div>
+            <div><strong>二星：</strong>{{printf "%.1f" .Rating.Star2}}%</div>
+            <div><strong>一星：</strong>{{printf "%.1f" .Rating.Star1}}%</div>
+        </div>
+    </article>
+    {{end}}
+
+    {{if .Book}}
+    <article>
+        <h3>图书信息</h3>
+        <div class="item-body">
+            {{if .Book.Thumbnail}}<img class="detail-thumb" src="{{.Book.Thumbnail}}" alt="thumbnail" loading="lazy" />{{end}}
+            <div class="detail-fields">
+                <p><strong>副标题：</strong>{{.Book.Subtitle}}</p>
+                <p><strong>作者：</strong>{{.Book.Author}}</p>
+                <p><strong>译者：</strong>{{.Book.Translator}}</p>
+                <p><strong>出版社：</strong>{{.Book.Press}}</p>
+                <p><strong>出版日期：</strong>{{.Book.PublishDate}}</p>
+                <p><strong>ISBN：</strong>{{.Book.ISBN}}</p>
+            </div>
+        </div>
+        {{if .Book.BookIntro}}<h4>内容简介</h4><p class="pre-wrap">{{.Book.BookIntro}}</p>{{end}}
+        {{if .Book.AuthorIntro}}<h4>作者简介</h4><p class="pre-wrap">{{.Book.AuthorIntro}}</p>{{end}}
+    </article>
+    {{end}}
+
+    {{if .Movie}}
+    <article>
+        <h3>电影信息</h3>
+        <div class="item-body">
+            {{if .Movie.Thumbnail}}<img class="detail-thumb" src="{{.Movie.Thumbnail}}" alt="thumbnail" loading="lazy" />{{end}}
+            <div class="detail-fields">
+                <p><strong>导演：</strong>{{.Movie.Director}}</p>
+                <p><strong>编剧：</strong>{{.Movie.Writer}}</p>
+                <p><strong>主演：</strong>{{.Movie.Actor}}</p>
+                <p><strong>类型：</strong>{{.Movie.Style}}</p>
+                <p><strong>上映日期：</strong>{{.Movie.PublishDate}}</p>
+                <p><strong>别名：</strong>{{.Movie.Alias}}</p>
+            </div>
+        </div>
+        {{if .Movie.Intro}}<h4>简介</h4><p class="pre-wrap">{{.Movie.Intro}}</p>{{end}}
+    </article>
+    {{end}}
+
+    {{if .Game}}
+    <article>
+        <h3>游戏信息</h3>
+        <div class="item-body">
+            {{if .Game.Thumbnail}}<img class="detail-thumb" src="{{.Game.Thumbnail}}" alt="thumbnail" loading="lazy" />{{end}}
+            <div class="detail-fields">
+                <p><strong>平台：</strong>{{.Game.Platform}}</p>
+                <p><strong>类型：</strong>{{.Game.Genre}}</p>
+                <p><strong>开发商：</strong>{{.Game.Developer}}</p>
+                <p><strong>发行商：</strong>{{.Game.Publisher}}</p>
+                <p><strong>发行日期：</strong>{{.Game.PublishDate}}</p>
+                <p><strong>别名：</strong>{{.Game.Alias}}</p>
+            </div>
+        </div>
+        {{if .Game.Intro}}<h4>简介</h4><p class="pre-wrap">{{.Game.Intro}}</p>{{end}}
+    </article>
+    {{end}}
+
+    {{if .Song}}
+    <article>
+        <h3>音乐信息</h3>
+        <div class="item-body">
+            {{if .Song.Thumbnail}}<img class="detail-thumb" src="{{.Song.Thumbnail}}" alt="thumbnail" loading="lazy" />{{end}}
+            <div class="detail-fields">
+                <p><strong>音乐人：</strong>{{.Song.Musician}}</p>
+                <p><strong>专辑类型：</strong>{{.Song.AlbumType}}</p>
+                <p><strong>流派：</strong>{{.Song.Genre}}</p>
+                <p><strong>发行方：</strong>{{.Song.Publisher}}</p>
+                <p><strong>发行日期：</strong>{{.Song.PublishDate}}</p>
+                <p><strong>别名：</strong>{{.Song.Alias}}</p>
+            </div>
+        </div>
+        {{if .Song.Intro}}<h4>简介</h4><p class="pre-wrap">{{.Song.Intro}}</p>{{end}}
+        {{if .Song.TrackList}}<h4>曲目</h4><p class="pre-wrap">{{.Song.TrackList}}</p>{{end}}
+    </article>
+    {{end}}
+    {{end}}
+</main>
+</body>
+</html>
+{{end}}
