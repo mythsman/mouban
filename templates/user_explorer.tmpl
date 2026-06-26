@@ -98,10 +98,10 @@
                     </header>
 
                     <div class="stats-list">
-                        <div><strong>图书</strong>：想读 {{.BookWish}}，在读 {{.BookDo}}，读过 {{.BookCollect}}</div>
-                        <div><strong>电影</strong>：想看 {{.MovieWish}}，在看 {{.MovieDo}}，看过 {{.MovieCollect}}</div>
-                        <div><strong>游戏</strong>：想玩 {{.GameWish}}，在玩 {{.GameDo}}，玩过 {{.GameCollect}}</div>
-                        <div><strong>音乐</strong>：想听 {{.SongWish}}，在听 {{.SongDo}}，听过 {{.SongCollect}}</div>
+                        <div class="stats-row"><strong>图书</strong><span>想读 {{.BookWish}}</span><span>在读 {{.BookDo}}</span><span>读过 {{.BookCollect}}</span></div>
+                        <div class="stats-row"><strong>电影</strong><span>想看 {{.MovieWish}}</span><span>在看 {{.MovieDo}}</span><span>看过 {{.MovieCollect}}</span></div>
+                        <div class="stats-row"><strong>游戏</strong><span>想玩 {{.GameWish}}</span><span>在玩 {{.GameDo}}</span><span>玩过 {{.GameCollect}}</span></div>
+                        <div class="stats-row"><strong>音乐</strong><span>想听 {{.SongWish}}</span><span>在听 {{.SongDo}}</span><span>听过 {{.SongCollect}}</span></div>
                     </div>
 
                     <a class="detail-link" href="/?q={{$.Query | urlquery}}&id={{.ID}}">查看完整信息</a>
@@ -217,7 +217,7 @@
     var n = parseInt(rate, 10);
     if (!n || n <= 0) return '—';
     if (n > 5) n = 5;
-    return '⭐️'.repeat(n) + '☆'.repeat(5 - n);
+    return '⭐️'.repeat(n);
   }
 
   document.querySelectorAll('.rate-stars').forEach(function (el) {
