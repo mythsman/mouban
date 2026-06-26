@@ -23,6 +23,7 @@
             <div>
                 <h2>{{if .Book}}{{.Book.Title}}{{end}}{{if .Movie}}{{.Movie.Title}}{{end}}{{if .Game}}{{.Game.Title}}{{end}}{{if .Song}}{{.Song.Title}}{{end}}</h2>
                 <div class="muted">{{.TypeName}} · DoubanID: {{.ItemID}}</div>
+                <div class="muted">最近爬取：{{.CrawledAtText}} · 数据更新：{{.DataUpdatedText}}</div>
                 <p><a href="{{.DoubanURL}}" target="_blank" rel="noopener noreferrer">去豆瓣查看原页面</a></p>
             </div>
         </header>
