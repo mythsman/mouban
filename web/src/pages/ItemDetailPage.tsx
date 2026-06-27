@@ -1,8 +1,8 @@
-import { Card, Descriptions, Empty, Image, Progress, Rate, Space, Spin, Statistic, Typography } from 'antd'
+import { App, Button, Card, Descriptions, Empty, Image, Progress, Rate, Space, Spin, Statistic, Typography } from 'antd'
 import { PictureOutlined } from '@ant-design/icons'
 import { useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { getItemDetail } from '../api/client'
+import { getItemDetail, refreshItem } from '../api/client'
 import DoubanLinkButton from '../components/DoubanLinkButton'
 import StatCard from '../components/StatCard'
 import type { ItemDetailResult } from '../types/api'
@@ -69,6 +69,7 @@ const introMap: Record<MediaType, FieldDef[]> = {
 }
 
 export default function ItemDetailPage() {
+  const { message } = App.useApp()
   const { type, id } = useParams()
   const itemId = Number(id)
   const itemType = (type || '') as MediaType
@@ -98,6 +99,21 @@ export default function ItemDetailPage() {
 
   const title = String(itemData?.Title || '-')
   const thumbnail = (itemData?.Thumbnail as string) || ''
+
+  async function onForceRefreshItem() {
+    if (!itemId || !['book', 'movie', 'game', 'song'].includes(itemType)) return
+    try {
+      setLoading(true)
+      await refreshItem(itemType, itemId)
+      message.success('已发起条目强制更新，请稍后刷新查看')
+      const latest = await getItemDetail(itemType, itemId)
+      setData(latest)
+    } catch (e) {
+      message.error(e instanceof Error ? e.message : '发起更新失败')
+    } finally {
+      setLoading(false)
+    }
+  }
 
   return (
     <Spin spinning={loading}>
@@ -155,7 +171,10 @@ export default function ItemDetailPage() {
                     />
                   </div>
                 </Space>
-                <DoubanLinkButton url={data.douban_url} tooltip="跳转豆瓣页面" />
+                <Space>
+                  <Button onClick={onForceRefreshItem}>强制更新</Button>
+                  <DoubanLinkButton url={data.douban_url} tooltip="跳转豆瓣页面" />
+                </Space>
               </Space>
             </Card>
 
