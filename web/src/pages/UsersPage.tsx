@@ -1,11 +1,27 @@
-import { Alert, App, Avatar, Button, Card, Col, Empty, Form, Input, List, Row, Space, Spin, Typography } from 'antd'
+import { Alert, App, Avatar, Button, Card, Empty, Form, Input, List, Space, Spin, Table, Typography } from 'antd'
 import { UserOutlined } from '@ant-design/icons'
-import { useState } from 'react'
+import type { ColumnsType } from 'antd/es/table'
+import { useMemo, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { resolveUsers } from '../api/client'
 import type { UserVO } from '../types/api'
 
 const { Title, Text } = Typography
+
+type StatRow = {
+  key: string
+  typeLabel: string
+  wish: number
+  doing: number
+  collect: number
+}
+
+const statColumns: ColumnsType<StatRow> = [
+  { title: '条目', dataIndex: 'typeLabel', width: 56 },
+  { title: '想', dataIndex: 'wish', width: 52, align: 'right' },
+  { title: '在', dataIndex: 'doing', width: 52, align: 'right' },
+  { title: '过', dataIndex: 'collect', width: 52, align: 'right' },
+]
 
 export default function UsersPage() {
   const { message } = App.useApp()
@@ -66,48 +82,58 @@ export default function UsersPage() {
             pagination={{ pageSize: 12, showSizeChanger: true, pageSizeOptions: [12, 24, 48], size: 'small' }}
             renderItem={(u) => (
               <List.Item>
-                <Card
-                  size="small"
-                  styles={{ body: { padding: 12 } }}
-                  title={
-                    <Space>
-                      <Avatar src={u.thumbnail} icon={<UserOutlined />} size={36} />
-                      <div>
-                        <div style={{ lineHeight: 1.2 }}>{u.name}</div>
-                        <Text type="secondary" style={{ fontSize: 12 }}>
-                          ID: {u.id}
-                        </Text>
-                      </div>
-                    </Space>
-                  }
-                  extra={
-                    <Link to={`/users/${u.id}`}>
-                      <Button type="link" size="small" style={{ padding: 0 }}>
-                        详情
-                      </Button>
-                    </Link>
-                  }
-                >
-                  <Row gutter={[8, 8]}>
-                    <Col span={12}><Text style={{ fontSize: 12 }}>图书 想读 {u.book_wish}</Text></Col>
-                    <Col span={12}><Text style={{ fontSize: 12 }}>图书 在读 {u.book_do}</Text></Col>
-                    <Col span={12}><Text style={{ fontSize: 12 }}>图书 读过 {u.book_collect}</Text></Col>
-                    <Col span={12}><Text style={{ fontSize: 12 }}>电影 想看 {u.movie_wish}</Text></Col>
-                    <Col span={12}><Text style={{ fontSize: 12 }}>电影 在看 {u.movie_do}</Text></Col>
-                    <Col span={12}><Text style={{ fontSize: 12 }}>电影 看过 {u.movie_collect}</Text></Col>
-                    <Col span={12}><Text style={{ fontSize: 12 }}>游戏 想玩 {u.game_wish}</Text></Col>
-                    <Col span={12}><Text style={{ fontSize: 12 }}>游戏 在玩 {u.game_do}</Text></Col>
-                    <Col span={12}><Text style={{ fontSize: 12 }}>游戏 玩过 {u.game_collect}</Text></Col>
-                    <Col span={12}><Text style={{ fontSize: 12 }}>音乐 想听 {u.song_wish}</Text></Col>
-                    <Col span={12}><Text style={{ fontSize: 12 }}>音乐 在听 {u.song_do}</Text></Col>
-                    <Col span={12}><Text style={{ fontSize: 12 }}>音乐 听过 {u.song_collect}</Text></Col>
-                  </Row>
-                </Card>
+                <UserCard user={u} />
               </List.Item>
             )}
           />
         )}
       </Spin>
     </Space>
+  )
+}
+
+function UserCard({ user }: { user: UserVO }) {
+  const rows = useMemo<StatRow[]>(
+    () => [
+      { key: 'book', typeLabel: '图书', wish: user.book_wish, doing: user.book_do, collect: user.book_collect },
+      { key: 'movie', typeLabel: '电影', wish: user.movie_wish, doing: user.movie_do, collect: user.movie_collect },
+      { key: 'game', typeLabel: '游戏', wish: user.game_wish, doing: user.game_do, collect: user.game_collect },
+      { key: 'song', typeLabel: '音乐', wish: user.song_wish, doing: user.song_do, collect: user.song_collect },
+    ],
+    [user],
+  )
+
+  return (
+    <Card
+      size="small"
+      styles={{ body: { padding: 12 } }}
+      title={
+        <Space size={10}>
+          <Avatar src={user.thumbnail} icon={<UserOutlined />} size={52} />
+          <div>
+            <div style={{ lineHeight: 1.2, fontWeight: 600 }}>{user.name}</div>
+            <Text type="secondary" style={{ fontSize: 12 }}>
+              ID: {user.id}
+            </Text>
+          </div>
+        </Space>
+      }
+      extra={
+        <Link to={`/users/${user.id}`}>
+          <Button type="link" size="small" style={{ padding: 0 }}>
+            详情
+          </Button>
+        </Link>
+      }
+    >
+      <Table<StatRow>
+        rowKey="key"
+        columns={statColumns}
+        dataSource={rows}
+        size="small"
+        pagination={false}
+        showHeader
+      />
+    </Card>
   )
 }

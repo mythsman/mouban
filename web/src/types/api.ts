@@ -114,7 +114,6 @@ export interface QueueCompletedTask {
 }
 
 export interface QueueOverviewResult {
-  generated_at_text: string
   pools: QueuePool[]
   types: QueueType[]
   running: QueueRunningTask[]
