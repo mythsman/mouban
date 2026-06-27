@@ -1,9 +1,10 @@
-import { App, Button, Card, Descriptions, Empty, Image, Progress, Rate, Space, Spin, Statistic, Typography } from 'antd'
+import { App, Card, Descriptions, Empty, Image, Progress, Rate, Space, Spin, Statistic, Typography } from 'antd'
 import { PictureOutlined } from '@ant-design/icons'
 import { useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { getItemDetail, refreshItem } from '../api/client'
 import DoubanLinkButton from '../components/DoubanLinkButton'
+import ForceRefreshButton from '../components/ForceRefreshButton'
 import StatCard from '../components/StatCard'
 import type { ItemDetailResult } from '../types/api'
 
@@ -77,6 +78,7 @@ export default function ItemDetailPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [data, setData] = useState<ItemDetailResult | null>(null)
+  const [refreshing, setRefreshing] = useState(false)
 
   useEffect(() => {
     if (!itemId || !['book', 'movie', 'game', 'song'].includes(itemType)) {
@@ -103,15 +105,13 @@ export default function ItemDetailPage() {
   async function onForceRefreshItem() {
     if (!itemId || !['book', 'movie', 'game', 'song'].includes(itemType)) return
     try {
-      setLoading(true)
+      setRefreshing(true)
       await refreshItem(itemType, itemId)
-      message.success('已发起条目强制更新，请稍后刷新查看')
-      const latest = await getItemDetail(itemType, itemId)
-      setData(latest)
+      message.success('已发起条目强制更新')
     } catch (e) {
       message.error(e instanceof Error ? e.message : '发起更新失败')
     } finally {
-      setLoading(false)
+      setRefreshing(false)
     }
   }
 
@@ -172,7 +172,7 @@ export default function ItemDetailPage() {
                   </div>
                 </Space>
                 <Space>
-                  <Button onClick={onForceRefreshItem}>强制更新</Button>
+                  <ForceRefreshButton onClick={onForceRefreshItem} loading={refreshing} />
                   <DoubanLinkButton url={data.douban_url} tooltip="跳转豆瓣页面" />
                 </Space>
               </Space>

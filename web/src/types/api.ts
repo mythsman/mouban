@@ -99,6 +99,8 @@ export interface QueueType {
 export interface QueueRunningTask {
   type_label: string
   douban_id: number
+  title: string
+  detail_url: string
   status: string
   updated_at_text: string
   running_for_seconds: number
@@ -107,6 +109,7 @@ export interface QueueRunningTask {
 export interface QueueCompletedTask {
   type_label: string
   douban_id: number
+  title: string
   status: string
   result: string
   detail_url: string

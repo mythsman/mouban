@@ -1,9 +1,10 @@
-import { Alert, App, Avatar, Button, Card, Descriptions, Empty, Segmented, Space, Spin, Table, Tabs, Typography } from 'antd'
+import { Alert, App, Avatar, Card, Descriptions, Empty, Segmented, Space, Spin, Table, Tabs, Typography } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { getUser, getUserComments, refreshUser } from '../api/client'
 import DoubanLinkButton from '../components/DoubanLinkButton'
+import ForceRefreshButton from '../components/ForceRefreshButton'
 import type { UserComment, UserVO } from '../types/api'
 
 const { Text, Paragraph } = Typography
@@ -42,6 +43,7 @@ export default function UserDetailPage() {
   const [activeAction, setActiveAction] = useState<ActionType>('collect')
   const [commentMap, setCommentMap] = useState<Record<string, UserComment[]>>({})
   const [commentLoading, setCommentLoading] = useState(false)
+  const [refreshing, setRefreshing] = useState(false)
 
   useEffect(() => {
     if (!userId) {
@@ -89,11 +91,11 @@ export default function UserDetailPage() {
           const thumbnail = row.item?.thumbnail || row.item?.Thumbnail
           return (
             <Space size={10} align="start">
-              <Avatar shape="square" src={thumbnail as string | undefined} size={52} />
+              <Avatar shape="square" src={thumbnail as string | undefined} size={64} />
               {itemId ? (
                 <Link
                   to={`/items/${activeType}/${itemId}`}
-                  style={{ maxWidth: 380, display: 'inline-block', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+                  style={{ maxWidth: 360, display: 'inline-block', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
                   title={title}
                 >
                   {title}
@@ -131,16 +133,13 @@ export default function UserDetailPage() {
   async function onForceRefreshUser() {
     if (!user) return
     try {
-      setLoading(true)
+      setRefreshing(true)
       await refreshUser(user.id)
-      message.success('已发起用户强制更新，请稍后刷新查看')
-      const latest = await getUser(user.id)
-      setUser(latest)
-      setCommentMap({})
+      message.success('已发起用户强制更新')
     } catch (e) {
       message.error(e instanceof Error ? e.message : '发起更新失败')
     } finally {
-      setLoading(false)
+      setRefreshing(false)
     }
   }
 
@@ -166,7 +165,7 @@ export default function UserDetailPage() {
                   </Descriptions>
                 </Space>
                 <Space>
-                  <Button onClick={onForceRefreshUser}>强制更新</Button>
+                  <ForceRefreshButton onClick={onForceRefreshUser} loading={refreshing} />
                   <DoubanLinkButton url={userProfileUrl} tooltip="跳转豆瓣主页" />
                 </Space>
               </Space>

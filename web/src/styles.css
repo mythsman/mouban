@@ -54,3 +54,15 @@ body {
   font-weight: 700;
   line-height: 1;
 }
+
+.force-refresh-btn {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #1677ff14 !important;
+  color: #1677ff !important;
+}
+
+.force-refresh-btn:hover {
+  background: #1677ff24 !important;
+}
