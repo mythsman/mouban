@@ -6,14 +6,10 @@ export default defineConfig({
   build: {
     outDir: '../build',
     emptyOutDir: true,
-    chunkSizeWarningLimit: 800,
+    cssCodeSplit: false,
     rollupOptions: {
       output: {
-        manualChunks: {
-          react: ['react', 'react-dom', 'react-router-dom'],
-          antd: ['antd'],
-          axios: ['axios'],
-        },
+        inlineDynamicImports: true,
       },
     },
   },

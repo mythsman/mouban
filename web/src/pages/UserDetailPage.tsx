@@ -1,11 +1,12 @@
-import { Alert, App, Avatar, Card, Descriptions, Empty, Rate, Space, Spin, Table, Tabs, Typography } from 'antd'
+import { App, Avatar, Button, Card, Descriptions, Empty, Space, Spin, Table, Tabs, Tooltip, Typography } from 'antd'
+import { ExportOutlined } from '@ant-design/icons'
 import type { ColumnsType } from 'antd/es/table'
 import { useEffect, useMemo, useState } from 'react'
-import { Link, useParams, useSearchParams } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import { getUser, getUserComments } from '../api/client'
 import type { UserComment, UserVO } from '../types/api'
 
-const { Text } = Typography
+const { Text, Paragraph } = Typography
 
 type MediaType = 'book' | 'movie' | 'game' | 'song'
 type ActionType = 'wish' | 'do' | 'collect'
@@ -17,11 +18,12 @@ const mediaOptions: Array<{ key: MediaType; label: string }> = [
   { key: 'song', label: '音乐' },
 ]
 
-const actionOptions: Array<{ key: ActionType; label: string }> = [
-  { key: 'collect', label: '已完成' },
-  { key: 'do', label: '进行中' },
-  { key: 'wish', label: '想要' },
-]
+const actionLabelMap: Record<MediaType, Record<ActionType, string>> = {
+  book: { wish: '想读', do: '在读', collect: '读过' },
+  movie: { wish: '想看', do: '在看', collect: '看过' },
+  game: { wish: '想玩', do: '在玩', collect: '玩过' },
+  song: { wish: '想听', do: '在听', collect: '听过' },
+}
 
 function commentKey(type: MediaType, action: ActionType) {
   return `${type}_${action}`
@@ -30,10 +32,8 @@ function commentKey(type: MediaType, action: ActionType) {
 export default function UserDetailPage() {
   const { message } = App.useApp()
   const { id } = useParams()
-  const [searchParams] = useSearchParams()
 
   const userId = Number(id)
-  const keyword = searchParams.get('q') || ''
 
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -79,14 +79,13 @@ export default function UserDetailPage() {
       {
         title: '条目',
         dataIndex: 'item',
-        width: 360,
         render: (_, row) => {
           const itemId = row.item?.douban_id || row.item?.DoubanId
           const title = row.item?.title || row.item?.Title || '-'
           const thumbnail = row.item?.thumbnail || row.item?.Thumbnail
           return (
-            <Space>
-              <Avatar shape="square" src={thumbnail as string | undefined} size={40} />
+            <Space size={8} align="start">
+              <Avatar shape="square" src={thumbnail as string | undefined} size={36} />
               {itemId ? <Link to={`/items/${activeType}/${itemId}`}>{title}</Link> : <Text>{title}</Text>}
             </Space>
           )
@@ -95,64 +94,83 @@ export default function UserDetailPage() {
       {
         title: '评分',
         dataIndex: 'rate',
-        width: 140,
-        render: (rate) => <Rate disabled value={Number(rate) || 0} count={5} />,
+        width: 88,
+        render: (rate) => {
+          const n = Number(rate) || 0
+          return n > 0 ? `${'★'.repeat(Math.min(n, 5))}` : '-'
+        },
       },
-      { title: '标签', dataIndex: 'label', width: 180 },
-      { title: '评论', dataIndex: 'comment', ellipsis: true },
-      { title: '标注日期', dataIndex: 'mark_date', width: 140 },
+      { title: '标签', dataIndex: 'label', width: 140 },
+      {
+        title: '评论',
+        dataIndex: 'comment',
+        render: (value) => (
+          <Paragraph style={{ marginBottom: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{value || '-'}</Paragraph>
+        ),
+      },
+      { title: '标注日期', dataIndex: 'mark_date', width: 120 },
     ],
     [activeType],
   )
 
-  return (
-    <Space direction="vertical" size={16} style={{ width: '100%' }}>
-      {keyword ? (
-        <Card>
-          <Link to={`/users?q=${encodeURIComponent(keyword)}`}>返回搜索结果</Link>
-        </Card>
-      ) : null}
+  const userProfileUrl = user ? `https://www.douban.com/people/${user.domain || user.id}/` : '#'
 
+  return (
+    <Space direction="vertical" size={12} style={{ width: '100%' }}>
       <Spin spinning={loading}>
-        {error ? <Alert type="error" message={error} /> : null}
+        {error ? <Card size="small"><Text type="danger">{error}</Text></Card> : null}
         {!loading && !error && !user ? <Empty description="未找到用户" /> : null}
 
         {user ? (
           <>
-            <Card>
-              <Space align="start">
-                <Avatar src={user.thumbnail} size={72} />
-                <Descriptions title={user.name} column={1} size="small">
-                  <Descriptions.Item label="ID">{user.id}</Descriptions.Item>
-                  <Descriptions.Item label="Domain">{user.domain || '-'}</Descriptions.Item>
-                  <Descriptions.Item label="最近发布">{formatUnix(user.publish_at)}</Descriptions.Item>
-                  <Descriptions.Item label="最近同步">{formatUnix(user.sync_at)}</Descriptions.Item>
-                  <Descriptions.Item label="最近检查">{formatUnix(user.check_at)}</Descriptions.Item>
-                </Descriptions>
+            <Card size="small">
+              <Space align="start" style={{ width: '100%', justifyContent: 'space-between' }}>
+                <Space align="start">
+                  <Avatar src={user.thumbnail} size={72} />
+                  <Descriptions title={user.name} column={1} size="small">
+                    <Descriptions.Item label="ID">{user.id}</Descriptions.Item>
+                    <Descriptions.Item label="Domain">{user.domain || '-'}</Descriptions.Item>
+                    <Descriptions.Item label="最近发布">{formatUnix(user.publish_at)}</Descriptions.Item>
+                    <Descriptions.Item label="最近同步">{formatUnix(user.sync_at)}</Descriptions.Item>
+                    <Descriptions.Item label="最近检查">{formatUnix(user.check_at)}</Descriptions.Item>
+                  </Descriptions>
+                </Space>
+                <Tooltip title="跳转豆瓣主页">
+                  <Button
+                    type="text"
+                    shape="circle"
+                    icon={<ExportOutlined />}
+                    onClick={() => window.open(userProfileUrl, '_blank', 'noopener,noreferrer')}
+                  />
+                </Tooltip>
               </Space>
             </Card>
 
-            <Card>
+            <Card size="small">
               <Tabs
                 activeKey={activeType}
-                onChange={(k) => setActiveType(k as MediaType)}
+                onChange={(k) => {
+                  setActiveType(k as MediaType)
+                  setActiveAction('collect')
+                }}
                 items={mediaOptions.map((x) => ({ key: x.key, label: x.label }))}
               />
               <Tabs
                 activeKey={activeAction}
                 onChange={(k) => setActiveAction(k as ActionType)}
-                items={actionOptions.map((x) => ({ key: x.key, label: x.label }))}
+                items={(['collect', 'do', 'wish'] as ActionType[]).map((key) => ({
+                  key,
+                  label: actionLabelMap[activeType][key],
+                }))}
               />
               <Spin spinning={commentLoading}>
                 <Table
-                  className="nowrap-table"
                   rowKey={(_, idx) => `${activeType}_${activeAction}_${idx}`}
                   columns={columns}
                   dataSource={comments}
                   locale={{ emptyText: <Empty description="暂无数据" /> }}
                   size="small"
                   pagination={{ defaultPageSize: 20, showSizeChanger: true, pageSizeOptions: [20, 50, 100] }}
-                  scroll={{ x: 'max-content' }}
                 />
               </Spin>
             </Card>
