@@ -114,12 +114,12 @@ export default function ItemDetailPage() {
               <Space align="start" style={{ width: '100%', justifyContent: 'space-between' }}>
                 <Space align="start" size={16}>
                   {thumbnail ? (
-                    <Image src={thumbnail} width={160} preview={false} style={{ borderRadius: 6 }} />
+                    <Image src={thumbnail} width={200} preview={false} style={{ borderRadius: 6 }} />
                   ) : (
                     <div
                       style={{
-                        width: 160,
-                        height: 220,
+                        width: 200,
+                        height: 280,
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',

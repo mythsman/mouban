@@ -72,21 +72,36 @@ export default function UserDetailPage() {
       .finally(() => setCommentLoading(false))
   }, [activeAction, activeType, commentMap, message, user, userId])
 
-  const comments = commentMap[commentKey(activeType, activeAction)] || []
-
   const columns: ColumnsType<UserComment> = useMemo(
     () => [
       {
         title: '条目',
         dataIndex: 'item',
+        width: 520,
         render: (_, row) => {
           const itemId = row.item?.douban_id || row.item?.DoubanId
           const title = row.item?.title || row.item?.Title || '-'
           const thumbnail = row.item?.thumbnail || row.item?.Thumbnail
           return (
-            <Space size={8} align="start">
-              <Avatar shape="square" src={thumbnail as string | undefined} size={36} />
-              {itemId ? <Link to={`/items/${activeType}/${itemId}`}>{title}</Link> : <Text>{title}</Text>}
+            <Space size={10} align="start">
+              <Avatar shape="square" src={thumbnail as string | undefined} size={56} />
+              {itemId ? (
+                <Link
+                  to={`/items/${activeType}/${itemId}`}
+                  style={{
+                    maxWidth: 430,
+                    display: 'inline-block',
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                  }}
+                  title={title}
+                >
+                  {title}
+                </Link>
+              ) : (
+                <Text>{title}</Text>
+              )}
             </Space>
           )
         },
@@ -118,7 +133,11 @@ export default function UserDetailPage() {
   return (
     <Space direction="vertical" size={12} style={{ width: '100%' }}>
       <Spin spinning={loading}>
-        {error ? <Card size="small"><Text type="danger">{error}</Text></Card> : null}
+        {error ? (
+          <Card size="small">
+            <Text type="danger">{error}</Text>
+          </Card>
+        ) : null}
         {!loading && !error && !user ? <Empty description="未找到用户" /> : null}
 
         {user ? (
@@ -126,7 +145,7 @@ export default function UserDetailPage() {
             <Card size="small">
               <Space align="start" style={{ width: '100%', justifyContent: 'space-between' }}>
                 <Space align="start">
-                  <Avatar src={user.thumbnail} size={72} />
+                  <Avatar src={user.thumbnail} size={96} />
                   <Descriptions title={user.name} column={1} size="small">
                     <Descriptions.Item label="ID">{user.id}</Descriptions.Item>
                     <Descriptions.Item label="Domain">{user.domain || '-'}</Descriptions.Item>
@@ -153,32 +172,64 @@ export default function UserDetailPage() {
                   setActiveType(k as MediaType)
                   setActiveAction('collect')
                 }}
-                items={mediaOptions.map((x) => ({ key: x.key, label: x.label }))}
-              />
-              <Tabs
-                activeKey={activeAction}
-                onChange={(k) => setActiveAction(k as ActionType)}
-                items={(['collect', 'do', 'wish'] as ActionType[]).map((key) => ({
-                  key,
-                  label: actionLabelMap[activeType][key],
+                items={mediaOptions.map((x) => ({
+                  key: x.key,
+                  label: `${x.label} (${typeTotalCount(user, x.key)})`,
                 }))}
               />
-              <Spin spinning={commentLoading}>
-                <Table
-                  rowKey={(_, idx) => `${activeType}_${activeAction}_${idx}`}
-                  columns={columns}
-                  dataSource={comments}
-                  locale={{ emptyText: <Empty description="暂无数据" /> }}
-                  size="small"
-                  pagination={{ defaultPageSize: 20, showSizeChanger: true, pageSizeOptions: [20, 50, 100] }}
-                />
-              </Spin>
+
+              <Tabs
+                tabPosition="left"
+                activeKey={activeAction}
+                onChange={(k) => setActiveAction(k as ActionType)}
+                items={(['collect', 'do', 'wish'] as ActionType[]).map((action) => {
+                  const list = commentMap[commentKey(activeType, action)] || []
+                  return {
+                    key: action,
+                    label: `${actionLabelMap[activeType][action]} (${typeActionCount(user, activeType, action)})`,
+                    children: (
+                      <Spin spinning={commentLoading && action === activeAction}>
+                        <Table
+                          rowKey={(_, idx) => `${activeType}_${action}_${idx}`}
+                          columns={columns}
+                          dataSource={list}
+                          locale={{ emptyText: <Empty description="暂无数据" /> }}
+                          size="small"
+                          pagination={{ defaultPageSize: 20, showSizeChanger: true, pageSizeOptions: [20, 50, 100] }}
+                        />
+                      </Spin>
+                    ),
+                  }
+                })}
+              />
             </Card>
           </>
         ) : null}
       </Spin>
     </Space>
   )
+}
+
+function typeActionCount(user: UserVO, type: MediaType, action: ActionType): number {
+  if (type === 'book' && action === 'wish') return user.book_wish
+  if (type === 'book' && action === 'do') return user.book_do
+  if (type === 'book' && action === 'collect') return user.book_collect
+
+  if (type === 'movie' && action === 'wish') return user.movie_wish
+  if (type === 'movie' && action === 'do') return user.movie_do
+  if (type === 'movie' && action === 'collect') return user.movie_collect
+
+  if (type === 'game' && action === 'wish') return user.game_wish
+  if (type === 'game' && action === 'do') return user.game_do
+  if (type === 'game' && action === 'collect') return user.game_collect
+
+  if (type === 'song' && action === 'wish') return user.song_wish
+  if (type === 'song' && action === 'do') return user.song_do
+  return user.song_collect
+}
+
+function typeTotalCount(user: UserVO, type: MediaType): number {
+  return typeActionCount(user, type, 'wish') + typeActionCount(user, type, 'do') + typeActionCount(user, type, 'collect')
 }
 
 function formatUnix(ts: number) {

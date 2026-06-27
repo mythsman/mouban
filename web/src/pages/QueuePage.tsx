@@ -1,11 +1,9 @@
-import { Card, Progress, Space, Table, Typography } from 'antd'
+import { Card, Progress, Space, Table } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { getQueueOverview } from '../api/client'
 import type { QueueCompletedTask, QueueOverviewResult, QueueRunningTask, QueueType } from '../types/api'
-
-const { Text, Title } = Typography
 
 export default function QueuePage() {
   const [loading, setLoading] = useState(true)
@@ -64,15 +62,6 @@ export default function QueuePage() {
 
   return (
     <Space direction="vertical" size={16} style={{ width: '100%' }}>
-      <Card>
-        <Title level={3} style={{ marginTop: 0 }}>
-          调度队列
-        </Title>
-        <Text type="secondary">自动刷新 20 秒；服务端缓存 20 秒</Text>
-        <br />
-        <Text type="secondary">最近更新时间：{data?.generated_at_text || '-'}</Text>
-      </Card>
-
       <Space wrap>
         {(data?.pools || []).map((pool) => (
           <Card key={pool.pool} title={pool.pool_label} style={{ minWidth: 280 }}>

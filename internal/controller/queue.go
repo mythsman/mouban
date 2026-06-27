@@ -58,12 +58,10 @@ type QueueCompletedTaskView struct {
 }
 
 type QueueOverviewResult struct {
-	GeneratedAt     int64                    `json:"generated_at"`
-	GeneratedAtText string                   `json:"generated_at_text"`
-	Types           []QueueTypeOverview      `json:"types"`
-	Pools           []QueuePoolOverview      `json:"pools"`
-	Running         []QueueRunningTaskView   `json:"running"`
-	Completed       []QueueCompletedTaskView `json:"completed"`
+	Types     []QueueTypeOverview      `json:"types"`
+	Pools     []QueuePoolOverview      `json:"pools"`
+	Running   []QueueRunningTaskView   `json:"running"`
+	Completed []QueueCompletedTaskView `json:"completed"`
 }
 
 var queueOverviewCache struct {
@@ -224,12 +222,10 @@ func buildQueueOverview() QueueOverviewResult {
 	}
 
 	return QueueOverviewResult{
-		GeneratedAt:     now.Unix(),
-		GeneratedAtText: now.Format("2006-01-02 15:04:05"),
-		Types:           ordered,
-		Pools:           pools,
-		Running:         runningSchedules,
-		Completed:       completedSchedules,
+		Types:     ordered,
+		Pools:     pools,
+		Running:   runningSchedules,
+		Completed: completedSchedules,
 	}
 }
 
