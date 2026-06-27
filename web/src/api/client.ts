@@ -55,3 +55,25 @@ export async function getQueueOverview() {
   })
   return unwrap(data)
 }
+
+export async function refreshUser(id: number) {
+  const { data } = await http.get<ApiResponse<unknown>>('/admin/refresh_user', { params: { id } })
+  if (!data.success) {
+    throw new Error(data.msg || '发起用户强制更新失败')
+  }
+}
+
+export async function refreshItem(type: 'book' | 'movie' | 'game' | 'song', id: number) {
+  const typeMap = {
+    book: 1,
+    movie: 2,
+    game: 3,
+    song: 4,
+  } as const
+  const { data } = await http.get<ApiResponse<unknown>>('/admin/refresh_item', {
+    params: { type: typeMap[type], id },
+  })
+  if (!data.success) {
+    throw new Error(data.msg || '发起条目强制更新失败')
+  }
+}

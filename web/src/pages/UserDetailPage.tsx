@@ -1,8 +1,8 @@
-import { Alert, App, Avatar, Card, Descriptions, Empty, Segmented, Space, Spin, Table, Tabs, Typography } from 'antd'
+import { Alert, App, Avatar, Button, Card, Descriptions, Empty, Segmented, Space, Spin, Table, Tabs, Typography } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { getUser, getUserComments } from '../api/client'
+import { getUser, getUserComments, refreshUser } from '../api/client'
 import DoubanLinkButton from '../components/DoubanLinkButton'
 import type { UserComment, UserVO } from '../types/api'
 
@@ -128,6 +128,22 @@ export default function UserDetailPage() {
   const userProfileUrl = user ? `https://www.douban.com/people/${user.domain || user.id}/` : '#'
   const currentList = commentMap[commentKey(activeType, activeAction)] || []
 
+  async function onForceRefreshUser() {
+    if (!user) return
+    try {
+      setLoading(true)
+      await refreshUser(user.id)
+      message.success('已发起用户强制更新，请稍后刷新查看')
+      const latest = await getUser(user.id)
+      setUser(latest)
+      setCommentMap({})
+    } catch (e) {
+      message.error(e instanceof Error ? e.message : '发起更新失败')
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
     <Space direction="vertical" size={12} style={{ width: '100%' }}>
       {error ? <Alert type="error" message={error} showIcon /> : null}
@@ -149,7 +165,10 @@ export default function UserDetailPage() {
                     <Descriptions.Item label="最近检查">{formatUnix(user.check_at)}</Descriptions.Item>
                   </Descriptions>
                 </Space>
-                <DoubanLinkButton url={userProfileUrl} tooltip="跳转豆瓣主页" />
+                <Space>
+                  <Button onClick={onForceRefreshUser}>强制更新</Button>
+                  <DoubanLinkButton url={userProfileUrl} tooltip="跳转豆瓣主页" />
+                </Space>
               </Space>
             </Card>
 
