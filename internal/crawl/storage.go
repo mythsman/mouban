@@ -8,25 +8,22 @@ import (
 	"mouban/internal/dao"
 	"mouban/internal/model"
 	"mouban/internal/util"
-	"net/http"
 	"net/url"
 	"os"
+	"os/exec"
 	"strings"
 	"sync"
-	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 
 	"github.com/gabriel-vasile/mimetype"
-	"github.com/hashicorp/go-retryablehttp"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"golang.org/x/net/context"
 )
 
-var retryClient *retryablehttp.Client
 var s3Client *s3.Client
 
 var storageInitOnce sync.Once
@@ -46,7 +43,6 @@ func initStorageFromConfig() error {
 		return fmt.Errorf("invalid s3.endpoint: %w", err)
 	}
 
-	retryClient = initHttpClient()
 	s3Client = initS3Client()
 	return nil
 }
@@ -125,6 +121,8 @@ func Storage(url string) string {
 	return result
 }
 
+const browserUA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36"
+
 func download(url string, referer string) (o *os.File) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -132,7 +130,7 @@ func download(url string, referer string) (o *os.File) {
 			o = nil
 		}
 	}()
-	// 创建一个文件用于保存
+
 	out, err := os.CreateTemp("/tmp", "mouban-")
 	if err != nil {
 		logrus.Errorln("create tmp file failed")
@@ -140,25 +138,31 @@ func download(url string, referer string) (o *os.File) {
 	}
 	defer out.Close()
 
-	req, _ := retryablehttp.NewRequest("GET", url, nil)
-	req.Header.Set("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36")
-	req.Header.Set("Referer", referer)
-
-	resp, err := retryClient.Do(req)
-
+	if err = downloadWithCurl(url, referer, out.Name()); err == nil && isImageFile(out.Name()) {
+		return out
+	}
 	if err != nil {
-		panic(err)
+		logrus.Warnln("download by curl failed:", url, err)
+	} else {
+		logrus.Warnln("download by curl got non-image:", url)
 	}
 
-	defer resp.Body.Close()
+	panic("download got invalid image for: " + url)
+}
 
-	// 然后将响应流和文件流对接起来
-	_, err = io.Copy(out, resp.Body)
+func downloadWithCurl(url string, referer string, output string) error {
+	args := []string{"-L", "-sS", "-A", browserUA, "-e", referer, "-o", output, url}
+	cmd := exec.Command("curl", args...)
+	data, err := cmd.CombinedOutput()
 	if err != nil {
-		logrus.Errorln("write file", url, "failed")
-		panic(err)
+		return fmt.Errorf("curl error: %w, output: %s", err, strings.TrimSpace(string(data)))
 	}
-	return out
+	return nil
+}
+
+func isImageFile(path string) bool {
+	mtype, _ := mime(path)
+	return strings.HasPrefix(mtype, "image/")
 }
 
 func mime(path string) (string, string) {
@@ -194,22 +198,6 @@ func upload(file string, name string, mimeType string) string {
 	url := viper.GetString("s3.endpoint") + "/" + viper.GetString("s3.bucket") + "/" + name
 
 	return url
-}
-
-func initHttpClient() *retryablehttp.Client {
-	client := retryablehttp.NewClient()
-	client.RetryMax = viper.GetInt("http.retry_max")
-	client.Logger = nil
-	client.RetryWaitMin = time.Duration(1) * time.Second
-	client.RetryWaitMax = time.Duration(60) * time.Second
-	client.CheckRetry = func(ctx context.Context, resp *http.Response, err error) (bool, error) {
-		return retryablehttp.DefaultRetryPolicy(ctx, resp, err)
-	}
-
-	client.HTTPClient = &http.Client{
-		Timeout: time.Duration(viper.GetInt("http.timeout")) * time.Millisecond,
-	}
-	return client
 }
 
 func initS3Client() *s3.Client {
