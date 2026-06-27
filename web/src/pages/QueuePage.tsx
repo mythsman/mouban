@@ -1,54 +1,110 @@
-import { Card, Progress, Space, Table } from 'antd'
+import { Alert, Button, Card, Space, Table, Typography } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { getQueueOverview } from '../api/client'
+import StatusTag from '../components/StatusTag'
+import StatCard from '../components/StatCard'
+import TimeText from '../components/TimeText'
 import type { QueueCompletedTask, QueueOverviewResult, QueueRunningTask, QueueType } from '../types/api'
+
+const { Text } = Typography
 
 export default function QueuePage() {
   const [loading, setLoading] = useState(true)
   const [data, setData] = useState<QueueOverviewResult | null>(null)
+  const [error, setError] = useState('')
+  const [updatedAt, setUpdatedAt] = useState<string>('')
+
+  async function load() {
+    try {
+      setError('')
+      const res = await getQueueOverview()
+      setData(res)
+      setUpdatedAt(new Date().toLocaleString('zh-CN', { hour12: false }))
+    } catch (e) {
+      setError(e instanceof Error ? e.message : '队列数据加载失败')
+    } finally {
+      setLoading(false)
+    }
+  }
 
   useEffect(() => {
     let mounted = true
 
-    async function load() {
-      try {
-        const res = await getQueueOverview()
-        if (mounted) setData(res)
-      } finally {
-        if (mounted) setLoading(false)
-      }
+    async function loadSafely() {
+      if (!mounted) return
+      await load()
     }
 
-    load()
-    const timer = setInterval(load, 20000)
+    loadSafely()
+    const timer = setInterval(loadSafely, 20000)
     return () => {
       mounted = false
       clearInterval(timer)
     }
   }, [])
 
+  const summary = useMemo(() => {
+    const types = data?.types || []
+    return types.reduce(
+      (acc, row) => {
+        acc.toCrawl += row.to_crawl
+        acc.crawling += row.crawling
+        acc.invalid += row.invalid
+        acc.unready += row.unready
+        acc.oldestWait = Math.max(acc.oldestWait, row.oldest_wait_seconds)
+        return acc
+      },
+      { toCrawl: 0, crawling: 0, invalid: 0, unready: 0, oldestWait: 0 },
+    )
+  }, [data?.types])
+
   const typeColumns: ColumnsType<QueueType> = [
     { title: '类型', dataIndex: 'type_label', width: 120 },
-    { title: 'to_crawl', dataIndex: 'to_crawl', width: 110 },
-    { title: 'crawling', dataIndex: 'crawling', width: 110 },
-    { title: 'can_crawl', dataIndex: 'can_crawl', width: 120 },
-    { title: 'unready', dataIndex: 'unready', width: 110 },
-    { title: 'invalid', dataIndex: 'invalid', width: 110 },
+    { title: '待抓取', dataIndex: 'to_crawl', width: 110 },
+    { title: '执行中', dataIndex: 'crawling', width: 110 },
+    { title: '可抓取', dataIndex: 'can_crawl', width: 120 },
+    {
+      title: '未就绪',
+      dataIndex: 'unready',
+      width: 110,
+      render: (v) => (v > 0 ? <Text type="warning">{v}</Text> : v),
+    },
+    {
+      title: '无效',
+      dataIndex: 'invalid',
+      width: 110,
+      render: (v) => (v > 0 ? <Text type="danger">{v}</Text> : v),
+    },
     { title: '最老等待(秒)', dataIndex: 'oldest_wait_seconds', width: 140 },
   ]
 
   const runningColumns: ColumnsType<QueueRunningTask> = [
     { title: '类型', dataIndex: 'type_label', width: 120 },
     { title: 'DoubanID', dataIndex: 'douban_id', width: 140 },
-    { title: '状态', dataIndex: 'status', width: 120 },
-    { title: '开始时间', dataIndex: 'updated_at_text', width: 180 },
+    {
+      title: '状态',
+      dataIndex: 'status',
+      width: 120,
+      render: (v) => <StatusTag text={v} />,
+    },
+    {
+      title: '开始时间',
+      dataIndex: 'updated_at_text',
+      width: 180,
+      render: (v) => <TimeText value={v} />,
+    },
     { title: '运行时长(秒)', dataIndex: 'running_for_seconds', width: 140 },
   ]
 
   const completedColumns: ColumnsType<QueueCompletedTask> = [
-    { title: '完成时间', dataIndex: 'updated_at_text', width: 180 },
+    {
+      title: '完成时间',
+      dataIndex: 'updated_at_text',
+      width: 180,
+      render: (v) => <TimeText value={v} />,
+    },
     { title: '类型', dataIndex: 'type_label', width: 120 },
     {
       title: 'DoubanID',
@@ -56,19 +112,42 @@ export default function QueuePage() {
       width: 140,
       render: (_, row) => (row.detail_url && row.detail_url !== '#' ? <Link to={row.detail_url}>{row.douban_id}</Link> : row.douban_id),
     },
-    { title: '状态', dataIndex: 'status', width: 120 },
-    { title: '结果', dataIndex: 'result', width: 120 },
+    {
+      title: '状态',
+      dataIndex: 'status',
+      width: 120,
+      render: (v) => <StatusTag text={v} />,
+    },
+    {
+      title: '结果',
+      dataIndex: 'result',
+      width: 120,
+      render: (v) => <StatusTag text={v} />,
+    },
   ]
 
   return (
     <Space direction="vertical" size={16} style={{ width: '100%' }}>
+      <Space style={{ width: '100%', justifyContent: 'space-between' }} wrap>
+        <Text type="secondary">最近刷新：{updatedAt || '-'}</Text>
+        <Button onClick={load} loading={loading}>手动刷新</Button>
+      </Space>
+
+      {error ? <Alert type="error" message={error} showIcon /> : null}
+
       <Space wrap>
+        <StatCard title="待抓取总量" value={summary.toCrawl} />
+        <StatCard title="执行中总量" value={summary.crawling} />
+        <StatCard title="无效任务" value={summary.invalid} />
+        <StatCard title="最老等待" value={`${summary.oldestWait}s`} />
         {(data?.pools || []).map((pool) => (
-          <Card key={pool.pool} title={pool.pool_label} style={{ minWidth: 280 }}>
-            <div>并发上限：{pool.concurrency}</div>
-            <div>运行中：{pool.running}</div>
-            <Progress percent={Math.min(100, Number((pool.utilization * 100).toFixed(1)))} status="active" />
-          </Card>
+          <StatCard
+            key={pool.pool}
+            title={pool.pool_label}
+            value={`${pool.running}/${pool.concurrency}`}
+            subtitle={`占用率 ${(pool.utilization * 100).toFixed(1)}%`}
+            percent={Number((pool.utilization * 100).toFixed(1))}
+          />
         ))}
       </Space>
 

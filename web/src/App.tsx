@@ -56,7 +56,7 @@ export default function RootApp() {
           ]}
         />
       </Header>
-      <Content style={{ padding: 24, maxWidth: 1280, margin: '0 auto', width: '100%' }}>
+      <Content style={{ padding: 20, maxWidth: 1360, margin: '0 auto', width: '100%' }}>
         <Breadcrumb items={breadcrumbItems} style={{ marginBottom: 12 }} />
         <Routes>
           <Route path="/" element={<Navigate to="/users" replace />} />
