@@ -52,109 +52,26 @@
 dbcl2需要在cookie中查看：
 ![img.png](docs/images/img.png)
 
-## 接口
+## 使用方式（推荐 Web 页面）
 
-以下为服务暴露的主要接口。线上已经部署了一套公共服务，域名使用 `https://mouban.mythsman.com/` 。
+线上已经部署了一套可直接使用的 Web 页面，推荐通过页面完成全部查询与浏览。
 
-### 常用接口
+入口：`https://mouban.mythsman.com/`
 
-#### 页面入口（后端渲染）
+### 页面能力
 
-`https://mouban.mythsman.com/`
+- **用户查询**：支持通过 Douban UID / domain / 用户名精确匹配用户。
+- **用户详情**：查看用户在书、影、游、音中的标注信息（想/在/过）。
+- **条目详情**：查看条目元信息、评分分布、简介等内容。
+- **调度队列**：查看当前抓取队列、运行任务与最近完成任务。
+- **强制更新**：在用户详情与条目详情页，可通过页面按钮发起强制更新。
 
-页面说明：
+### 建议使用流程
 
-- 这是项目默认的前端页面入口（SSR），直接访问即可使用。
-- 支持输入 Douban UID / domain / 用户名（精确匹配）查询候选用户。
-- 选中用户后可查看该用户当前收录的书、影、游、音全部信息（wish/do/collect）。
+1. 打开 Web 页面并搜索目标用户。
+2. 进入用户详情，按媒体类型与标注状态筛选内容。
+3. 点击条目进入详情页查看更多信息。
+4. 如需排查抓取状态，进入「调度队列」页面。
+5. 如需立即重新抓取，使用页面内的「强制更新」按钮。
 
-#### 用户解析（通过ID/domain/name精确匹配）
-
-`https://mouban.mythsman.com/guest/resolve_user?q={id_or_domain_or_name}`
-
-#### 用户录入/更新
-
-`https://mouban.mythsman.com/guest/check_user?id={your_douban_id}`
-
-```json
-{
-  "result": {
-    "id": 1000001,
-    "domain": "ahbei",
-    "name": "阿北",
-    "thumbnail": "https://img1.doubanio.com/icon/u1000001-30.jpg",
-    "book_wish": 81,
-    "book_do": 61,
-    "book_collect": 115,
-    "game_wish": 1,
-    "game_do": 0,
-    "game_collect": 0,
-    "movie_wish": 77,
-    "movie_do": 17,
-    "movie_collect": 218,
-    "song_wish": 23,
-    "song_do": 21,
-    "song_collect": 24,
-    "sync_at": 1667232000,
-    "check_at": 1679646797,
-    "publish_at": 1570409179
-  },
-  "success": true
-}
-```
-
-其中：
-
-* publish_at 表示用户最近一次更新的时间戳。
-* check_at 表示最近一次**检测**用户是否有更新的时间戳。
-* sync_at 表示最近一次**同步**用户信息的时间戳。
-
-#### 查询用户的读书评论
-
-`https://mouban.mythsman.com/guest/user_book?id={your_douban_id}&action=wish`
-
-`https://mouban.mythsman.com/guest/user_book?id={your_douban_id}&action=do`
-
-`https://mouban.mythsman.com/guest/user_book?id={your_douban_id}&action=collect`
-
-#### 查询用户的电影评论
-
-`https://mouban.mythsman.com/guest/user_movie?id={your_douban_id}&action=wish`
-
-`https://mouban.mythsman.com/guest/user_movie?id={your_douban_id}&action=do`
-
-`https://mouban.mythsman.com/guest/user_movie?id={your_douban_id}&action=collect`
-
-#### 查询用户的游戏评论
-
-`https://mouban.mythsman.com/guest/user_game?id={your_douban_id}&action=wish`
-
-`https://mouban.mythsman.com/guest/user_game?id={your_douban_id}&action=do`
-
-`https://mouban.mythsman.com/guest/user_game?id={your_douban_id}&action=collect`
-
-#### 查询用户的音乐评论
-
-`https://mouban.mythsman.com/guest/user_song?id={your_douban_id}&action=wish`
-
-`https://mouban.mythsman.com/guest/user_song?id={your_douban_id}&action=do`
-
-`https://mouban.mythsman.com/guest/user_song?id={your_douban_id}&action=collect`
-
-### 后台接口
-
-#### 强制更新条目
-
-目前条目下载好后，后续不会进行更新，如有更新需要，目前暂时需要手动强制更新一下。
-
-item_type 取: 1-book 2-movie 3-game 4-song
-
-`https://mouban.mythsman.com/admin/refresh_item?type={item_type}&id={item_douban_id}`
-
-#### 强制更新用户
-
-目前用户的评论信息更新下载好后，后续只会进行增量更新。如果对老的条目进行评论修改、删除等操作是不会同步更新的。
-
-如有更新的要求，目前暂时需要手动强制更新一下。（谨慎使用，会对系统造成较大压力）
-
-`https://mouban.mythsman.com/admin/refresh_user?id={douban_uid}`
+> 说明：README 不再展示具体接口路径。若你是二次开发者，可在源码中查看路由与 controller 实现。
