@@ -1,7 +1,21 @@
+:root {
+  --page-bg: #f6f8fb;
+}
+
 body {
   margin: 0;
+  background: var(--page-bg);
 }
 
 .nowrap-table .ant-table-thead > tr > th {
   white-space: nowrap;
+}
+
+.time-text {
+  font-variant-numeric: tabular-nums;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+}
+
+.stat-card {
+  min-width: 180px;
 }

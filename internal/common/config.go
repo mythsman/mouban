@@ -26,7 +26,6 @@ func initDefaults() {
 	viper.SetDefault("crawl.enable", true)
 	viper.SetDefault("storage.enable", true)
 
-	viper.SetDefault("datasource.driver", "mysql")
 	viper.SetDefault("datasource.port", "3306")
 	viper.SetDefault("datasource.charset", "utf8mb4")
 	viper.SetDefault("datasource.loc", "Asia/Shanghai")

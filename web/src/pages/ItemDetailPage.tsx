@@ -1,8 +1,9 @@
-import { Button, Card, Descriptions, Empty, Image, Space, Spin, Statistic, Tooltip, Typography } from 'antd'
+import { Button, Card, Descriptions, Empty, Image, Progress, Space, Spin, Statistic, Tooltip, Typography } from 'antd'
 import { ExportOutlined, PictureOutlined } from '@ant-design/icons'
 import { useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { getItemDetail } from '../api/client'
+import StatCard from '../components/StatCard'
 import type { ItemDetailResult } from '../types/api'
 
 const { Title, Paragraph, Text } = Typography
@@ -134,28 +135,27 @@ export default function ItemDetailPage() {
                     <Title level={3} style={{ marginTop: 0, marginBottom: 4, fontWeight: 600 }}>
                       {title}
                     </Title>
-                    <Descriptions column={1} size="small" style={{ marginBottom: 8 }} items={[
-                      { key: 'type', label: '类型', children: data.type_name },
-                      { key: 'id', label: '豆瓣ID', children: data.item_id },
-                      { key: 'crawl', label: '最近爬取', children: data.crawled_at_text },
-                      { key: 'update', label: '数据更新', children: data.data_updated_text },
-                    ]} />
+                    <Descriptions
+                      column={1}
+                      size="small"
+                      style={{ marginBottom: 8 }}
+                      items={[
+                        { key: 'type', label: '类型', children: data.type_name },
+                        { key: 'id', label: '豆瓣ID', children: data.item_id },
+                        { key: 'crawl', label: '最近爬取', children: data.crawled_at_text },
+                        { key: 'update', label: '数据更新', children: data.data_updated_text },
+                      ]}
+                    />
                     <Descriptions
                       column={1}
                       size="small"
                       styles={{ label: { width: 96, color: 'rgba(0,0,0,0.65)' } }}
-                      items={fieldMap[itemType]
-                        .map((f) => ({ key: f.key, label: f.label, children: itemData[f.key] ? String(itemData[f.key]) : '-' }))}
+                      items={fieldMap[itemType].map((f) => ({ key: f.key, label: f.label, children: itemData[f.key] ? String(itemData[f.key]) : '-' }))}
                     />
                   </div>
                 </Space>
                 <Tooltip title="跳转豆瓣页面">
-                  <Button
-                    type="text"
-                    shape="circle"
-                    icon={<ExportOutlined />}
-                    onClick={() => window.open(data.douban_url, '_blank', 'noopener,noreferrer')}
-                  />
+                  <Button type="text" shape="circle" icon={<ExportOutlined />} onClick={() => window.open(data.douban_url, '_blank', 'noopener,noreferrer')} />
                 </Tooltip>
               </Space>
             </Card>
@@ -163,13 +163,15 @@ export default function ItemDetailPage() {
             {data.rating ? (
               <Card size="small" title="评分信息">
                 <Space wrap>
-                  <Statistic title="平均分" value={data.rating.rating} precision={1} />
-                  <Statistic title="评分人数" value={data.rating.total} />
-                  <Statistic title="五星" value={data.rating.star5} suffix="%" precision={1} />
-                  <Statistic title="四星" value={data.rating.star4} suffix="%" precision={1} />
-                  <Statistic title="三星" value={data.rating.star3} suffix="%" precision={1} />
-                  <Statistic title="二星" value={data.rating.star2} suffix="%" precision={1} />
-                  <Statistic title="一星" value={data.rating.star1} suffix="%" precision={1} />
+                  <StatCard title="平均分" value={data.rating.rating.toFixed(1)} />
+                  <StatCard title="评分人数" value={data.rating.total} />
+                </Space>
+                <Space direction="vertical" style={{ marginTop: 12, width: '100%' }} size={8}>
+                  <RateRow label="五星" value={data.rating.star5} />
+                  <RateRow label="四星" value={data.rating.star4} />
+                  <RateRow label="三星" value={data.rating.star3} />
+                  <RateRow label="二星" value={data.rating.star2} />
+                  <RateRow label="一星" value={data.rating.star1} />
                 </Space>
               </Card>
             ) : null}
@@ -187,5 +189,15 @@ export default function ItemDetailPage() {
         ) : null}
       </Space>
     </Spin>
+  )
+}
+
+function RateRow({ label, value }: { label: string; value: number }) {
+  return (
+    <Space style={{ width: '100%' }}>
+      <Text style={{ width: 44 }}>{label}</Text>
+      <Progress percent={Number(value.toFixed(1))} style={{ flex: 1 }} />
+      <Statistic value={value} suffix="%" precision={1} valueStyle={{ fontSize: 14 }} />
+    </Space>
   )
 }
