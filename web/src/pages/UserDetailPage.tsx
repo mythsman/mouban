@@ -1,10 +1,9 @@
-import { Alert, App, Avatar, Button, Card, Descriptions, Empty, Segmented, Space, Spin, Table, Tabs, Tooltip, Typography } from 'antd'
-import { ExportOutlined } from '@ant-design/icons'
+import { Alert, App, Avatar, Card, Descriptions, Empty, Segmented, Space, Spin, Table, Tabs, Typography } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { getUser, getUserComments } from '../api/client'
-import StatCard from '../components/StatCard'
+import DoubanLinkButton from '../components/DoubanLinkButton'
 import type { UserComment, UserVO } from '../types/api'
 
 const { Text, Paragraph } = Typography
@@ -150,9 +149,7 @@ export default function UserDetailPage() {
                     <Descriptions.Item label="最近检查">{formatUnix(user.check_at)}</Descriptions.Item>
                   </Descriptions>
                 </Space>
-                <Tooltip title="跳转豆瓣主页">
-                  <Button type="text" shape="circle" icon={<ExportOutlined />} onClick={() => window.open(userProfileUrl, '_blank', 'noopener,noreferrer')} />
-                </Tooltip>
+                <DoubanLinkButton url={userProfileUrl} tooltip="跳转豆瓣主页" />
               </Space>
             </Card>
 
@@ -165,12 +162,6 @@ export default function UserDetailPage() {
                 }}
                 items={mediaOptions.map((x) => ({ key: x.key, label: `${x.label} (${typeTotalCount(user, x.key)})` }))}
               />
-
-              <Space wrap style={{ marginBottom: 12 }}>
-                <StatCard title={actionLabelMap[activeType].collect} value={typeActionCount(user, activeType, 'collect')} />
-                <StatCard title={actionLabelMap[activeType].do} value={typeActionCount(user, activeType, 'do')} />
-                <StatCard title={actionLabelMap[activeType].wish} value={typeActionCount(user, activeType, 'wish')} />
-              </Space>
 
               <Segmented
                 block
