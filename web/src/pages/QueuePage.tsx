@@ -82,7 +82,21 @@ export default function QueuePage() {
 
   const runningColumns: ColumnsType<QueueRunningTask> = [
     { title: '类型', dataIndex: 'type_label', width: 120 },
-    { title: 'DoubanID', dataIndex: 'douban_id', width: 140 },
+    {
+      title: 'DoubanID',
+      dataIndex: 'douban_id',
+      width: 140,
+      render: (_, row) => (row.detail_url && row.detail_url !== '#' ? <Link to={row.detail_url}>{row.douban_id}</Link> : row.douban_id),
+    },
+    {
+      title: '名称',
+      dataIndex: 'title',
+      width: 260,
+      render: (_, row) => {
+        const text = row.title || '-'
+        return row.detail_url && row.detail_url !== '#' ? <Link to={row.detail_url}>{text}</Link> : text
+      },
+    },
     {
       title: '状态',
       dataIndex: 'status',
@@ -111,6 +125,15 @@ export default function QueuePage() {
       dataIndex: 'douban_id',
       width: 140,
       render: (_, row) => (row.detail_url && row.detail_url !== '#' ? <Link to={row.detail_url}>{row.douban_id}</Link> : row.douban_id),
+    },
+    {
+      title: '名称',
+      dataIndex: 'title',
+      width: 260,
+      render: (_, row) => {
+        const text = row.title || '-'
+        return row.detail_url && row.detail_url !== '#' ? <Link to={row.detail_url}>{text}</Link> : text
+      },
     },
     {
       title: '状态',

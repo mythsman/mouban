@@ -39,6 +39,8 @@ type QueueRunningTaskView struct {
 	TypeCode          uint8  `json:"type_code"`
 	TypeName          string `json:"type"`
 	TypeLabel         string `json:"type_label"`
+	Title             string `json:"title"`
+	DetailURL         string `json:"detail_url"`
 	Status            string `json:"status"`
 	UpdatedAtUnix     int64  `json:"updated_at_unix"`
 	UpdatedAtText     string `json:"updated_at_text"`
@@ -50,6 +52,7 @@ type QueueCompletedTaskView struct {
 	TypeCode      uint8  `json:"type_code"`
 	TypeName      string `json:"type"`
 	TypeLabel     string `json:"type_label"`
+	Title         string `json:"title"`
 	Status        string `json:"status"`
 	Result        string `json:"result"`
 	DetailURL     string `json:"detail_url"`
@@ -150,6 +153,7 @@ func buildQueueOverview() QueueOverviewResult {
 				TypeCode:          row.Type,
 				TypeName:          consts.ParseType(row.Type).Name,
 				TypeLabel:         typeLabel(row.Type),
+				DetailURL:         buildScheduleDetailURL(row.Type, row.DoubanId),
 				Status:            consts.ParseScheduleStatus(statusCode).Name,
 				UpdatedAtUnix:     row.UpdatedAt.Unix(),
 				UpdatedAtText:     formatTimeCN(row.UpdatedAt),
@@ -196,6 +200,14 @@ func buildQueueOverview() QueueOverviewResult {
 		completedSchedules = completedSchedules[:50]
 	}
 
+	titleMap := buildQueueTaskTitleMap(runningSchedules, completedSchedules)
+	for i := range runningSchedules {
+		runningSchedules[i].Title = titleMap[queueTaskKey(runningSchedules[i].TypeCode, runningSchedules[i].DoubanID)]
+	}
+	for i := range completedSchedules {
+		completedSchedules[i].Title = titleMap[queueTaskKey(completedSchedules[i].TypeCode, completedSchedules[i].DoubanID)]
+	}
+
 	userConcurrency := viper.GetInt("agent.user.concurrency")
 	itemConcurrency := viper.GetInt("agent.item.concurrency")
 	userRunning := typeMap[consts.TypeUser.Code].Crawling
@@ -214,7 +226,7 @@ func buildQueueOverview() QueueOverviewResult {
 		},
 		{
 			Pool:        "item",
-			PoolLabel:   "条目队列（book/movie/game/song 共享）",
+			PoolLabel:   "条目队列",
 			Concurrency: itemConcurrency,
 			Running:     itemRunning,
 			Utilization: calcUtilization(itemRunning, itemConcurrency),
@@ -269,4 +281,74 @@ func buildScheduleDetailURL(t uint8, doubanID uint64) string {
 	default:
 		return "#"
 	}
+}
+
+func queueTaskKey(t uint8, doubanID uint64) string {
+	return strconv.Itoa(int(t)) + ":" + strconv.FormatUint(doubanID, 10)
+}
+
+func buildQueueTaskTitleMap(running []QueueRunningTaskView, completed []QueueCompletedTaskView) map[string]string {
+	idsByType := map[uint8]map[uint64]bool{}
+
+	add := func(t uint8, id uint64) {
+		if id == 0 {
+			return
+		}
+		if idsByType[t] == nil {
+			idsByType[t] = map[uint64]bool{}
+		}
+		idsByType[t][id] = true
+	}
+
+	for _, row := range running {
+		add(row.TypeCode, row.DoubanID)
+	}
+	for _, row := range completed {
+		add(row.TypeCode, row.DoubanID)
+	}
+
+	titleMap := map[string]string{}
+
+	for t, idSet := range idsByType {
+		ids := make([]uint64, 0, len(idSet))
+		for id := range idSet {
+			ids = append(ids, id)
+		}
+
+		switch t {
+		case consts.TypeUser.Code:
+			for _, id := range ids {
+				user := dao.GetUser(id)
+				if user != nil {
+					titleMap[queueTaskKey(t, id)] = user.Name
+				}
+			}
+		case consts.TypeBook.Code:
+			books := dao.ListBookBrief(&ids)
+			for i := range *books {
+				book := (*books)[i]
+				titleMap[queueTaskKey(t, book.DoubanId)] = book.Title
+			}
+		case consts.TypeMovie.Code:
+			movies := dao.ListMovieBrief(&ids)
+			for i := range *movies {
+				movie := (*movies)[i]
+				titleMap[queueTaskKey(t, movie.DoubanId)] = movie.Title
+			}
+		case consts.TypeGame.Code:
+			games := dao.ListGameBrief(&ids)
+			for i := range *games {
+				game := (*games)[i]
+				titleMap[queueTaskKey(t, game.DoubanId)] = game.Title
+			}
+		case consts.TypeSong.Code:
+			songs := dao.ListSongBrief(&ids)
+			for i := range *songs {
+				song := (*songs)[i]
+				titleMap[queueTaskKey(t, song.DoubanId)] = song.Title
+			}
+		}
+	}
+
+	return titleMap
 }
