@@ -1,4 +1,5 @@
-import { Alert, App, Button, Card, Col, Descriptions, Empty, Form, Input, Row, Space, Spin, Typography } from 'antd'
+import { Alert, App, Avatar, Button, Card, Col, Empty, Form, Input, List, Row, Space, Spin, Typography } from 'antd'
+import { UserOutlined } from '@ant-design/icons'
 import { useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { resolveUsers } from '../api/client'
@@ -36,13 +37,13 @@ export default function UsersPage() {
   }
 
   return (
-    <Space direction="vertical" size={16} style={{ width: '100%' }}>
-      <Card>
-        <Title level={3} style={{ marginTop: 0 }}>
+    <Space direction="vertical" size={12} style={{ width: '100%' }}>
+      <Card size="small">
+        <Title level={4} style={{ marginTop: 0, marginBottom: 12 }}>
           用户查询
         </Title>
         <Form layout="inline" onFinish={(v) => onSearch(v.q)} initialValues={{ q }}>
-          <Form.Item name="q" rules={[{ required: true, message: '请输入关键词' }]} style={{ flex: 1 }}>
+          <Form.Item name="q" rules={[{ required: true, message: '请输入关键词' }]} style={{ flex: 1, minWidth: 320 }}>
             <Input placeholder="例如: 1000001 / ahbei / 阿北" allowClear />
           </Form.Item>
           <Form.Item>
@@ -57,33 +58,54 @@ export default function UsersPage() {
 
       <Spin spinning={loading}>
         {users.length === 0 ? (
-          <Card>{q ? <Empty description="没有匹配结果" /> : <Text type="secondary">请输入关键词开始查询</Text>}</Card>
+          <Card size="small">{q ? <Empty description="没有匹配结果" /> : <Text type="secondary">请输入关键词开始查询</Text>}</Card>
         ) : (
-          <Row gutter={[16, 16]}>
-            {users.map((u) => (
-              <Col xs={24} md={12} key={u.id}>
+          <List
+            grid={{ gutter: 12, xs: 1, sm: 2, md: 2, lg: 3, xl: 3, xxl: 4 }}
+            dataSource={users}
+            pagination={{ pageSize: 12, showSizeChanger: true, pageSizeOptions: [12, 24, 48], size: 'small' }}
+            renderItem={(u) => (
+              <List.Item>
                 <Card
-                  title={u.name}
+                  size="small"
+                  styles={{ body: { padding: 12 } }}
+                  title={
+                    <Space>
+                      <Avatar src={u.thumbnail} icon={<UserOutlined />} size={36} />
+                      <div>
+                        <div style={{ lineHeight: 1.2 }}>{u.name}</div>
+                        <Text type="secondary" style={{ fontSize: 12 }}>
+                          ID: {u.id}
+                        </Text>
+                      </div>
+                    </Space>
+                  }
                   extra={
-                    <Link to={`/users/${u.id}${q ? `?q=${encodeURIComponent(q)}` : ''}`}>
-                      <Button type="link" style={{ padding: 0 }}>
-                        查看详情
+                    <Link to={`/users/${u.id}`}>
+                      <Button type="link" size="small" style={{ padding: 0 }}>
+                        详情
                       </Button>
                     </Link>
                   }
                 >
-                  <Descriptions column={1} size="small">
-                    <Descriptions.Item label="ID">{u.id}</Descriptions.Item>
-                    <Descriptions.Item label="Domain">{u.domain || '-'}</Descriptions.Item>
-                    <Descriptions.Item label="图书">想读 {u.book_wish} / 在读 {u.book_do} / 读过 {u.book_collect}</Descriptions.Item>
-                    <Descriptions.Item label="电影">想看 {u.movie_wish} / 在看 {u.movie_do} / 看过 {u.movie_collect}</Descriptions.Item>
-                    <Descriptions.Item label="游戏">想玩 {u.game_wish} / 在玩 {u.game_do} / 玩过 {u.game_collect}</Descriptions.Item>
-                    <Descriptions.Item label="音乐">想听 {u.song_wish} / 在听 {u.song_do} / 听过 {u.song_collect}</Descriptions.Item>
-                  </Descriptions>
+                  <Row gutter={[8, 8]}>
+                    <Col span={12}><Text style={{ fontSize: 12 }}>图书 想读 {u.book_wish}</Text></Col>
+                    <Col span={12}><Text style={{ fontSize: 12 }}>图书 在读 {u.book_do}</Text></Col>
+                    <Col span={12}><Text style={{ fontSize: 12 }}>图书 读过 {u.book_collect}</Text></Col>
+                    <Col span={12}><Text style={{ fontSize: 12 }}>电影 想看 {u.movie_wish}</Text></Col>
+                    <Col span={12}><Text style={{ fontSize: 12 }}>电影 在看 {u.movie_do}</Text></Col>
+                    <Col span={12}><Text style={{ fontSize: 12 }}>电影 看过 {u.movie_collect}</Text></Col>
+                    <Col span={12}><Text style={{ fontSize: 12 }}>游戏 想玩 {u.game_wish}</Text></Col>
+                    <Col span={12}><Text style={{ fontSize: 12 }}>游戏 在玩 {u.game_do}</Text></Col>
+                    <Col span={12}><Text style={{ fontSize: 12 }}>游戏 玩过 {u.game_collect}</Text></Col>
+                    <Col span={12}><Text style={{ fontSize: 12 }}>音乐 想听 {u.song_wish}</Text></Col>
+                    <Col span={12}><Text style={{ fontSize: 12 }}>音乐 在听 {u.song_do}</Text></Col>
+                    <Col span={12}><Text style={{ fontSize: 12 }}>音乐 听过 {u.song_collect}</Text></Col>
+                  </Row>
                 </Card>
-              </Col>
-            ))}
-          </Row>
+              </List.Item>
+            )}
+          />
         )}
       </Spin>
     </Space>
