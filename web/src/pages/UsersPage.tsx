@@ -1,6 +1,5 @@
-import { Alert, App, Avatar, Button, Card, Empty, Form, Input, List, Select, Space, Spin, Table, Tag, Typography } from 'antd'
+import { Alert, App, Avatar, Button, Card, Empty, Form, Input, List, Select, Space, Tag, Typography } from 'antd'
 import { UserOutlined } from '@ant-design/icons'
-import type { ColumnsType } from 'antd/es/table'
 import { useMemo, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { resolveUsers } from '../api/client'
@@ -9,21 +8,6 @@ import type { UserVO } from '../types/api'
 const { Title, Text } = Typography
 
 type SortType = 'relevance' | 'total_desc' | 'sync_desc'
-
-type StatRow = {
-  key: string
-  typeLabel: string
-  wish: number
-  doing: number
-  collect: number
-}
-
-const statColumns: ColumnsType<StatRow> = [
-  { title: '条目', dataIndex: 'typeLabel', width: 56 },
-  { title: '想', dataIndex: 'wish', width: 52, align: 'right' },
-  { title: '在', dataIndex: 'doing', width: 52, align: 'right' },
-  { title: '过', dataIndex: 'collect', width: 52, align: 'right' },
-]
 
 export default function UsersPage() {
   const { message } = App.useApp()
@@ -106,36 +90,32 @@ export default function UsersPage() {
         </Space>
       </Card>
 
-      <Spin spinning={loading}>
-        {sortedUsers.length === 0 ? (
-          <Card size="small">{q ? <Empty description="没有匹配结果" /> : <Text type="secondary">请输入关键词开始查询</Text>}</Card>
-        ) : (
-          <List
-            grid={{ gutter: 12, xs: 1, sm: 2, md: 2, lg: 3, xl: 3, xxl: 4 }}
-            dataSource={sortedUsers}
-            pagination={{ pageSize: 12, showSizeChanger: true, pageSizeOptions: [12, 24, 48], size: 'small' }}
-            renderItem={(u) => (
-              <List.Item>
-                <UserCard user={u} />
-              </List.Item>
-            )}
-          />
-        )}
-      </Spin>
+      {sortedUsers.length === 0 ? (
+        <Card size="small">{q ? <Empty description="没有匹配结果" /> : <Text type="secondary">请输入关键词开始查询</Text>}</Card>
+      ) : (
+        <List
+          grid={{ gutter: 12, xs: 1, sm: 2, md: 2, lg: 3, xl: 3, xxl: 4 }}
+          dataSource={sortedUsers}
+          loading={loading}
+          pagination={{ pageSize: 12, showSizeChanger: true, pageSizeOptions: [12, 24, 48], size: 'small' }}
+          renderItem={(u) => (
+            <List.Item>
+              <UserCard user={u} />
+            </List.Item>
+          )}
+        />
+      )}
     </Space>
   )
 }
 
 function UserCard({ user }: { user: UserVO }) {
-  const rows = useMemo<StatRow[]>(
-    () => [
-      { key: 'book', typeLabel: '图书', wish: user.book_wish, doing: user.book_do, collect: user.book_collect },
-      { key: 'movie', typeLabel: '电影', wish: user.movie_wish, doing: user.movie_do, collect: user.movie_collect },
-      { key: 'game', typeLabel: '游戏', wish: user.game_wish, doing: user.game_do, collect: user.game_collect },
-      { key: 'song', typeLabel: '音乐', wish: user.song_wish, doing: user.song_do, collect: user.song_collect },
-    ],
-    [user],
-  )
+  const mediaRows = [
+    { label: '图书', wish: user.book_wish, doing: user.book_do, collect: user.book_collect },
+    { label: '电影', wish: user.movie_wish, doing: user.movie_do, collect: user.movie_collect },
+    { label: '游戏', wish: user.game_wish, doing: user.game_do, collect: user.game_collect },
+    { label: '音乐', wish: user.song_wish, doing: user.song_do, collect: user.song_collect },
+  ]
 
   return (
     <Card
@@ -164,7 +144,21 @@ function UserCard({ user }: { user: UserVO }) {
         <Tag color="blue">总条目 {userTotalCount(user)}</Tag>
         {user.sync_at ? <Tag>同步 {new Date(user.sync_at * 1000).toLocaleDateString('zh-CN')}</Tag> : null}
       </Space>
-      <Table<StatRow> rowKey="key" columns={statColumns} dataSource={rows} size="small" pagination={false} showHeader />
+
+      <div className="user-stat-list">
+        {mediaRows.map((row) => {
+          const total = row.wish + row.doing + row.collect
+          return (
+            <div key={row.label} className="user-stat-row">
+              <Text strong>{row.label}</Text>
+              <Text type="secondary">总 {total}</Text>
+              <Text type="secondary">过 {row.collect}</Text>
+              <Text type="secondary">在 {row.doing}</Text>
+              <Text type="secondary">想 {row.wish}</Text>
+            </div>
+          )
+        })}
+      </div>
     </Card>
   )
 }

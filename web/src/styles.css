@@ -19,3 +19,38 @@ body {
 .stat-card {
   min-width: 180px;
 }
+
+.user-stat-list {
+  display: grid;
+  gap: 6px;
+}
+
+.user-stat-row {
+  display: grid;
+  grid-template-columns: 42px repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  padding: 4px 0;
+  border-bottom: 1px dashed #f0f0f0;
+}
+
+.user-stat-row:last-child {
+  border-bottom: none;
+}
+
+.douban-link-btn {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #42bd56 !important;
+}
+
+.douban-link-btn:hover {
+  background: #389d49 !important;
+}
+
+.douban-link-btn .douban-link-btn__text {
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+}

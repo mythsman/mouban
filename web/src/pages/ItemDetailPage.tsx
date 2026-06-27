@@ -1,8 +1,9 @@
-import { Button, Card, Descriptions, Empty, Image, Progress, Space, Spin, Statistic, Tooltip, Typography } from 'antd'
-import { ExportOutlined, PictureOutlined } from '@ant-design/icons'
+import { Card, Descriptions, Empty, Image, Progress, Rate, Space, Spin, Statistic, Typography } from 'antd'
+import { PictureOutlined } from '@ant-design/icons'
 import { useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { getItemDetail } from '../api/client'
+import DoubanLinkButton from '../components/DoubanLinkButton'
 import StatCard from '../components/StatCard'
 import type { ItemDetailResult } from '../types/api'
 
@@ -154,9 +155,7 @@ export default function ItemDetailPage() {
                     />
                   </div>
                 </Space>
-                <Tooltip title="跳转豆瓣页面">
-                  <Button type="text" shape="circle" icon={<ExportOutlined />} onClick={() => window.open(data.douban_url, '_blank', 'noopener,noreferrer')} />
-                </Tooltip>
+                <DoubanLinkButton url={data.douban_url} tooltip="跳转豆瓣页面" />
               </Space>
             </Card>
 
@@ -165,6 +164,13 @@ export default function ItemDetailPage() {
                 <Space wrap>
                   <StatCard title="平均分" value={data.rating.rating.toFixed(1)} />
                   <StatCard title="评分人数" value={data.rating.total} />
+                  <Card size="small" style={{ minWidth: 220 }}>
+                    <Text type="secondary">星级观感</Text>
+                    <div style={{ marginTop: 8 }}>
+                      <Rate disabled allowHalf value={Math.max(0, Math.min(5, data.rating.rating / 2))} />
+                    </div>
+                    <Text type="secondary">{(data.rating.rating / 2).toFixed(1)} / 5</Text>
+                  </Card>
                 </Space>
                 <Space direction="vertical" style={{ marginTop: 12, width: '100%' }} size={8}>
                   <RateRow label="五星" value={data.rating.star5} />

@@ -1,4 +1,4 @@
-import { Alert, Button, Card, Space, Table, Typography } from 'antd'
+import { Alert, Card, Space, Table, Typography } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
@@ -128,10 +128,7 @@ export default function QueuePage() {
 
   return (
     <Space direction="vertical" size={16} style={{ width: '100%' }}>
-      <Space style={{ width: '100%', justifyContent: 'space-between' }} wrap>
-        <Text type="secondary">最近刷新：{updatedAt || '-'}</Text>
-        <Button onClick={load} loading={loading}>手动刷新</Button>
-      </Space>
+      <Text type="secondary">最近刷新：{updatedAt || '-'}</Text>
 
       {error ? <Alert type="error" message={error} showIcon /> : null}
 
