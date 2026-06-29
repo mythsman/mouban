@@ -169,7 +169,7 @@ export default function QueuePage() {
         />
       </Card>
 
-      <Card title="最近完成（最新 20 条）">
+      <Card title="最近完成">
         <Table
           className="nowrap-table"
           rowKey={(row) => `${row.type_label}_${row.douban_id}_${row.updated_at_text}`}

@@ -68,3 +68,12 @@ func ListUserByName(name string) *[]model.User {
 	common.Db.Where("name = ?", name).Find(&users)
 	return &users
 }
+
+func ListUserBrief(doubanUids *[]uint64) *[]model.User {
+	users := []model.User{}
+	if doubanUids == nil || len(*doubanUids) == 0 {
+		return &users
+	}
+	common.Db.Select("douban_uid", "name").Where("douban_uid IN ?", *doubanUids).Find(&users)
+	return &users
+}
