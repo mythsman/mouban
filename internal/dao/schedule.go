@@ -165,10 +165,16 @@ func CountScheduleByStatusesGrouped(statuses []uint8) map[uint8]map[uint8]int64 
 		return result
 	}
 
+	// []uint8 is alias of []byte; for SQL IN we must avoid passing binary payload.
+	statusList := make([]int, 0, len(statuses))
+	for _, s := range statuses {
+		statusList = append(statusList, int(s))
+	}
+
 	rows := make([]typeStatusCountRow, 0)
 	common.Db.Model(&model.Schedule{}).
 		Select("type, status, COUNT(*) as count").
-		Where("status IN ?", statuses).
+		Where("status IN ?", statusList).
 		Group("type, status").
 		Find(&rows)
 
