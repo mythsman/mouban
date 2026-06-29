@@ -2,7 +2,6 @@ package controller
 
 import (
 	"net/http"
-	"sort"
 	"strconv"
 	"sync"
 	"time"
@@ -135,35 +134,27 @@ func buildQueueOverview() QueueOverviewResult {
 	}
 
 	runningSchedules := make([]QueueRunningTaskView, 0)
-	for _, t := range types {
-		rows := dao.ListScheduleByTypeAndStatus(t.Code, consts.ScheduleCrawling.Code, 30)
-		for _, row := range rows {
-			runningSeconds := int64(now.Sub(row.UpdatedAt).Seconds())
-			if runningSeconds < 0 {
-				runningSeconds = 0
-			}
-			statusCode := consts.ScheduleCrawling.Code
-			if row.Status != nil {
-				statusCode = *row.Status
-			}
-			runningSchedules = append(runningSchedules, QueueRunningTaskView{
-				DoubanID:          row.DoubanId,
-				TypeCode:          row.Type,
-				TypeName:          consts.ParseType(row.Type).Name,
-				TypeLabel:         typeLabel(row.Type),
-				DetailURL:         buildScheduleDetailURL(row.Type, row.DoubanId),
-				Status:            consts.ParseScheduleStatus(statusCode).Name,
-				UpdatedAtUnix:     row.UpdatedAt.Unix(),
-				UpdatedAtText:     formatTimeCN(row.UpdatedAt),
-				RunningForSeconds: runningSeconds,
-			})
+	runningRows := dao.ListScheduleByStatus(consts.ScheduleCrawling.Code, 20)
+	for _, row := range runningRows {
+		runningSeconds := int64(now.Sub(row.UpdatedAt).Seconds())
+		if runningSeconds < 0 {
+			runningSeconds = 0
 		}
-	}
-	sort.Slice(runningSchedules, func(i, j int) bool {
-		return runningSchedules[i].UpdatedAtUnix < runningSchedules[j].UpdatedAtUnix
-	})
-	if len(runningSchedules) > 100 {
-		runningSchedules = runningSchedules[:100]
+		statusCode := consts.ScheduleCrawling.Code
+		if row.Status != nil {
+			statusCode = *row.Status
+		}
+		runningSchedules = append(runningSchedules, QueueRunningTaskView{
+			DoubanID:          row.DoubanId,
+			TypeCode:          row.Type,
+			TypeName:          consts.ParseType(row.Type).Name,
+			TypeLabel:         typeLabel(row.Type),
+			DetailURL:         buildScheduleDetailURL(row.Type, row.DoubanId),
+			Status:            consts.ParseScheduleStatus(statusCode).Name,
+			UpdatedAtUnix:     row.UpdatedAt.Unix(),
+			UpdatedAtText:     formatTimeCN(row.UpdatedAt),
+			RunningForSeconds: runningSeconds,
+		})
 	}
 
 	completedSchedules := make([]QueueCompletedTaskView, 0)
@@ -307,11 +298,10 @@ func buildQueueTaskTitleMap(running []QueueRunningTaskView, completed []QueueCom
 
 		switch t {
 		case consts.TypeUser.Code:
-			for _, id := range ids {
-				user := dao.GetUser(id)
-				if user != nil {
-					titleMap[queueTaskKey(t, id)] = user.Name
-				}
+			users := dao.ListUserBrief(&ids)
+			for i := range *users {
+				user := (*users)[i]
+				titleMap[queueTaskKey(t, user.DoubanUid)] = user.Name
 			}
 		case consts.TypeBook.Code:
 			books := dao.ListBookBrief(&ids)
