@@ -20,9 +20,6 @@ type QueueTypeOverview struct {
 	TypeLabel         string `json:"type_label"`
 	ToCrawl           int64  `json:"to_crawl"`
 	Crawling          int64  `json:"crawling"`
-	CanCrawl          int64  `json:"can_crawl"`
-	Unready           int64  `json:"unready"`
-	Invalid           int64  `json:"invalid"`
 	OldestWaitSeconds int64  `json:"oldest_wait_seconds"`
 }
 
@@ -77,7 +74,7 @@ func QueueOverview(ctx *gin.Context) {
 	logAccess(ctx, 0)
 	ctx.JSON(http.StatusOK, gin.H{
 		"success": true,
-		"result":  getQueueOverviewCached(20 * time.Second),
+		"result":  getQueueOverviewCached(5 * time.Second),
 	})
 }
 
@@ -107,16 +104,20 @@ func buildQueueOverview() QueueOverviewResult {
 	typeMap := map[uint8]*QueueTypeOverview{}
 	ordered := make([]QueueTypeOverview, len(types))
 
+	countMap := dao.CountScheduleByStatusesGrouped([]uint8{consts.ScheduleToCrawl.Code, consts.ScheduleCrawling.Code})
+	oldestMap := dao.FindOldestUpdatedAtByStatusGrouped(consts.ScheduleToCrawl.Code)
+
 	for i, t := range types {
-		toCrawl := dao.CountScheduleByTypeAndStatus(t.Code, consts.ScheduleToCrawl.Code)
-		crawling := dao.CountScheduleByTypeAndStatus(t.Code, consts.ScheduleCrawling.Code)
-		canCrawl := dao.CountScheduleByTypeAndStatus(t.Code, consts.ScheduleCanCrawl.Code)
-		unready := dao.CountScheduleByTypeAndResult(t.Code, consts.ScheduleUnready.Code)
-		invalid := dao.CountScheduleByTypeAndResult(t.Code, consts.ScheduleInvalid.Code)
+		toCrawl := int64(0)
+		crawling := int64(0)
+		if grouped := countMap[t.Code]; grouped != nil {
+			toCrawl = grouped[consts.ScheduleToCrawl.Code]
+			crawling = grouped[consts.ScheduleCrawling.Code]
+		}
 
 		oldestWait := int64(0)
-		if oldest := dao.FindOldestUpdatedAtByTypeAndStatus(t.Code, consts.ScheduleToCrawl.Code); oldest != nil {
-			oldestWait = int64(now.Sub(*oldest).Seconds())
+		if oldest, ok := oldestMap[t.Code]; ok {
+			oldestWait = int64(now.Sub(oldest).Seconds())
 			if oldestWait < 0 {
 				oldestWait = 0
 			}
@@ -128,9 +129,6 @@ func buildQueueOverview() QueueOverviewResult {
 			TypeLabel:         typeLabel(t.Code),
 			ToCrawl:           toCrawl,
 			Crawling:          crawling,
-			CanCrawl:          canCrawl,
-			Unready:           unready,
-			Invalid:           invalid,
 			OldestWaitSeconds: oldestWait,
 		}
 		typeMap[t.Code] = &ordered[i]
@@ -169,35 +167,27 @@ func buildQueueOverview() QueueOverviewResult {
 	}
 
 	completedSchedules := make([]QueueCompletedTaskView, 0)
-	for _, t := range types {
-		rows := dao.ListRecentScheduleByTypeAndStatus(t.Code, consts.ScheduleCrawled.Code, 20)
-		for _, row := range rows {
-			statusCode := consts.ScheduleCrawled.Code
-			if row.Status != nil {
-				statusCode = *row.Status
-			}
-			resultCode := consts.ScheduleUnready.Code
-			if row.Result != nil {
-				resultCode = *row.Result
-			}
-			completedSchedules = append(completedSchedules, QueueCompletedTaskView{
-				DoubanID:      row.DoubanId,
-				TypeCode:      row.Type,
-				TypeName:      consts.ParseType(row.Type).Name,
-				TypeLabel:     typeLabel(row.Type),
-				Status:        consts.ParseScheduleStatus(statusCode).Name,
-				Result:        consts.ParseResult(resultCode).Name,
-				DetailURL:     buildScheduleDetailURL(row.Type, row.DoubanId),
-				UpdatedAtUnix: row.UpdatedAt.Unix(),
-				UpdatedAtText: formatTimeCN(row.UpdatedAt),
-			})
+	completedRows := dao.ListRecentScheduleByStatus(consts.ScheduleCrawled.Code, 20)
+	for _, row := range completedRows {
+		statusCode := consts.ScheduleCrawled.Code
+		if row.Status != nil {
+			statusCode = *row.Status
 		}
-	}
-	sort.Slice(completedSchedules, func(i, j int) bool {
-		return completedSchedules[i].UpdatedAtUnix > completedSchedules[j].UpdatedAtUnix
-	})
-	if len(completedSchedules) > 50 {
-		completedSchedules = completedSchedules[:50]
+		resultCode := consts.ScheduleUnready.Code
+		if row.Result != nil {
+			resultCode = *row.Result
+		}
+		completedSchedules = append(completedSchedules, QueueCompletedTaskView{
+			DoubanID:      row.DoubanId,
+			TypeCode:      row.Type,
+			TypeName:      consts.ParseType(row.Type).Name,
+			TypeLabel:     typeLabel(row.Type),
+			Status:        consts.ParseScheduleStatus(statusCode).Name,
+			Result:        consts.ParseResult(resultCode).Name,
+			DetailURL:     buildScheduleDetailURL(row.Type, row.DoubanId),
+			UpdatedAtUnix: row.UpdatedAt.Unix(),
+			UpdatedAtText: formatTimeCN(row.UpdatedAt),
+		})
 	}
 
 	titleMap := buildQueueTaskTitleMap(runningSchedules, completedSchedules)

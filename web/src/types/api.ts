@@ -90,9 +90,6 @@ export interface QueueType {
   type_label: string
   to_crawl: number
   crawling: number
-  can_crawl: number
-  unready: number
-  invalid: number
   oldest_wait_seconds: number
 }
 
