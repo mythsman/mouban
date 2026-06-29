@@ -140,3 +140,63 @@ func ListRecentScheduleByTypeAndStatus(t uint8, status uint8, limit int) []model
 		Find(&rows)
 	return rows
 }
+
+func ListRecentScheduleByStatus(status uint8, limit int) []model.Schedule {
+	if limit <= 0 {
+		limit = 50
+	}
+	rows := make([]model.Schedule, 0)
+	common.Db.Where("status = ?", status).
+		Order("updated_at desc").
+		Limit(limit).
+		Find(&rows)
+	return rows
+}
+
+type typeStatusCountRow struct {
+	Type   uint8 `gorm:"column:type"`
+	Status uint8 `gorm:"column:status"`
+	Count  int64 `gorm:"column:count"`
+}
+
+func CountScheduleByStatusesGrouped(statuses []uint8) map[uint8]map[uint8]int64 {
+	result := map[uint8]map[uint8]int64{}
+	if len(statuses) == 0 {
+		return result
+	}
+
+	rows := make([]typeStatusCountRow, 0)
+	common.Db.Model(&model.Schedule{}).
+		Select("type, status, COUNT(*) as count").
+		Where("status IN ?", statuses).
+		Group("type, status").
+		Find(&rows)
+
+	for _, row := range rows {
+		if result[row.Type] == nil {
+			result[row.Type] = map[uint8]int64{}
+		}
+		result[row.Type][row.Status] = row.Count
+	}
+	return result
+}
+
+type typeOldestRow struct {
+	Type   uint8     `gorm:"column:type"`
+	Oldest time.Time `gorm:"column:oldest"`
+}
+
+func FindOldestUpdatedAtByStatusGrouped(status uint8) map[uint8]time.Time {
+	result := map[uint8]time.Time{}
+	rows := make([]typeOldestRow, 0)
+	common.Db.Model(&model.Schedule{}).
+		Select("type, MIN(updated_at) as oldest").
+		Where("status = ?", status).
+		Group("type").
+		Scan(&rows)
+
+	for _, row := range rows {
+		result[row.Type] = row.Oldest
+	}
+	return result
+}

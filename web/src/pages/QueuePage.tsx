@@ -30,19 +30,7 @@ export default function QueuePage() {
   }
 
   useEffect(() => {
-    let mounted = true
-
-    async function loadSafely() {
-      if (!mounted) return
-      await load()
-    }
-
-    loadSafely()
-    const timer = setInterval(loadSafely, 20000)
-    return () => {
-      mounted = false
-      clearInterval(timer)
-    }
+    load()
   }, [])
 
   const summary = useMemo(() => {
@@ -51,12 +39,10 @@ export default function QueuePage() {
       (acc, row) => {
         acc.toCrawl += row.to_crawl
         acc.crawling += row.crawling
-        acc.invalid += row.invalid
-        acc.unready += row.unready
         acc.oldestWait = Math.max(acc.oldestWait, row.oldest_wait_seconds)
         return acc
       },
-      { toCrawl: 0, crawling: 0, invalid: 0, unready: 0, oldestWait: 0 },
+      { toCrawl: 0, crawling: 0, oldestWait: 0 },
     )
   }, [data?.types])
 
@@ -64,19 +50,6 @@ export default function QueuePage() {
     { title: '类型', dataIndex: 'type_label', width: 120 },
     { title: '待抓取', dataIndex: 'to_crawl', width: 110 },
     { title: '执行中', dataIndex: 'crawling', width: 110 },
-    { title: '可抓取', dataIndex: 'can_crawl', width: 120 },
-    {
-      title: '未就绪',
-      dataIndex: 'unready',
-      width: 110,
-      render: (v) => (v > 0 ? <Text type="warning">{v}</Text> : v),
-    },
-    {
-      title: '无效',
-      dataIndex: 'invalid',
-      width: 110,
-      render: (v) => (v > 0 ? <Text type="danger">{v}</Text> : v),
-    },
     { title: '最老等待(秒)', dataIndex: 'oldest_wait_seconds', width: 140 },
   ]
 
@@ -158,7 +131,6 @@ export default function QueuePage() {
       <Space wrap>
         <StatCard title="待抓取总量" value={summary.toCrawl} />
         <StatCard title="执行中总量" value={summary.crawling} />
-        <StatCard title="无效任务" value={summary.invalid} />
         <StatCard title="最老等待" value={`${summary.oldestWait}s`} />
         {(data?.pools || []).map((pool) => (
           <StatCard
@@ -197,7 +169,7 @@ export default function QueuePage() {
         />
       </Card>
 
-      <Card title="最近完成（最新 50 条）">
+      <Card title="最近完成（最新 20 条）">
         <Table
           className="nowrap-table"
           rowKey={(row) => `${row.type_label}_${row.douban_id}_${row.updated_at_text}`}
