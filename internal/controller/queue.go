@@ -103,20 +103,13 @@ func buildQueueOverview() QueueOverviewResult {
 	typeMap := map[uint8]*QueueTypeOverview{}
 	ordered := make([]QueueTypeOverview, len(types))
 
-	countMap := dao.CountScheduleByStatusesGrouped([]uint8{consts.ScheduleToCrawl.Code, consts.ScheduleCrawling.Code})
-	oldestMap := dao.FindOldestUpdatedAtByStatusGrouped(consts.ScheduleToCrawl.Code)
-
 	for i, t := range types {
-		toCrawl := int64(0)
-		crawling := int64(0)
-		if grouped := countMap[t.Code]; grouped != nil {
-			toCrawl = grouped[consts.ScheduleToCrawl.Code]
-			crawling = grouped[consts.ScheduleCrawling.Code]
-		}
+		toCrawl := dao.CountScheduleByTypeAndStatus(t.Code, consts.ScheduleToCrawl.Code)
+		crawling := dao.CountScheduleByTypeAndStatus(t.Code, consts.ScheduleCrawling.Code)
 
 		oldestWait := int64(0)
-		if oldest, ok := oldestMap[t.Code]; ok {
-			oldestWait = int64(now.Sub(oldest).Seconds())
+		if oldest := dao.FindOldestUpdatedAtByTypeAndStatus(t.Code, consts.ScheduleToCrawl.Code); oldest != nil {
+			oldestWait = int64(now.Sub(*oldest).Seconds())
 			if oldestWait < 0 {
 				oldestWait = 0
 			}
