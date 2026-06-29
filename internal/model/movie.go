@@ -21,7 +21,7 @@ type Movie struct {
 	Alias       string `gorm:"type:varchar(512)"`
 	IMDb        string `gorm:"type:varchar(512);column:imdb"`
 	Intro       string `gorm:"type:mediumtext"`
-	Thumbnail   string `gorm:"type:varchar(512)"`
+	Thumbnail   string `gorm:"type:varchar(512);index:idx_movie_thumbnail,length:191"`
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 }

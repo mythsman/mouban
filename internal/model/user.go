@@ -9,7 +9,7 @@ type User struct {
 	DoubanUid    uint64 `gorm:"not null;uniqueIndex"`
 	Domain       string `gorm:"not null;index;type:varchar(64)"`
 	Name         string `gorm:"not null;type:varchar(512);"`
-	Thumbnail    string `gorm:"type:varchar(512);"`
+	Thumbnail    string `gorm:"type:varchar(512);index:idx_user_thumbnail,length:191"`
 	BookWish     uint32 `gorm:"not null default 0"`
 	BookDo       uint32 `gorm:"not null default 0"`
 	BookCollect  uint32 `gorm:"not null default 0"`
