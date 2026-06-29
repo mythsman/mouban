@@ -145,21 +145,19 @@ func download(url string, referer string) (o *os.File) {
 		return out
 	}
 
-	if statusCode == 404 || statusCode == 418 {
-		if truncateErr := out.Truncate(0); truncateErr != nil {
-			panic(fmt.Errorf("truncate fallback file failed: %w", truncateErr))
-		}
-		logrus.Warnln("download fallback to empty file for status", statusCode, ":", url)
-		return out
+	if truncateErr := out.Truncate(0); truncateErr != nil {
+		panic(fmt.Errorf("truncate fallback file failed: %w", truncateErr))
+	}
+	if _, seekErr := out.Seek(0, 0); seekErr != nil {
+		panic(fmt.Errorf("seek fallback file failed: %w", seekErr))
 	}
 
 	if err != nil {
-		logrus.Warnln("download by curl failed:", url, err, "status", statusCode)
+		logrus.Warnln("download fallback to empty file:", url, "status", statusCode, "error", err)
 	} else {
-		logrus.Warnln("download by curl got non-image:", url, "status", statusCode)
+		logrus.Warnln("download fallback to empty file:", url, "status", statusCode, "reason non-image")
 	}
-
-	panic("download got invalid image for: " + url)
+	return out
 }
 
 func downloadWithCurl(url string, referer string, output string) (int, error) {
