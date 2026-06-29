@@ -1,6 +1,7 @@
 package crawl
 
 import (
+	"bytes"
 	"crypto/md5"
 	"encoding/hex"
 	"fmt"
@@ -11,6 +12,7 @@ import (
 	"net/url"
 	"os"
 	"os/exec"
+	"strconv"
 	"strings"
 	"sync"
 
@@ -138,26 +140,44 @@ func download(url string, referer string) (o *os.File) {
 	}
 	defer out.Close()
 
-	if err = downloadWithCurl(url, referer, out.Name()); err == nil && isImageFile(out.Name()) {
+	statusCode, err := downloadWithCurl(url, referer, out.Name())
+	if err == nil && isImageFile(out.Name()) {
 		return out
 	}
+
+	if statusCode == 404 || statusCode == 418 {
+		if truncateErr := out.Truncate(0); truncateErr != nil {
+			panic(fmt.Errorf("truncate fallback file failed: %w", truncateErr))
+		}
+		logrus.Warnln("download fallback to empty file for status", statusCode, ":", url)
+		return out
+	}
+
 	if err != nil {
-		logrus.Warnln("download by curl failed:", url, err)
+		logrus.Warnln("download by curl failed:", url, err, "status", statusCode)
 	} else {
-		logrus.Warnln("download by curl got non-image:", url)
+		logrus.Warnln("download by curl got non-image:", url, "status", statusCode)
 	}
 
 	panic("download got invalid image for: " + url)
 }
 
-func downloadWithCurl(url string, referer string, output string) error {
-	args := []string{"-L", "-sS", "-A", browserUA, "-e", referer, "-o", output, url}
+func downloadWithCurl(url string, referer string, output string) (int, error) {
+	args := []string{"-L", "-sS", "-A", browserUA, "-e", referer, "-o", output, "-w", "%{http_code}", url}
 	cmd := exec.Command("curl", args...)
-	data, err := cmd.CombinedOutput()
+
+	var stdout bytes.Buffer
+	var stderr bytes.Buffer
+	cmd.Stdout = &stdout
+	cmd.Stderr = &stderr
+
+	err := cmd.Run()
+	statusText := strings.TrimSpace(stdout.String())
+	statusCode, _ := strconv.Atoi(statusText)
 	if err != nil {
-		return fmt.Errorf("curl error: %w, output: %s", err, strings.TrimSpace(string(data)))
+		return statusCode, fmt.Errorf("curl error: %w, stderr: %s", err, strings.TrimSpace(stderr.String()))
 	}
-	return nil
+	return statusCode, nil
 }
 
 func isImageFile(path string) bool {
