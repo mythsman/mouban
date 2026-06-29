@@ -15,7 +15,7 @@ type Game struct {
 	Publisher   string `gorm:"type:varchar(512)"`
 	PublishDate string `gorm:"type:varchar(512)"`
 	Intro       string `gorm:"type:mediumtext"`
-	Thumbnail   string `gorm:"type:varchar(512)"`
+	Thumbnail   string `gorm:"type:varchar(512);index:idx_game_thumbnail,length:191"`
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 }

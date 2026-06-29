@@ -20,7 +20,7 @@ type Song struct {
 	AlbumCount  uint32 //唱片数量
 	Intro       string `gorm:"type:mediumtext"`
 	TrackList   string `gorm:"type:mediumtext"`
-	Thumbnail   string `gorm:"type:varchar(512)"`
+	Thumbnail   string `gorm:"type:varchar(512);index:idx_song_thumbnail,length:191"`
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 }

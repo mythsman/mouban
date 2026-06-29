@@ -22,7 +22,7 @@ type Book struct {
 	Price       uint32
 	BookIntro   string `gorm:"type:mediumtext"`
 	AuthorIntro string `gorm:"type:mediumtext"`
-	Thumbnail   string `gorm:"type:varchar(512)"`
+	Thumbnail   string `gorm:"type:varchar(512);index:idx_book_thumbnail,length:191"`
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 }
