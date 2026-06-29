@@ -62,7 +62,7 @@ func getConnection(username string, password string, host string, port string, d
 		url.QueryEscape(loc))
 
 	db, err := gorm.Open(mysql.Open(sqlStr), &gorm.Config{
-		Logger: newGormStructuredLogger(20 * time.Millisecond),
+		Logger: newGormStructuredLogger(100 * time.Millisecond),
 	})
 
 	if err != nil {
