@@ -12,7 +12,6 @@ import (
 	"github.com/spf13/viper"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
 )
 
 var Db *gorm.DB
@@ -62,18 +61,8 @@ func getConnection(username string, password string, host string, port string, d
 		charset,
 		url.QueryEscape(loc))
 
-	dbLogger := logger.New(
-		logrus.StandardLogger(),
-		logger.Config{
-			SlowThreshold:             500 * time.Second,
-			LogLevel:                  logger.Warn,
-			IgnoreRecordNotFoundError: true,
-			Colorful:                  true,
-		},
-	)
-
 	db, err := gorm.Open(mysql.Open(sqlStr), &gorm.Config{
-		Logger: dbLogger,
+		Logger: newGormStructuredLogger(20 * time.Millisecond),
 	})
 
 	if err != nil {
