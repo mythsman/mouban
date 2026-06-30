@@ -76,7 +76,6 @@ func getConnection(username string, password string, host string, port string, d
 func migrateTables() {
 
 	err := Db.Set("gorm:table_options", "ENGINE=InnoDB ROW_FORMAT=COMPRESSED").AutoMigrate(
-		&model.Access{},
 		&model.Book{},
 		&model.Comment{},
 		&model.Game{},

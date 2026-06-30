@@ -118,7 +118,6 @@ func GuestItemDetail(ctx *gin.Context) {
 		result.DataUpdatedText = "暂无"
 	}
 
-	logAccess(ctx, 0)
 	ctx.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"result":  result,

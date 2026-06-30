@@ -29,7 +29,6 @@ func ResolveUser(ctx *gin.Context) {
 		return
 	}
 
-	logAccess(ctx, 0)
 
 	ctx.JSON(http.StatusOK, gin.H{
 		"success": true,
@@ -47,7 +46,6 @@ func CheckUser(ctx *gin.Context) {
 		BadRequest(ctx, "用户ID输入错误")
 		return
 	}
-	logAccess(ctx, doubanUid)
 
 	schedule := dao.GetSchedule(doubanUid, consts.TypeUser.Code)
 
@@ -96,7 +94,6 @@ func ListUserItem(ctx *gin.Context, t uint8) {
 		BadRequest(ctx, "id 参数错误")
 		return
 	}
-	logAccess(ctx, doubanUid)
 
 	action := ctx.Query("action")
 	if action == "" {
@@ -258,10 +255,3 @@ func buildUserCommentsVO(doubanUid uint64, t uint8, actionCode uint8, offset int
 	return commentsVO
 }
 
-func logAccess(ctx *gin.Context, doubanUid uint64) {
-	ua := ctx.GetHeader("User-Agent")
-	referer := ctx.GetHeader("Referer")
-	ip := ctx.ClientIP()
-
-	dao.AddAccess(doubanUid, ctx.FullPath(), ip, ua, referer)
-}
