@@ -36,7 +36,7 @@ jobs:
         run: node --version
 
       - name: Build
-        run: ./build.sh
+        run: make build
 
       - name: Docker login
         run: echo "${{ secrets.REGISTRY_TOKEN }}" | docker login https://gitea.mythsman.com -u "${{ secrets.REGISTRY_USERNAME }}" --password-stdin

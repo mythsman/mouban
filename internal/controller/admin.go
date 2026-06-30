@@ -10,6 +10,15 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+// RefreshUser godoc
+// @Summary      手动刷新用户
+// @Tags         admin
+// @Produce      json
+// @Param        id  query  string  true  "豆瓣用户ID"
+// @Success      200  {object}  map[string]interface{}
+// @Failure      400  {object}  map[string]interface{}
+// @Failure      404  {object}  map[string]interface{}
+// @Router       /admin/refresh_user [get]
 func RefreshUser(ctx *gin.Context) {
 	idStr := ctx.Query("id")
 	id := util.ParseNumber(idStr)
@@ -38,6 +47,18 @@ func RefreshUser(ctx *gin.Context) {
 	dao.CasScheduleStatus(user.DoubanUid, consts.TypeUser.Code, consts.ScheduleToCrawl.Code, *schedule.Status)
 
 }
+
+// RefreshItem godoc
+// @Summary      手动刷新条目
+// @Tags         admin
+// @Produce      json
+// @Param        type  query  string  true  "类型编码"
+// @Param        id    query  string  true  "豆瓣条目ID"
+// @Success      200  {object}  map[string]interface{}
+// @Failure      400  {object}  map[string]interface{}
+// @Failure      404  {object}  map[string]interface{}
+// @Failure      409  {object}  map[string]interface{}
+// @Router       /admin/refresh_item [get]
 func RefreshItem(ctx *gin.Context) {
 	typeStr := ctx.Query("type")
 	idStr := ctx.Query("id")

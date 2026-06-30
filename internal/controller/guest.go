@@ -22,13 +22,21 @@ type resolveUserCandidate struct {
 	matchBy map[string]bool
 }
 
+// ResolveUser godoc
+// @Summary      解析用户
+// @Description  根据关键词匹配用户（id/domain/name）
+// @Tags         guest
+// @Produce      json
+// @Param        q  query  string  true  "关键词"
+// @Success      200  {object}  map[string]interface{}
+// @Failure      400  {object}  map[string]interface{}
+// @Router       /guest/resolve_user [get]
 func ResolveUser(ctx *gin.Context) {
 	q := strings.TrimSpace(ctx.Query("q"))
 	if q == "" {
 		BadRequest(ctx, "q 参数错误")
 		return
 	}
-
 
 	ctx.JSON(http.StatusOK, gin.H{
 		"success": true,
@@ -39,6 +47,17 @@ func ResolveUser(ctx *gin.Context) {
 	})
 }
 
+// CheckUser godoc
+// @Summary      查询用户抓取状态
+// @Description  检查用户是否收录，不存在则触发抓取
+// @Tags         guest
+// @Produce      json
+// @Param        id  query  string  true  "豆瓣用户ID"
+// @Success      200  {object}  map[string]interface{}
+// @Success      202  {object}  map[string]interface{}
+// @Failure      400  {object}  map[string]interface{}
+// @Failure      404  {object}  map[string]interface{}
+// @Router       /guest/check_user [get]
 func CheckUser(ctx *gin.Context) {
 	id := ctx.Query("id")
 	doubanUid, err := strconv.ParseUint(id, 10, 64)
@@ -85,6 +104,66 @@ func CheckUser(ctx *gin.Context) {
 		}
 	}
 
+}
+
+// GuestUserBook godoc
+// @Summary      查询用户图书互动
+// @Tags         guest
+// @Produce      json
+// @Param        id      query  string  true   "豆瓣用户ID"
+// @Param        action  query  string  true   "wish/collect/do/hide"
+// @Param        offset  query  int     false  "偏移"
+// @Success      200  {object}  map[string]interface{}
+// @Failure      400  {object}  map[string]interface{}
+// @Failure      404  {object}  map[string]interface{}
+// @Router       /guest/user_book [get]
+func GuestUserBook(ctx *gin.Context) {
+	ListUserItem(ctx, consts.TypeBook.Code)
+}
+
+// GuestUserGame godoc
+// @Summary      查询用户游戏互动
+// @Tags         guest
+// @Produce      json
+// @Param        id      query  string  true   "豆瓣用户ID"
+// @Param        action  query  string  true   "wish/collect/do/hide"
+// @Param        offset  query  int     false  "偏移"
+// @Success      200  {object}  map[string]interface{}
+// @Failure      400  {object}  map[string]interface{}
+// @Failure      404  {object}  map[string]interface{}
+// @Router       /guest/user_game [get]
+func GuestUserGame(ctx *gin.Context) {
+	ListUserItem(ctx, consts.TypeGame.Code)
+}
+
+// GuestUserMovie godoc
+// @Summary      查询用户电影互动
+// @Tags         guest
+// @Produce      json
+// @Param        id      query  string  true   "豆瓣用户ID"
+// @Param        action  query  string  true   "wish/collect/do/hide"
+// @Param        offset  query  int     false  "偏移"
+// @Success      200  {object}  map[string]interface{}
+// @Failure      400  {object}  map[string]interface{}
+// @Failure      404  {object}  map[string]interface{}
+// @Router       /guest/user_movie [get]
+func GuestUserMovie(ctx *gin.Context) {
+	ListUserItem(ctx, consts.TypeMovie.Code)
+}
+
+// GuestUserSong godoc
+// @Summary      查询用户音乐互动
+// @Tags         guest
+// @Produce      json
+// @Param        id      query  string  true   "豆瓣用户ID"
+// @Param        action  query  string  true   "wish/collect/do/hide"
+// @Param        offset  query  int     false  "偏移"
+// @Success      200  {object}  map[string]interface{}
+// @Failure      400  {object}  map[string]interface{}
+// @Failure      404  {object}  map[string]interface{}
+// @Router       /guest/user_song [get]
+func GuestUserSong(ctx *gin.Context) {
+	ListUserItem(ctx, consts.TypeSong.Code)
 }
 
 func ListUserItem(ctx *gin.Context, t uint8) {
@@ -254,4 +333,3 @@ func buildUserCommentsVO(doubanUid uint64, t uint8, actionCode uint8, offset int
 
 	return commentsVO
 }
-

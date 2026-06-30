@@ -35,6 +35,16 @@ type itemDetailResult struct {
 	Song            interface{}     `json:"song"`
 }
 
+// GuestItemDetail godoc
+// @Summary      查询条目详情
+// @Tags         guest
+// @Produce      json
+// @Param        type  query  string  true  "book/movie/game/song"
+// @Param        id    query  string  true  "豆瓣条目ID"
+// @Success      200  {object}  map[string]interface{}
+// @Failure      400  {object}  map[string]interface{}
+// @Failure      404  {object}  map[string]interface{}
+// @Router       /guest/item_detail [get]
 func GuestItemDetail(ctx *gin.Context) {
 	typeName := strings.TrimSpace(ctx.Query("type"))
 	idStr := strings.TrimSpace(ctx.Query("id"))

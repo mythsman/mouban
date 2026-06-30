@@ -75,3 +75,22 @@ dbcl2需要在cookie中查看：
 5. 如需立即重新抓取，使用页面内的「强制更新」按钮。
 
 > 说明：README 不再展示具体接口路径。若你是二次开发者，可在源码中查看路由与 controller 实现。
+
+## Swagger 文档
+
+项目已内置 Swagger 静态页面，运行后可直接访问：
+
+- `http://<host>:8080/swagger/`
+
+Swagger 页面由后端 Gin 直接托管（`/swagger`），不依赖前端路由。
+
+## 构建说明（Makefile）
+
+当前构建流程已统一为 Makefile：
+
+- `make build-frontend`：仅构建前端资源（输出到 `build/`）
+- `make build-swagger`：生成 OpenAPI 文档并输出到 `build/swagger/`
+- `make build-backend`：仅构建后端二进制 `main`
+- `make build`：按顺序执行以上三步（CI 使用）
+
+> CI 会先执行 `make build`，`docker build` 仅负责将 `main` 与 `build/` 产物组装进镜像。
