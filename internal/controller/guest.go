@@ -28,8 +28,8 @@ type resolveUserCandidate struct {
 // @Tags         guest
 // @Produce      json
 // @Param        q  query  string  true  "关键词"
-// @Success      200  {object}  map[string]interface{}
-// @Failure      400  {object}  map[string]interface{}
+// @Success      200  {object}  ResolveUserResponse
+// @Failure      400  {object}  ErrorResponse
 // @Router       /guest/resolve_user [get]
 func ResolveUser(ctx *gin.Context) {
 	q := strings.TrimSpace(ctx.Query("q"))
@@ -53,10 +53,10 @@ func ResolveUser(ctx *gin.Context) {
 // @Tags         guest
 // @Produce      json
 // @Param        id  query  string  true  "豆瓣用户ID"
-// @Success      200  {object}  map[string]interface{}
-// @Success      202  {object}  map[string]interface{}
-// @Failure      400  {object}  map[string]interface{}
-// @Failure      404  {object}  map[string]interface{}
+// @Success      200  {object}  CheckUserResponse
+// @Success      202  {object}  ErrorResponse
+// @Failure      400  {object}  ErrorResponse
+// @Failure      404  {object}  ErrorResponse
 // @Router       /guest/check_user [get]
 func CheckUser(ctx *gin.Context) {
 	id := ctx.Query("id")
@@ -113,9 +113,9 @@ func CheckUser(ctx *gin.Context) {
 // @Param        id      query  string  true   "豆瓣用户ID"
 // @Param        action  query  string  true   "wish/collect/do/hide"
 // @Param        offset  query  int     false  "偏移"
-// @Success      200  {object}  map[string]interface{}
-// @Failure      400  {object}  map[string]interface{}
-// @Failure      404  {object}  map[string]interface{}
+// @Success      200  {object}  ListUserBookItemResponse
+// @Failure      400  {object}  ErrorResponse
+// @Failure      404  {object}  ErrorResponse
 // @Router       /guest/user_book [get]
 func GuestUserBook(ctx *gin.Context) {
 	ListUserItem(ctx, consts.TypeBook.Code)
@@ -128,9 +128,9 @@ func GuestUserBook(ctx *gin.Context) {
 // @Param        id      query  string  true   "豆瓣用户ID"
 // @Param        action  query  string  true   "wish/collect/do/hide"
 // @Param        offset  query  int     false  "偏移"
-// @Success      200  {object}  map[string]interface{}
-// @Failure      400  {object}  map[string]interface{}
-// @Failure      404  {object}  map[string]interface{}
+// @Success      200  {object}  ListUserGameItemResponse
+// @Failure      400  {object}  ErrorResponse
+// @Failure      404  {object}  ErrorResponse
 // @Router       /guest/user_game [get]
 func GuestUserGame(ctx *gin.Context) {
 	ListUserItem(ctx, consts.TypeGame.Code)
@@ -143,9 +143,9 @@ func GuestUserGame(ctx *gin.Context) {
 // @Param        id      query  string  true   "豆瓣用户ID"
 // @Param        action  query  string  true   "wish/collect/do/hide"
 // @Param        offset  query  int     false  "偏移"
-// @Success      200  {object}  map[string]interface{}
-// @Failure      400  {object}  map[string]interface{}
-// @Failure      404  {object}  map[string]interface{}
+// @Success      200  {object}  ListUserMovieItemResponse
+// @Failure      400  {object}  ErrorResponse
+// @Failure      404  {object}  ErrorResponse
 // @Router       /guest/user_movie [get]
 func GuestUserMovie(ctx *gin.Context) {
 	ListUserItem(ctx, consts.TypeMovie.Code)
@@ -158,9 +158,9 @@ func GuestUserMovie(ctx *gin.Context) {
 // @Param        id      query  string  true   "豆瓣用户ID"
 // @Param        action  query  string  true   "wish/collect/do/hide"
 // @Param        offset  query  int     false  "偏移"
-// @Success      200  {object}  map[string]interface{}
-// @Failure      400  {object}  map[string]interface{}
-// @Failure      404  {object}  map[string]interface{}
+// @Success      200  {object}  ListUserSongItemResponse
+// @Failure      400  {object}  ErrorResponse
+// @Failure      404  {object}  ErrorResponse
 // @Router       /guest/user_song [get]
 func GuestUserSong(ctx *gin.Context) {
 	ListUserItem(ctx, consts.TypeSong.Code)

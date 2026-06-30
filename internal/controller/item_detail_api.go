@@ -7,6 +7,7 @@ import (
 
 	"mouban/internal/consts"
 	"mouban/internal/dao"
+	"mouban/internal/model"
 
 	"github.com/gin-gonic/gin"
 )
@@ -29,10 +30,10 @@ type itemDetailResult struct {
 	CrawledAtText   string          `json:"crawled_at_text"`
 	DataUpdatedText string          `json:"data_updated_text"`
 	Rating          *itemRatingView `json:"rating"`
-	Book            interface{}     `json:"book"`
-	Movie           interface{}     `json:"movie"`
-	Game            interface{}     `json:"game"`
-	Song            interface{}     `json:"song"`
+	Book            *model.Book     `json:"book,omitempty"`
+	Movie           *model.Movie    `json:"movie,omitempty"`
+	Game            *model.Game     `json:"game,omitempty"`
+	Song            *model.Song     `json:"song,omitempty"`
 }
 
 // GuestItemDetail godoc
@@ -41,9 +42,9 @@ type itemDetailResult struct {
 // @Produce      json
 // @Param        type  query  string  true  "book/movie/game/song"
 // @Param        id    query  string  true  "豆瓣条目ID"
-// @Success      200  {object}  map[string]interface{}
-// @Failure      400  {object}  map[string]interface{}
-// @Failure      404  {object}  map[string]interface{}
+// @Success      200  {object}  GuestItemDetailResponse
+// @Failure      400  {object}  ErrorResponse
+// @Failure      404  {object}  ErrorResponse
 // @Router       /guest/item_detail [get]
 func GuestItemDetail(ctx *gin.Context) {
 	typeName := strings.TrimSpace(ctx.Query("type"))
