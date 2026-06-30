@@ -70,7 +70,6 @@ var queueOverviewCache struct {
 }
 
 func QueueOverview(ctx *gin.Context) {
-	logAccess(ctx, 0)
 	ctx.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"result":  getQueueOverviewCached(5 * time.Second),

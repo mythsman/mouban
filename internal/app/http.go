@@ -45,6 +45,7 @@ func NewRouter() *gin.Engine {
 	router := gin.New()
 	router.Static("/assets", "build/assets")
 	router.StaticFile("/favicon.ico", "build/favicon.ico")
+	router.StaticFile("/robots.txt", "build/robots.txt")
 
 	router.Use(recoverMiddleware)
 	router.Use(corsMiddleware)
