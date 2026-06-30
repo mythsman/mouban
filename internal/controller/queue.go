@@ -69,6 +69,12 @@ var queueOverviewCache struct {
 	data     QueueOverviewResult
 }
 
+// QueueOverview godoc
+// @Summary      队列概览
+// @Tags         explore
+// @Produce      json
+// @Success      200  {object}  map[string]interface{}
+// @Router       /explore/queue_overview [get]
 func QueueOverview(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{
 		"success": true,

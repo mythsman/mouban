@@ -25,3 +25,8 @@ web/*.tsbuildinfo
 web/vite.config.js
 web/vite.config.d.ts
 build/
+
+# swagger generated files
+docs/docs.go
+docs/swagger.json
+docs/swagger.yaml

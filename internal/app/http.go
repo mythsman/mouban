@@ -1,7 +1,6 @@
 package app
 
 import (
-	"mouban/internal/consts"
 	"mouban/internal/controller"
 	"mouban/internal/util"
 	"net/http"
@@ -53,6 +52,10 @@ func NewRouter() *gin.Engine {
 	router.Use(metricsMiddleware)
 
 	router.GET("/metrics", gin.WrapH(promhttp.Handler()))
+	router.GET("/swagger", func(ctx *gin.Context) {
+		ctx.Redirect(http.StatusMovedPermanently, "/swagger/")
+	})
+	router.Static("/swagger", "build/swagger")
 
 	adminGroup := router.Group("/admin")
 	{
@@ -65,18 +68,10 @@ func NewRouter() *gin.Engine {
 		queryGroup.GET("/resolve_user", controller.ResolveUser)
 		queryGroup.GET("/check_user", controller.CheckUser)
 		queryGroup.GET("/item_detail", controller.GuestItemDetail)
-		queryGroup.GET("/user_book", func(ctx *gin.Context) {
-			controller.ListUserItem(ctx, consts.TypeBook.Code)
-		})
-		queryGroup.GET("/user_game", func(ctx *gin.Context) {
-			controller.ListUserItem(ctx, consts.TypeGame.Code)
-		})
-		queryGroup.GET("/user_movie", func(ctx *gin.Context) {
-			controller.ListUserItem(ctx, consts.TypeMovie.Code)
-		})
-		queryGroup.GET("/user_song", func(ctx *gin.Context) {
-			controller.ListUserItem(ctx, consts.TypeSong.Code)
-		})
+		queryGroup.GET("/user_book", controller.GuestUserBook)
+		queryGroup.GET("/user_game", controller.GuestUserGame)
+		queryGroup.GET("/user_movie", controller.GuestUserMovie)
+		queryGroup.GET("/user_song", controller.GuestUserSong)
 	}
 
 	router.GET("/explore/queue_overview", controller.QueueOverview)
