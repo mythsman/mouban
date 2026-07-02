@@ -1,0 +1,16 @@
+.git/
+.gitea/
+.vscode/
+.idea/
+
+.env
+.env.*
+!.env.sample
+
+main
+build/
+
+web/node_modules/
+web/*.tsbuildinfo
+
+*.log

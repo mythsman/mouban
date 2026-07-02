@@ -1,49 +1,29 @@
-name: Go Build
+name: Docker Build
 
 on:
-  workflow_dispatch:  # 支持手动触发
-  push:               # 支持 push 后自动触发
+  workflow_dispatch:
+  push:
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    
-    env:
-      GOPROXY: https://goproxy.cn,direct
-      GO111MODULE: on
-    
+
     steps:
-      # 1. 检出代码
       - name: Checkout code
         uses: https://gitea.com/actions/checkout@v4
 
-      - name: Set up Go
-        uses: https://gitea.com/actions/setup-go@v5
-        with:
-          go-version: '1.26'
-
-      - name: Set up Node.js
-        uses: https://gitea.com/actions/setup-node@v4
-        with:
-          node-version: '24'
-          cache: 'npm'
-          cache-dependency-path: web/package-lock.json
-
-      - name: Show Go version
-        run: go version
-
-      - name: Show Node version
-        run: node --version
-
-      - name: Build
-        run: make build
+      - name: Prepare buildx
+        run: |
+          docker buildx create --name ci-builder --driver docker-container --use || docker buildx use ci-builder
+          docker buildx inspect --bootstrap
 
       - name: Docker login
         run: echo "${{ secrets.REGISTRY_TOKEN }}" | docker login https://gitea.mythsman.com -u "${{ secrets.REGISTRY_USERNAME }}" --password-stdin
 
-      - name: Docker build
-        run: docker build -t gitea.mythsman.com/${{ secrets.REGISTRY_USERNAME }}/mouban:latest .
-
-      - name: Docker push
-        run: docker push gitea.mythsman.com/${{ secrets.REGISTRY_USERNAME }}/mouban:latest
-
+      - name: Docker build and push
+        run: |
+          docker buildx build \
+            --file Dockerfile \
+            --tag gitea.mythsman.com/${{ secrets.REGISTRY_USERNAME }}/mouban:latest \
+            --push \
+            .
