@@ -84,13 +84,13 @@ dbcl2需要在cookie中查看：
 
 Swagger 页面由后端 Gin 直接托管（`/swagger`），不依赖前端路由。
 
-## 构建说明（Makefile）
+## 构建说明（Docker 多阶段）
 
-当前构建流程已统一为 Makefile：
+当前构建流程已收敛到 Dockerfile 多阶段构建：
 
-- `make build-frontend`：仅构建前端资源（输出到 `build/`）
-- `make build-swagger`：生成 OpenAPI 文档并输出到 `build/swagger/`
-- `make build-backend`：仅构建后端二进制 `main`
-- `make build`：按顺序执行以上三步（CI 使用）
+- 前端：在 `node` 构建阶段执行 `npm run build`（输出到 `build/`）
+- Swagger：在 `golang` 构建阶段执行 `swag init`，并复制到 `build/swagger/`
+- 后端：在 `golang` 构建阶段生成二进制 `main`
+- 运行时镜像：仅包含 `main` 与 `build/` 静态资源
 
-> CI 会先执行 `make build`，`docker build` 仅负责将 `main` 与 `build/` 产物组装进镜像。
+CI 使用 `docker buildx build` 直接构建并推送 `latest`。
