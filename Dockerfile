@@ -20,8 +20,6 @@ ENV GOPROXY=https://goproxy.cn,direct \
     GOOS=linux \
     GOARCH=amd64
 
-RUN apk add --no-cache git
-
 COPY go.mod go.sum ./
 RUN --mount=type=cache,target=/go/pkg/mod \
     --mount=type=cache,target=/root/.cache/go-build \
