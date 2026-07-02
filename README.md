@@ -93,4 +93,10 @@ Swagger 页面由后端 Gin 直接托管（`/swagger`），不依赖前端路由
 - 后端：在 `golang` 构建阶段生成二进制 `main`
 - 运行时镜像：仅包含 `main` 与 `build/` 静态资源
 
+本地可使用以下命令构建镜像：
+
+```bash
+docker buildx build -t mouban:latest .
+```
+
 CI 使用 `docker buildx build` 直接构建并推送 `latest`。

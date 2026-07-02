@@ -1,7 +1,7 @@
 # Agent 工作指南（mouban）
 
 ## 1) 项目概览
-- 项目：`mouban`（Go 1.21）
+- 项目：`mouban`（Go 1.26）
 - 作用：为 `hexo-douban` 提供豆瓣用户书/影/音/游数据抓取与查询服务
 - 入口：`main.go`
 - 核心目录：
@@ -36,7 +36,7 @@ go run .
 ### Don’t
 - 不要在未确认的情况下修改公开 API 路径和返回结构
 - 不要提交真实密钥、账号、cookie、代理凭据
-- 不要直接运行 `build.sh`（会执行 docker build/push）
+- 不要手工改动 CI 发布流程（`.gitea/workflows/release.yaml`）中的镜像名、tag 规则，除非需求明确要求
 - 不要大规模重构无关模块
 
 ## 4) 验证策略
